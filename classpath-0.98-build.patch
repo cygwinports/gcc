@@ -1,0 +1,29 @@
+1) -avoid-version for JNI libraries
+2) allow create_html to be run manually after the build
+
+--- origsrc/gcc-4.5.0/libjava/classpath//configure.ac	2009-02-05 17:26:08.000000000 -0600
++++ src/gcc-4.5.0/libjava/classpath//configure.ac	2009-12-06 01:58:25.091013300 -0600
+@@ -26,7 +26,7 @@ case "$host_os" in
+ 	cp_module=""
+ 	;;
+ 	*)
+-	cp_module="-module"
++	cp_module="-module -avoid-version"
+ 	;;
+ esac
+ 
+--- origsrc/gcc-4.5.0/libjava/classpath//doc/api/Makefile.am	2008-03-10 15:35:33.000000000 -0500
++++ src/gcc-4.5.0/libjava/classpath//doc/api/Makefile.am	2009-12-06 01:58:25.091013300 -0600
+@@ -36,7 +36,6 @@ clean-local:
+ 
+ create_html:
+ 	-$(MKDIR) html > /dev/null 2>&1
+-if CREATE_API_DOCS
+ 	$(GJDOC) \
+ 	-use \
+ 	-sourcepath "$(sourcepath)" \
+@@ -52,4 +51,3 @@ if CREATE_API_DOCS
+ 	-header $(classpathbox) -footer $(classpathbox) \
+ 	-subpackages java:javax:org
+ 	touch create_html
+-endif

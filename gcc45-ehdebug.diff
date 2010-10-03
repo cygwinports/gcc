@@ -1,0 +1,157 @@
+diff -pruN origsrc/gcc-4.5.0/gcc/unwind-dw2-fde.c src/gcc-4.5.0/gcc/unwind-dw2-fde.c
+--- origsrc/gcc-4.5.0/gcc/unwind-dw2-fde.c	2009-09-20 12:03:33.000000000 +0100
++++ src/gcc-4.5.0/gcc/unwind-dw2-fde.c	2010-04-19 04:28:35.406250000 +0100
+@@ -37,6 +37,8 @@ see the files COPYING3 and COPYING.RUNTI
+ #include "gthr.h"
+ #endif
+ 
++#define __debug_unwind_enabled (0)
++
+ /* The unseen_objects list contains objects that have been registered
+    but not yet categorized in any way.  The seen_objects list has had
+    its pc_begin and count fields initialized at minimum, and is sorted
+@@ -840,6 +842,8 @@ binary_search_unencoded_fdes (struct obj
+   struct fde_vector *vec = ob->u.sort;
+   size_t lo, hi;
+ 
++  if (__debug_unwind_enabled) printf ("search fdes ob %p: vec %p count %d\n", ob, vec, vec->count);
++
+   for (lo = 0, hi = vec->count; lo < hi; )
+     {
+       size_t i = (lo + hi) / 2;
+@@ -849,6 +853,8 @@ binary_search_unencoded_fdes (struct obj
+       memcpy (&pc_begin, (const void * const *) f->pc_begin, sizeof (void *));
+       memcpy (&pc_range, (const uaddr *) f->pc_begin + 1, sizeof (uaddr));
+ 
++if (__debug_unwind_enabled) printf ("fde#%d (%p): pc_begin %p pc_range %p\n", i, f, pc_begin, (void *)pc_range);
++
+       if (pc < pc_begin)
+ 	hi = i;
+       else if (pc >= pc_begin + pc_range)
+@@ -856,7 +862,7 @@ binary_search_unencoded_fdes (struct obj
+       else
+ 	return f;
+     }
+-
++if (__debug_unwind_enabled) printf ("**not found\n");
+   return NULL;
+ }
+ 
+@@ -977,6 +983,8 @@ _Unwind_Find_FDE (void *pc, struct dwarf
+   /* Linear search through the classified objects, to find the one
+      containing the pc.  Note that pc_begin is sorted descending, and
+      we expect objects to be non-overlapping.  */
++  if (__debug_unwind_enabled) printf ("Search seen obs for pc %p: Bases t %p, d %p, func %p\n", 
++	pc, bases->tbase, bases->dbase, bases->func);
+   for (ob = seen_objects; ob; ob = ob->next)
+     if (pc >= ob->pc_begin)
+       {
+@@ -987,6 +995,8 @@ _Unwind_Find_FDE (void *pc, struct dwarf
+       }
+ 
+   /* Classify and search the objects we've not yet processed.  */
++  if (__debug_unwind_enabled) printf ("Search unseen obs for pc %p: Bases t %p, d %p, func %p\n", 
++	pc, bases->tbase, bases->dbase, bases->func);
+   while ((ob = unseen_objects))
+     {
+       struct object **p;
+@@ -1022,6 +1032,15 @@ _Unwind_Find_FDE (void *pc, struct dwarf
+       read_encoded_value_with_base (encoding, base_from_object (encoding, ob),
+ 				    f->pc_begin, &func);
+       bases->func = (void *) func;
++
++  if (__debug_unwind_enabled) printf ("Found fde %p: Bases t %p, d %p, func %p\n", 
++	f, bases->tbase, bases->dbase, bases->func);
++
++    }
++    else
++    {
++  if (__debug_unwind_enabled) printf ("No fde %p: Bases t %p, d %p, func %p\n", 
++	f, bases->tbase, bases->dbase, bases->func);
+     }
+ 
+   return f;
+diff -pruN origsrc/gcc-4.5.0/gcc/unwind-dw2.c src/gcc-4.5.0/gcc/unwind-dw2.c
+--- origsrc/gcc-4.5.0/gcc/unwind-dw2.c	2010-01-20 08:13:50.000000000 +0000
++++ src/gcc-4.5.0/gcc/unwind-dw2.c	2010-04-19 04:28:35.421875000 +0100
+@@ -79,6 +79,7 @@ struct _Unwind_Context
+ 
+ /* Byte size of every register managed by these routines.  */
+ static unsigned char dwarf_reg_size_table[DWARF_FRAME_REGISTERS+1];
++#define __debug_unwind_enabled (0)
+ 
+ 
+ /* Read unaligned data from the instruction buffer.  */
+@@ -370,7 +371,7 @@ extract_cie_info (const struct dwarf_cie
+       fs->retaddr_column = (_Unwind_Word)utmp;
+     }
+   fs->lsda_encoding = DW_EH_PE_omit;
+-
++if (__debug_unwind_enabled) printf ("extract cie: augmentation '%c'\n", *aug);
+   /* If the augmentation starts with 'z', then a uleb128 immediately
+      follows containing the length of the augmentation field following
+      the size.  */
+@@ -386,6 +387,7 @@ extract_cie_info (const struct dwarf_cie
+   /* Iterate over recognized augmentation subsequences.  */
+   while (*aug != '\0')
+     {
++if (__debug_unwind_enabled) printf ("handle augmentation '%c'\n", *aug);
+       /* "L" indicates a byte showing how the LSDA pointer is encoded.  */
+       if (aug[0] == 'L')
+ 	{
+@@ -423,6 +425,7 @@ extract_cie_info (const struct dwarf_cie
+ 	return ret;
+     }
+ 
++if (__debug_unwind_enabled) printf ("extract cie: augmentation done\n");
+   return ret ? ret : p;
+ }
+ 
+@@ -1568,9 +1571,25 @@ uw_identify_context (struct _Unwind_Cont
+     return _Unwind_GetCFA (context) + _Unwind_IsSignalFrame (context);
+ }
+ 
++static _Unwind_Reason_Code 
++debug_unwind_trace (struct _Unwind_Context *ctx, void *arg)
++{
++  fflush (NULL);
++  printf ("_Unwind_Context %p\n", ctx);
++  printf ("    cfa %p  ra %p  lsda %p\n", ctx->cfa, ctx->ra, ctx->lsda);
++  printf (" bases: t %p d %p func %p\n", ctx->bases.tbase, ctx->bases.dbase, ctx->bases.func);
++  printf ("\n");
++  fflush (NULL);
++  return _URC_NO_REASON;
++}
+ 
+ #include "unwind.inc"
+ 
++void debug_dump_stack_trace (void *arg)
++{
++  _Unwind_Backtrace (debug_unwind_trace, arg);
++}
++
+ #if defined (USE_GAS_SYMVER) && defined (SHARED) && defined (USE_LIBUNWIND_EXCEPTIONS)
+ alias (_Unwind_Backtrace);
+ alias (_Unwind_DeleteException);
+diff -pruN origsrc/gcc-4.5.0/gcc/unwind.inc src/gcc-4.5.0/gcc/unwind.inc
+--- origsrc/gcc-4.5.0/gcc/unwind.inc	2009-04-09 16:00:19.000000000 +0100
++++ src/gcc-4.5.0/gcc/unwind.inc	2010-04-19 04:28:35.421875000 +0100
+@@ -96,8 +96,9 @@ _Unwind_RaiseException(struct _Unwind_Ex
+ 
+       /* Set up fs to describe the FDE for the caller of cur_context.  The
+ 	 first time through the loop, that means __cxa_throw.  */
++if (__debug_unwind_enabled) printf ("Ctx: ra %p\n", cur_context.ra);
+       code = uw_frame_state_for (&cur_context, &fs);
+-
++if (__debug_unwind_enabled) printf ("... code %d, perso %p\n", code, fs.personality);
+       if (code == _URC_END_OF_STACK)
+ 	/* Hit end of stack with no handler found.  */
+ 	return _URC_END_OF_STACK;
+@@ -112,6 +113,7 @@ _Unwind_RaiseException(struct _Unwind_Ex
+ 	{
+ 	  code = (*fs.personality) (1, _UA_SEARCH_PHASE, exc->exception_class,
+ 				    exc, &cur_context);
++if (__debug_unwind_enabled) printf ("perso returns code %d\n", code);
+ 	  if (code == _URC_HANDLER_FOUND)
+ 	    break;
+ 	  else if (code != _URC_CONTINUE_UNWIND)

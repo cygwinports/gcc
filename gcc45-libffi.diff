@@ -1,0 +1,63 @@
+diff -pruN origsrc/gcc-4.5.0/libffi/Makefile.am src/gcc-4.5.0/libffi/Makefile.am
+--- origsrc/gcc-4.5.0/libffi/Makefile.am	2009-12-31 17:44:32.000000000 +0000
++++ src/gcc-4.5.0/libffi/Makefile.am	2010-04-22 04:55:33.078125000 +0100
+@@ -32,6 +32,11 @@ EXTRA_DIST = LICENSE ChangeLog.v1 Change
+ 	src/pa/ffitarget.h src/pa/ffi.c src/pa/linux.S src/pa/hpux32.S \
+ 	src/frv/ffi.c src/frv/eabi.S src/frv/ffitarget.h src/dlmalloc.c
+ 
++# Where generated headers like ffitarget.h get installed.
++gcc_version   := $(shell cat $(top_srcdir)/../gcc/BASE-VER)
++# There's probably already some other name for this directory.
++toollibffidir := $(libdir)/gcc/$(target_alias)/$(gcc_version)
++
+ ## ################################################################
+ 
+ ##
+diff -pruN origsrc/gcc-4.5.0/libffi/configure.ac src/gcc-4.5.0/libffi/configure.ac
+--- origsrc/gcc-4.5.0/libffi/configure.ac	2010-03-15 19:36:26.000000000 +0000
++++ src/gcc-4.5.0/libffi/configure.ac	2010-04-22 05:02:49.078125000 +0100
+@@ -83,7 +83,7 @@ case "$host" in
+   i?86-win32* | i?86-*-cygwin* | i?86-*-mingw*)
+ 	TARGET=X86_WIN32; TARGETDIR=x86
+ 	# All mingw/cygwin/win32 builds require this for sharedlib
+-	AM_LTLDFLAGS="-no-undefined"
++	AM_LTLDFLAGS='-no-undefined -bindir $(bindir)'
+ 	;;
+   i?86-*-darwin*)
+ 	TARGET=X86_DARWIN; TARGETDIR=x86
+@@ -390,7 +390,7 @@ if test -n "$with_cross_host" &&
+   toolexeclibdir='$(toolexecdir)/lib'
+ else
+   toolexecdir='$(libdir)/gcc-lib/$(target_alias)'
+-  toolexeclibdir='$(libdir)'
++  toolexeclibdir="${host__toolexeclibdir:-\$(libdir)}"
+ fi
+ multi_os_directory=`$CC -print-multi-os-directory`
+ case $multi_os_directory in
+diff -pruN origsrc/gcc-4.5.0/libffi/configure.host src/gcc-4.5.0/libffi/configure.host
+--- origsrc/gcc-4.5.0/libffi/configure.host	2004-08-30 16:43:03.000000000 +0100
++++ src/gcc-4.5.0/libffi/configure.host	2010-04-22 04:55:33.078125000 +0100
+@@ -8,4 +8,8 @@ case "${host}" in
+   frv*-elf)
+     LDFLAGS=`echo $LDFLAGS | sed "s/\-B[^ ]*libgloss\/frv\///"`\ -B`pwd`/../libgloss/frv/
+     ;;
++  i?86-*-cygwin*)
++    # Redirect installation to gcc private dir.
++    host__toolexeclibdir='$(toollibffidir)'
++    ;;
+ esac
+diff -pruN origsrc/gcc-4.5.0/libffi/Makefile.in src/gcc-4.5.0/libffi/Makefile.in
+--- origsrc/gcc-4.5.0/libffi/Makefile.in	2010-04-02 19:18:06.000000000 +0100
++++ src/gcc-4.5.0/libffi/Makefile.in	2010-04-22 05:03:04.796875000 +0100
+@@ -417,6 +417,11 @@ EXTRA_DIST = LICENSE ChangeLog.v1 Change
+ 	src/frv/ffi.c src/frv/eabi.S src/frv/ffitarget.h src/dlmalloc.c
+ 
+ 
++# Where generated headers like ffitarget.h get installed.
++gcc_version := $(shell cat $(top_srcdir)/../gcc/BASE-VER)
++# There's probably already some other name for this directory.
++toollibffidir := $(libdir)/gcc/$(target_alias)/$(gcc_version)
++
+ # Work around what appears to be a GNU make bug handling MAKEFLAGS
+ # values defined in terms of make variables, as is the case for CC and
+ # friends when we are called from the top level Makefile.
