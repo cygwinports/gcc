@@ -26,11 +26,12 @@ SRC_URI="http://ftp.gnu.org/gnu/gcc/gcc-${PV}/gcc-${PV}.tar.bz2 \
          http://ftp.gnu.org/gnu/gcc/gcc-${PV}/gcc-${PV}.tar.bz2.sig"
 SRC_DIR="gcc-${PV}"
 
-PATCH_URI="classpath-0.98-FIONREAD.patch \
+PATCH_URI="
 	classpath-0.98-build.patch \
 	classpath-0.98-awt.patch \
 	gcc45-ada.diff \
 	gcc45-ehdebug.diff \
+	gcc45-java-FIONREAD.diff \
 	gcc45-libffi.diff \
 	gcc45-libstdc.diff \
 	gcc45-misc-core.diff \
