@@ -1,0 +1,4 @@
+sdesc: "GCC Release series 4 compiler: Java shared runtime"
+category: Devel Libs
+requires: libiconv2 libgcj-common libgcc1
+external-source: gcc4

@@ -496,7 +496,7 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/gcc-interface/Makefile.in src/gcc-4.5.0/gcc
 +	   if [ -f $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) ]; then \
 +	      $(INSTALL) $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) \
 +			 $(DESTDIR)$(bindir); \
-+	      $(LN_S) $(bindir)$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) \
++	      $(LN_S) $(bindir)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) \
 +	      $(DESTDIR)$(ADA_RTL_OBJ_DIR)/lib$${file}$(hyphen)$(LIBRARY_VERSION).dll.a; \
 +	   fi; \
 +	done

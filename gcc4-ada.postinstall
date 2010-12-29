@@ -1,0 +1,23 @@
+#!/bin/bash
+
+prefix=/usr
+bindir=${prefix}/bin
+sbindir=${prefix}/sbin
+infodir=${prefix}/share/info
+
+/usr/sbin/update-alternatives \
+    --install "/usr/bin/gnat.exe" "gnat" "/usr/bin/gnat-4.exe" 40 \
+  --slave "/usr/bin/gnatbind.exe" "gnatbind" "/usr/bin/gnatbind-4.exe" \
+  --slave "/usr/bin/gnatbl.exe" "gnatbl" "/usr/bin/gnatbl-4.exe" \
+  --slave "/usr/bin/gnatchop.exe" "gnatchop" "/usr/bin/gnatchop-4.exe" \
+  --slave "/usr/bin/gnatclean.exe" "gnatclean" "/usr/bin/gnatclean-4.exe" \
+  --slave "/usr/bin/gnatfind.exe" "gnatfind" "/usr/bin/gnatfind-4.exe" \
+  --slave "/usr/bin/gnatkr.exe" "gnatkr" "/usr/bin/gnatkr-4.exe" \
+  --slave "/usr/bin/gnatlink.exe" "gnatlink" "/usr/bin/gnatlink-4.exe" \
+  --slave "/usr/bin/gnatls.exe" "gnatls" "/usr/bin/gnatls-4.exe" \
+  --slave "/usr/bin/gnatmake.exe" "gnatmake" "/usr/bin/gnatmake-4.exe" \
+  --slave "/usr/bin/gnatname.exe" "gnatname" "/usr/bin/gnatname-4.exe" \
+  --slave "/usr/bin/gnatprep.exe" "gnatprep" "/usr/bin/gnatprep-4.exe" \
+  --slave "/usr/bin/gnatxref.exe" "gnatxref" "/usr/bin/gnatxref-4.exe" \
+
+

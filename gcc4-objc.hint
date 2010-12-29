@@ -1,0 +1,4 @@
+sdesc: "GCC Release series 4 compiler: Objective C and Objective C++ subpackage"
+category: Devel
+requires: binutils w32api libgcc1 libgmp3 libintl8 libmpfr1 gcc4-core gcc4-g++ libobjc2 libcloog0 libmpc1 libppl
+external-source: gcc4

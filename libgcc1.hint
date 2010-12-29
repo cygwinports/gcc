@@ -1,0 +1,4 @@
+sdesc: "GCC Release series 4 compiler: GCC compiler support shared runtime"
+category: Devel Libs Base
+requires: 
+external-source: gcc4

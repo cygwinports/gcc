@@ -1,0 +1,59 @@
+#!/bin/bash
+
+/usr/sbin/update-alternatives \
+  --install "/usr/bin/gcj.exe" "gcj" "/usr/bin/gcj-4.exe" 40 \
+  --slave "/usr/bin/gc-analyze.exe" "gc-analyze" "/usr/bin/gc-analyze-4.exe" \
+  --slave "/usr/bin/gcj-dbtool.exe" "gcj-dbtool" "/usr/bin/gcj-dbtool-4.exe" \
+  --slave "/usr/bin/gcjh.exe" "gcjh" "/usr/bin/gcjh-4.exe" \
+  --slave "/usr/bin/gij.exe" "gij" "/usr/bin/gij-4.exe" \
+  --slave "/usr/bin/i686-pc-cygwin-gcj.exe" "i686-pc-cygwin-gcj" "/usr/bin/i686-pc-cygwin-gcj-4.exe" \
+  --slave "/usr/bin/jv-convert.exe" "jv-convert" "/usr/bin/jv-convert-4.exe" \
+  --slave "/usr/share/man/man1/gc-analyze.1.gz" "gc-analyze.1.gz" "/usr/share/man/man1/gc-analyze-4.1.gz" \
+  --slave "/usr/share/man/man1/gcj.1.gz" "gcj.1.gz" "/usr/share/man/man1/gcj-4.1.gz" \
+  --slave "/usr/share/man/man1/gcj-dbtool.1.gz" "gcj-dbtool.1.gz" "/usr/share/man/man1/gcj-dbtool-4.1.gz" \
+  --slave "/usr/share/man/man1/gcjh.1.gz" "gcjh.1.gz" "/usr/share/man/man1/gcjh-4.1.gz" \
+  --slave "/usr/share/man/man1/gij.1.gz" "gij.1.gz" "/usr/share/man/man1/gij-4.1.gz" \
+  --slave "/usr/share/man/man1/jv-convert.1.gz" "jv-convert.1.gz" "/usr/share/man/man1/jv-convert-4.1.gz"
+
+/usr/sbin/update-alternatives \
+  --install "/usr/bin/jar" "jar" "/usr/bin/gjar-4.exe" 40 \
+  --slave "/usr/share/man/man1/jar.1.gz" "jar.1.gz" "/usr/share/man/man1/gjar-4.1.gz"
+
+# update version for each release!
+/usr/sbin/update-alternatives \
+  --install "/usr/bin/java" "java" "/usr/bin/gij-4.exe" 40 \
+  --slave "/usr/lib/tools.jar" "tools.jar" "/usr/share/java/libgcj-tools-4.5.2.jar"
+
+/usr/sbin/update-alternatives \
+  --install "/usr/bin/javadoc" "javadoc" "/usr/bin/gjdoc-4.exe" 40 \
+  --slave "/usr/share/man/man1/javadoc.1.gz" "javadoc.1.gz" "/usr/share/man/man1/gjdoc-4.1.gz"
+
+/usr/sbin/update-alternatives \
+  --install "/usr/bin/javah" "javah" "/usr/bin/gjavah-4.exe" 40 \
+  --slave "/usr/share/man/man1/javah.1.gz" "javah.1.gz" "/usr/share/man/man1/gjavah-4.1.gz"
+
+/usr/sbin/update-alternatives \
+  --install "/usr/bin/javap" "javap" "/usr/bin/jcf-dump-4.exe" 40 \
+  --slave "/usr/share/man/man1/jcf-dump.1.gz" "jcf-dump.1.gz" "/usr/share/man/man1/jcf-dump-4.1.gz"
+
+/usr/sbin/update-alternatives \
+  --install "/usr/bin/appletviewer" "appletviewer" "/usr/bin/gappletviewer-4.exe" 40 \
+  --slave "/usr/bin/jarsigner" "jarsigner" "/usr/bin/gjarsigner-4.exe" \
+  --slave "/usr/bin/keytool" "keytool" "/usr/bin/gkeytool-4.exe" \
+  --slave "/usr/bin/native2ascii" "native2ascii" "/usr/bin/gnative2ascii-4.exe" \
+  --slave "/usr/bin/orbd" "orbd" "/usr/bin/gorbd-4.exe" \
+  --slave "/usr/bin/rmic" "rmic" "/usr/bin/grmic-4.exe" \
+  --slave "/usr/bin/rmid" "rmid" "/usr/bin/grmid-4.exe" \
+  --slave "/usr/bin/rmiregistry" "rmiregistry" "/usr/bin/grmiregistry-4.exe" \
+  --slave "/usr/bin/serialver" "serialver" "/usr/bin/gserialver-4.exe" \
+  --slave "/usr/bin/tnameserv" "tnameserv" "/usr/bin/gtnameserv-4.exe" \
+  --slave "/usr/share/man/man1/appletviewer.1.gz" "appletviewer.1.gz" "/usr/share/man/man1/gappletviewer-4.1.gz" \
+  --slave "/usr/share/man/man1/jarsigner.1.gz" "jarsigner.1.gz" "/usr/share/man/man1/gjarsigner-4.1.gz" \
+  --slave "/usr/share/man/man1/keytool.1.gz" "keytool.1.gz" "/usr/share/man/man1/gkeytool-4.1.gz" \
+  --slave "/usr/share/man/man1/native2ascii.1.gz" "native2ascii.1.gz" "/usr/share/man/man1/gnative2ascii-4.1.gz" \
+  --slave "/usr/share/man/man1/orbd.1.gz" "orbd.1.gz" "/usr/share/man/man1/gorbd-4.1.gz" \
+  --slave "/usr/share/man/man1/rmic.1.gz" "rmic.1.gz" "/usr/share/man/man1/grmic-4.1.gz" \
+  --slave "/usr/share/man/man1/rmid.1.gz" "rmid.1.gz" "/usr/share/man/man1/grmid-4.1.gz" \
+  --slave "/usr/share/man/man1/rmiregistry.1.gz" "rmiregistry.1.gz" "/usr/share/man/man1/grmiregistry-4.1.gz" \
+  --slave "/usr/share/man/man1/serialver.1.gz" "serialver.1.gz" "/usr/share/man/man1/gserialver-4.1.gz" \
+  --slave "/usr/share/man/man1/tnameserv.1.gz" "tnameserv.1.gz" "/usr/share/man/man1/gtnameserv-4.1.gz"

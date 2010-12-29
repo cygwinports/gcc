@@ -1,0 +1,4 @@
+sdesc: "GCC Release series 4 compiler: Static Stack Protection shared runtime"
+category: Devel Libs
+requires: libgcc1
+external-source: gcc4

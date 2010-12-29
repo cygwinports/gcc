@@ -1,0 +1,4 @@
+sdesc: "GCC Release series 4 compiler: Foreign Frame Interface shared runtime"
+category: Devel Libs
+requires: libgcc1
+external-source: gcc4

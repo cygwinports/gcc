@@ -1,0 +1,10 @@
+#!/bin/bash
+
+/usr/sbin/update-alternatives --remove "gcj" "/usr/bin/gcj-4.exe"
+/usr/sbin/update-alternatives --remove "jar" "/usr/bin/gjar-4.exe"
+/usr/sbin/update-alternatives --remove "java" "/usr/bin/gij-4.exe"
+/usr/sbin/update-alternatives --remove "javadoc" "/usr/bin/gjdoc-4.exe"
+/usr/sbin/update-alternatives --remove "javah" "/usr/bin/gjavah-4.exe"
+/usr/sbin/update-alternatives --remove "javap" "/usr/bin/jcf-dump-4.exe"
+/usr/sbin/update-alternatives --remove "appletviewer" "/usr/bin/gappletviewer-4.exe"
+

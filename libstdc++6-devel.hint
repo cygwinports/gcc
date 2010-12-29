@@ -1,0 +1,4 @@
+sdesc: "GCC Release series 4 compiler: C++ Standard Library static/import link libs"
+category: Devel Libs
+requires:
+external-source: gcc4

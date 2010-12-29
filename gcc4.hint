@@ -1,0 +1,3 @@
+sdesc: "GCC Release series 4 compiler (C & C++ install helper)"
+category: Devel
+requires: gcc4-core gcc4-g++

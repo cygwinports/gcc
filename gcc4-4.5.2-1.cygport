@@ -27,6 +27,7 @@ SRC_URI="http://ftp.gnu.org/gnu/gcc/gcc-${PV}/gcc-${PV}.tar.bz2 \
 SRC_DIR="gcc-${PV}"
 
 PATCH_URI="
+	config-rpath.patch \
 	classpath-0.98-build.patch \
 	classpath-0.98-awt.patch \
 	gcc45-ada.diff \
@@ -39,6 +40,8 @@ PATCH_URI="
 	gcc45-sig-unwind.diff \
 	gcc45-skiptest.diff \
 	gcc45-weak-binding.diff"
+
+DIFF_EXCLUDES="configure"
 
 # new files created by ada.patch, need to be removed if re-prep'ing
 DISTCLEANFILES="gcc/ada/*-cygwin.*"
@@ -109,8 +112,7 @@ if [[ x"$BUILD_WITH_SJLJ" != x ]] ;
 then
     PROGRAM_SUFFIX=-sjlj-4
     SJLJ_EXCEPTIONS=enable
-    echo "Not ready yet."
-    exit -1
+    error "SjLj exceptions not ready yet."
 else
     PROGRAM_SUFFIX=-4
     SJLJ_EXCEPTIONS=disable
@@ -130,8 +132,6 @@ CYGCONF_ARGS="--datadir=/usr/share --infodir=/usr/share/info \
 	--with-arch=i686 --with-tune=generic --enable-libgcj-sublibs \
 	$EXTRA_CYGCONF_INPUT_ARGS"
 
-# This defaults to on, anyway.
-USE_DESTDIR=1
 # Ensure gcc-special autoconf-2.59, automake-1.9.4 are first in the path.
 export PATH="/opt/gcc-tools/bin:${PATH}"
 
@@ -144,22 +144,22 @@ export PATH="/opt/gcc-tools/bin:${PATH}"
 # also boehm-gc libffi libjava libmudflap libssp libstdc++-v3 zlib
 src_compile() {
 	cd ${S}
-	autoconf || exit -1
+	autoconf -f || error
 	cd ${S}/gcc
-	autoconf || exit -1
-	autoheader || exit -1
+	autoconf -f || error
+	autoheader -f || error
 	cd ${S}/libiberty
-	autoconf || exit -1
+	autoconf -f || error
 	cd ${S}/libjava
-	autoconf || exit -1
+	autoconf -f || error
 	cd ${S}/libffi
-	aclocal -I . -I .. -I ../config || exit -1
-	autoconf || exit -1
+	aclocal -I . -I .. -I ../config || error
+	autoconf -f || error
 	cd ${S}
 	for x in boehm-gc libffi libgfortran libgomp libjava libmudflap libssp libstdc++-v3 zlib;
 	do
 		pushd $x
-		automake || exit -1
+		automake -f || error
 		popd
 	done
 	cd ${S}/gcc/testsuite/ada/acats
@@ -197,17 +197,10 @@ src_install() {
 	tar -cj -C ${S} INSTALL | tar -xj -C ${D}/usr/share/doc/${PN}/
 
 	# And create defaults of libgcj-common config files.
-	mkdir -p ${D}/etc/defaults/usr/lib/security
-	for f in usr/lib/logging.properties usr/lib/security/classpath.security ;
-	do
-		mv ${D}/${f} ${D}/etc/defaults/${f}
-	done
+	make_etc_defaults /usr/lib/logging.properties /usr/lib/security/classpath.security
 
 	# Speaking of which: install the helper scripts for fixing them up.
 	dosbin ${C}/fix-libtool-scripts-for-latest-gcc-runtimes.sh
-
-	# And the script to update the ecj jar file.
-	dosbin ${C}/download_ecj.sh
 }
 
 # override default src_test, as we need to ignore failures and
@@ -220,40 +213,11 @@ src_test() {
 	make -k check
 }
 
-
-# Append auto-generated package content variables here.
-# See manifest-to-cygport.sh in CYGWIN-PATCHES.
-
 PKG_NAMES="${PN} libgcc1 libgomp1 libssp0 ${PN}-core ${PN}-g++ ${PN}-java ${PN}-fortran ${PN}-objc ${PN}-ada libgfortran3 libffi4 libgcj-common libobjc2 libstdc++6 libstdc++6-devel libgnat4.5 libgcj11"
-PKG_HINTS="setup libgcc1 libgomp1 libssp0 core g++ java fortran objc ada libgfortran3 libffi4 libgcj-common libobjc2 libstdc++6 libstdc++6-devel libgnat4.5 libgcj11"
-
-# Alternatives are:
-
-gcc4_CONTENTS="usr/share/doc/gcc4 \
-    usr/share/doc/Cygwin/gcc4.README \
-    usr/share/man/man7/fsf-funding.7.gz \
-    usr/share/man/man7/gfdl.7.gz \
-    usr/share/man/man7/gpl.7.gz "
-
-# Alternatives are: usr/share/man/man7/fsf-funding.7.gz usr/share/man/man7/gfdl.7.gz usr/share/man/man7/gpl.7.gz
-
-libgcc1_CONTENTS="usr/bin/cyggcc_s-1.dll "
-
-# Alternatives are:
-
-libgomp1_CONTENTS="usr/bin/cyggomp-1.dll "
-
-# Alternatives are:
-
-libssp0_CONTENTS="usr/bin/cygssp-0.dll "
-
-# Alternatives are:
 
 gcc4_core_CONTENTS="--exclude=jni*.h
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/*.h \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/ssp/ \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include-fixed \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/install-tools \
+    etc/postinstall/gcc4-core.sh \
+    etc/preremove/gcc4-core.sh \
     usr/bin/cpp${PROGRAM_SUFFIX}.exe \
     usr/bin/gcc${PROGRAM_SUFFIX}.exe \
     usr/bin/gccbug${PROGRAM_SUFFIX} \
@@ -262,6 +226,10 @@ gcc4_core_CONTENTS="--exclude=jni*.h
     usr/bin/i686-pc-cygwin-gcc${PROGRAM_SUFFIX}.exe \
     usr/bin/set-gcc-default-3.sh \
     usr/bin/set-gcc-default-4.sh \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/*.h \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/ssp/ \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include-fixed \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/install-tools \
     usr/lib/gcc/i686-pc-cygwin/${PV}/cc1.exe \
     usr/lib/gcc/i686-pc-cygwin/${PV}/collect2.exe \
     usr/lib/gcc/i686-pc-cygwin/${PV}/crt*.o \
@@ -272,6 +240,7 @@ gcc4_core_CONTENTS="--exclude=jni*.h
     usr/lib/gcc/i686-pc-cygwin/${PV}/libssp* \
     usr/lib/gcc/i686-pc-cygwin/${PV}/lto*.exe \
     usr/sbin/fix-libtool-scripts-for-latest-gcc-runtimes.sh \
+	usr/share/doc/ \
     usr/share/locale/* \
     usr/share/info/cpp.info.gz \
     usr/share/info/cppinternals.info.gz \
@@ -285,37 +254,26 @@ gcc4_core_CONTENTS="--exclude=jni*.h
     usr/share/man/man3/ffi${PROGRAM_SUFFIX}.3.gz \
     usr/share/man/man3/ffi_call${PROGRAM_SUFFIX}.3.gz \
     usr/share/man/man3/ffi_prep_cif${PROGRAM_SUFFIX}.3.gz \
-    etc/postinstall/gcc4-core.sh \
-    etc/preremove/gcc4-core.sh "
-
-# Alternatives are: usr/bin/cpp-4.exe usr/bin/gcc-4.exe usr/bin/gcov-4.exe usr/bin/i686-pc-cygwin-gcc-${PV}.exe usr/bin/i686-pc-cygwin-gcc-4.exe usr/share/man/man1/cpp-4.1.gz usr/share/man/man1/gcc-4.1.gz usr/share/man/man1/gcov-4.1.gz usr/share/man/man3/ffi-4.3.gz usr/share/man/man3/ffi_call-4.3.gz usr/share/man/man3/ffi_prep_cif-4.3.gz
-
+    usr/share/man/man7/fsf-funding.7.gz \
+    usr/share/man/man7/gfdl.7.gz \
+    usr/share/man/man7/gpl.7.gz
+"
 gcc4_g___CONTENTS="
     --exclude=gcj --exclude=gnu --exclude=java --exclude=javax --exclude=org
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++ \
+    etc/postinstall/gcc4-g++.sh \
+    etc/preremove/gcc4-g++.sh \
     usr/bin/c++${PROGRAM_SUFFIX}.exe \
     usr/bin/g++${PROGRAM_SUFFIX}.exe \
     usr/bin/i686-pc-cygwin-c++${PROGRAM_SUFFIX}.exe \
     usr/bin/i686-pc-cygwin-g++${PROGRAM_SUFFIX}.exe \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++ \
     usr/lib/gcc/i686-pc-cygwin/${PV}/cc1plus.exe \
     usr/share/man/man1/g++${PROGRAM_SUFFIX}.1.gz \
-    etc/postinstall/gcc4-g++.sh \
-    etc/preremove/gcc4-g++.sh "
-
-# Alternatives are: usr/bin/c++-4.exe usr/bin/g++-4.exe usr/bin/i686-pc-cygwin-c++-4.exe usr/bin/i686-pc-cygwin-g++-4.exe usr/share/man/man1/g++-4.1.gz
-
+"
 gcc4_java_CONTENTS="
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/gcj/ \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/gnu/ \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/java*/ \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/org/ \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/gcj/ \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/include/jni*.h \
-    usr/lib/gcj-${PV}-11 \
-    usr/sbin/download_ecj.sh \
-    usr/share/java \
+    etc/postinstall/gcc4-java.sh \
+    etc/preremove/gcc4-java.sh \
     usr/bin/aot-compile${PROGRAM_SUFFIX} \
-    usr/bin/rebuild-gcj-db${PROGRAM_SUFFIX} \
     usr/bin/cygjvm.dll \
     usr/bin/gappletviewer${PROGRAM_SUFFIX}.exe \
     usr/bin/gc-analyze${PROGRAM_SUFFIX}.exe \
@@ -326,6 +284,7 @@ gcc4_java_CONTENTS="
     usr/bin/gjar${PROGRAM_SUFFIX}.exe \
     usr/bin/gjarsigner${PROGRAM_SUFFIX}.exe \
     usr/bin/gjavah${PROGRAM_SUFFIX}.exe \
+    usr/bin/gjdoc${PROGRAM_SUFFIX}.exe \
     usr/bin/gkeytool${PROGRAM_SUFFIX}.exe \
     usr/bin/gnative2ascii${PROGRAM_SUFFIX}.exe \
     usr/bin/gorbd${PROGRAM_SUFFIX}.exe \
@@ -337,14 +296,24 @@ gcc4_java_CONTENTS="
     usr/bin/i686-pc-cygwin-gcj${PROGRAM_SUFFIX}.exe \
     usr/bin/jcf-dump${PROGRAM_SUFFIX}.exe \
     usr/bin/jv-convert${PROGRAM_SUFFIX}.exe \
+    usr/bin/rebuild-gcj-db${PROGRAM_SUFFIX} \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/gcj/ \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/gnu/ \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/java*/ \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/c++/org/ \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/gcj/ \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/include/jni*.h \
     usr/lib/gcc/i686-pc-cygwin/${PV}/ecj1.exe \
     usr/lib/gcc/i686-pc-cygwin/${PV}/jc1.exe \
     usr/lib/gcc/i686-pc-cygwin/${PV}/jvgenmain.exe \
     usr/lib/gcc/i686-pc-cygwin/${PV}/libgcj*
     usr/lib/gcc/i686-pc-cygwin/${PV}/libgij* \
-    usr/lib/pkgconfig/libgcj-4.5.pc \
+    usr/lib/gcj-${PV}-11 \
+    usr/lib/pkgconfig/libgcj-*.pc \
     usr/share/info/cp-tools.info.gz \
     usr/share/info/gcj.info.gz \
+    usr/share/java \
+    usr/share/man/man1/aot-compile-4.1.gz \
     usr/share/man/man1/gappletviewer${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/gc-analyze${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/gcj${PROGRAM_SUFFIX}.1.gz \
@@ -354,6 +323,7 @@ gcc4_java_CONTENTS="
     usr/share/man/man1/gjar${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/gjarsigner${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/gjavah${PROGRAM_SUFFIX}.1.gz \
+    usr/share/man/man1/gjdoc${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/gkeytool${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/gnative2ascii${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/gorbd${PROGRAM_SUFFIX}.1.gz \
@@ -364,36 +334,29 @@ gcc4_java_CONTENTS="
     usr/share/man/man1/gtnameserv${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/jcf-dump${PROGRAM_SUFFIX}.1.gz \
     usr/share/man/man1/jv-convert${PROGRAM_SUFFIX}.1.gz \
-    usr/share/man/man1/aot-compile-4.1.gz \
-    usr/share/man/man1/gjdoc-4.1.gz \
     usr/share/man/man1/rebuild-gcj-db-4.1.gz \
     usr/share/python/aotcompile.py \
     usr/share/python/classfile.py \
-    etc/postinstall/gcc4-java.sh \
-    etc/preremove/gcc4-java.sh "
-
-# Alternatives are: usr/bin/gappletviewer-4.exe usr/bin/gc-analyze-4.exe usr/bin/gcj-4.exe usr/bin/gcj-dbtool-4.exe usr/bin/gcjh-4.exe usr/bin/gij-4.exe usr/bin/gjar-4.exe usr/bin/gjarsigner-4.exe usr/bin/gjavah-4.exe usr/bin/gkeytool-4.exe usr/bin/gnative2ascii-4.exe usr/bin/gorbd-4.exe usr/bin/grmic-4.exe usr/bin/grmid-4.exe usr/bin/grmiregistry-4.exe usr/bin/gserialver-4.exe usr/bin/gtnameserv-4.exe usr/bin/i686-pc-cygwin-gcj-4.exe usr/bin/jcf-dump-4.exe usr/bin/jv-convert-4.exe usr/share/man/man1/gappletviewer-4.1.gz usr/share/man/man1/gc-analyze-4.1.gz usr/share/man/man1/gcj-4.1.gz usr/share/man/man1/gcj-dbtool-4.1.gz usr/share/man/man1/gcjh-4.1.gz usr/share/man/man1/gij-4.1.gz usr/share/man/man1/gjar-4.1.gz usr/share/man/man1/gjarsigner-4.1.gz usr/share/man/man1/gjavah-4.1.gz usr/share/man/man1/gkeytool-4.1.gz usr/share/man/man1/gnative2ascii-4.1.gz usr/share/man/man1/gorbd-4.1.gz usr/share/man/man1/grmic-4.1.gz usr/share/man/man1/grmid-4.1.gz usr/share/man/man1/grmiregistry-4.1.gz usr/share/man/man1/gserialver-4.1.gz usr/share/man/man1/gtnameserv-4.1.gz usr/share/man/man1/jcf-dump-4.1.gz usr/share/man/man1/jv-convert-4.1.gz
-
-gcc4_fortran_CONTENTS="usr/lib/gcc/i686-pc-cygwin/${PV}/finclude \
+"
+gcc4_fortran_CONTENTS="
+    etc/postinstall/gcc4-fortran.sh \
+    etc/preremove/gcc4-fortran.sh
     usr/bin/gfortran${PROGRAM_SUFFIX}.exe \
     usr/bin/i686-pc-cygwin-gfortran${PROGRAM_SUFFIX}.exe \
+	usr/lib/gcc/i686-pc-cygwin/${PV}/finclude \
     usr/lib/gcc/i686-pc-cygwin/${PV}/f951.exe \
     usr/lib/gcc/i686-pc-cygwin/${PV}/libgfortran* \
     usr/share/info/gfortran.info.gz \
     usr/share/man/man1/gfortran${PROGRAM_SUFFIX}.1.gz \
-    etc/postinstall/gcc4-fortran.sh \
-    etc/preremove/gcc4-fortran.sh "
-
-# Alternatives are: usr/bin/gfortran-4.exe usr/bin/i686-pc-cygwin-gfortran-4.exe usr/share/man/man1/gfortran-4.1.gz
-
-gcc4_objc_CONTENTS="usr/lib/gcc/i686-pc-cygwin/${PV}/include/objc \
+"
+gcc4_objc_CONTENTS="
+	usr/lib/gcc/i686-pc-cygwin/${PV}/include/objc \
     usr/lib/gcc/i686-pc-cygwin/${PV}/cc1obj* \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/libobjc.*"
-
-# Alternatives are:
-
-gcc4_ada_CONTENTS="usr/lib/gcc/i686-pc-cygwin/${PV}/adainclude \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/adalib \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/libobjc.*
+"
+gcc4_ada_CONTENTS="
+    etc/postinstall/gcc4-ada.sh \
+    etc/preremove/gcc4-ada.sh \
     usr/bin/gnat${PROGRAM_SUFFIX}.exe \
     usr/bin/gnatbind${PROGRAM_SUFFIX}.exe \
     usr/bin/gnatchop${PROGRAM_SUFFIX}.exe \
@@ -406,50 +369,30 @@ gcc4_ada_CONTENTS="usr/lib/gcc/i686-pc-cygwin/${PV}/adainclude \
     usr/bin/gnatname${PROGRAM_SUFFIX}.exe \
     usr/bin/gnatprep${PROGRAM_SUFFIX}.exe \
     usr/bin/gnatxref${PROGRAM_SUFFIX}.exe \
+	usr/lib/gcc/i686-pc-cygwin/${PV}/adainclude \
+    usr/lib/gcc/i686-pc-cygwin/${PV}/adalib \
     usr/lib/gcc/i686-pc-cygwin/${PV}/gnat1.exe \
     usr/share/info/gnat-style.info.gz \
     usr/share/info/gnat_rm.info.gz \
     usr/share/info/gnat_ugn.info.gz \
-    etc/postinstall/gcc4-ada.sh \
-    etc/preremove/gcc4-ada.sh "
-
-# Alternatives are: usr/bin/gnat-4.exe usr/bin/gnatbind-4.exe usr/bin/gnatbl-4.exe usr/bin/gnatchop-4.exe usr/bin/gnatclean-4.exe usr/bin/gnatfind-4.exe usr/bin/gnatkr-4.exe usr/bin/gnatlink-4.exe usr/bin/gnatls-4.exe usr/bin/gnatmake-4.exe usr/bin/gnatname-4.exe usr/bin/gnatprep-4.exe usr/bin/gnatxref-4.exe
-
-libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll "
-
-# Alternatives are:
-
-libffi4_CONTENTS="usr/bin/cygffi-4.dll "
-
-# Alternatives are:
-
-libgcj_common_CONTENTS="etc/defaults/usr/lib/logging.properties \
+"
+libffi4_CONTENTS="usr/bin/cygffi-4.dll"
+libgcc1_CONTENTS="usr/bin/cyggcc_s-1.dll"
+libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
+libgnat4_5_CONTENTS="usr/bin/cyggnarl-4.5.dll usr/bin/cyggnat-4.5.dll"
+libgcj11_CONTENTS="usr/bin/cyggcj*-11.dll usr/bin/cyggij-11.dll"
+libgcj_common_CONTENTS="
+	etc/defaults/usr/lib/logging.properties \
     etc/defaults/usr/lib/security/classpath.security \
-    etc/postinstall/libgcj-common.sh \
-    etc/preremove/libgcj-common.sh "
-
-# Alternatives are:
-
-libobjc2_CONTENTS="usr/bin/cygobjc-2.dll "
-
-# Alternatives are:
-
-libstdc__6_CONTENTS="usr/bin/cygstdc++-6.dll "
-
-# Alternatives are:
-
-libstdc__6_devel_CONTENTS="usr/lib/gcc/i686-pc-cygwin/${PV}/libstdc++* \
-    usr/lib/gcc/i686-pc-cygwin/${PV}/libsupc++* \
-    usr/share/gcc-${PV}/python/libstdcxx/"
-
-# Alternatives are:
-
-libgnat4_5_CONTENTS="usr/bin/cyggnarl-4.5.dll \
-    usr/bin/cyggnat-4.5.dll "
-
-# Alternatives are:
-
-libgcj11_CONTENTS="usr/bin/cyggcj-11.dll \
-    usr/bin/cyggcj-noncore-11.dll \
-    usr/bin/cyggcj-tools-11.dll \
-    usr/bin/cyggij-11.dll "
+    etc/postinstall/gcc4.sh
+    etc/preremove/gcc4.sh
+"
+libgomp1_CONTENTS="usr/bin/cyggomp-1.dll"
+libobjc2_CONTENTS="usr/bin/cygobjc-2.dll"
+libssp0_CONTENTS="usr/bin/cygssp-0.dll "
+libstdc__6_CONTENTS="usr/bin/cygstdc++-6.dll"
+libstdc__6_devel_CONTENTS="
+	usr/lib/gcc/i686-pc-cygwin/${PV}/libstdc++*
+    usr/lib/gcc/i686-pc-cygwin/${PV}/libsupc++*
+    usr/share/gcc-${PV}/python/libstdcxx/
+"
