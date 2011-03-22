@@ -39,7 +39,7 @@ PATCH_URI="
 	gcc45-mnocygwin.diff \
 	gcc45-sig-unwind.diff \
 	gcc45-skiptest.diff \
-	gcc45-weak-binding.diff"
+"
 
 DIFF_EXCLUDES="configure"
 
