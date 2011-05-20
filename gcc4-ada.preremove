@@ -1,11 +1,3 @@
-#!/bin/bash
-
-prefix=/usr
-bindir=${prefix}/bin
-sbindir=${prefix}/sbin
-infodir=${prefix}/share/info
-
-/usr/sbin/update-alternatives \
-    --remove "gnat" "/usr/bin/gnat-4.exe"
+/usr/sbin/update-alternatives --remove "gnat" "/usr/bin/gnat-4.exe"
 
 

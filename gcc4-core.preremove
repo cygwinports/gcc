@@ -1,11 +1,1 @@
-#!/bin/bash
-
-prefix=/usr
-bindir=${prefix}/bin
-sbindir=${prefix}/sbin
-infodir=${prefix}/share/info
-
-/usr/sbin/update-alternatives \
-    --remove "gcc" "/usr/bin/gcc-4.exe"
-
-
+/usr/sbin/update-alternatives --remove "gcc" "/usr/bin/gcc-4.exe"
