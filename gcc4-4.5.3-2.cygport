@@ -39,6 +39,7 @@ PATCH_URI="
 	gcc45-mnocygwin.diff \
 	gcc45-sig-unwind.diff \
 	gcc45-skiptest.diff \
+	gcc45-peflags.diff \
 "
 
 DIFF_EXCLUDES="configure"
@@ -195,6 +196,9 @@ src_install() {
 	# Now move docs to correct location
 	mkdir -p ${D}/usr/share/doc/${PN}
 	tar -cj -C ${S} INSTALL | tar -xj -C ${D}/usr/share/doc/${PN}/
+
+	# Remove libtool files so they don't get hardcoded in other libraries
+	rm -f ${D}/usr/lib/gcc/i686-pc-cygwin/${PV}/*.la
 
 	# And create defaults of libgcj-common config files.
 	make_etc_defaults /usr/lib/logging.properties /usr/lib/security/classpath.security
