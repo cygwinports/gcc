@@ -12,5 +12,5 @@ echo "${extrafiles}" \
 
 find ${libdir} -type f -name '*.la' \
   | xargs -r grep -l '^dependency_libs=.*/usr/lib/gcc/i686-pc-cygwin/[34].[3-9].[0-9]/lib[a-z_+]*.la' \
-  | xargs -r sed -i -e "/^dependency_libs=/ s|\(pc-cygwin\)/[34].[3-9].[0-9]/\(lib[a-z_+]*.la\)|\1/$(/usr/bin/gcc-4 -dumpversion)/\2|g"
+  | xargs -r sed -i -e "/^dependency_libs=/ s|[^ ]*pc-cygwin/[34].[3-9].[0-9]/lib\([a-z_+]*\)\.la|-l\1|g"
 
