@@ -1,6 +1,0 @@
-/usr/sbin/update-alternatives \
-    --install "/usr/bin/gfortran.exe" "gfortran" "/usr/bin/gfortran-4.exe" 40 \
-  --slave "/usr/bin/i686-pc-cygwin-gfortran.exe" "i686-pc-cygwin-gfortran" "/usr/bin/i686-pc-cygwin-gfortran-4.exe" \
-  --slave "/usr/share/man/man1/gfortran.1.gz" "gfortran.1.gz" "/usr/share/man/man1/gfortran-4.1.gz" \
-
-

@@ -1,0 +1,27 @@
+--- origsrc/gcc-4.7.2/gcc/cppdefault.c	2012-01-06 08:14:32.000000000 +0800
++++ src/gcc-4.7.2/gcc/cppdefault.c	2013-02-26 19:32:22.836275000 +0800
+@@ -35,6 +35,8 @@
+ # undef NATIVE_SYSTEM_HEADER_DIR
+ #else
+ # undef CROSS_INCLUDE_DIR
++# undef CROSS_INCLUDE_DIR_1
++# undef CROSS_INCLUDE_DIR_2
+ #endif
+ 
+ const struct default_include cpp_include_defaults[]
+@@ -84,6 +86,14 @@ const struct default_include cpp_include
+     /* One place the target system's headers might be.  */
+     { CROSS_INCLUDE_DIR, "GCC", 0, 0, 0, 0 },
+ #endif
++#ifdef CROSS_INCLUDE_DIR_1
++    /* One more place the target system's headers might be.  */
++    { CROSS_INCLUDE_DIR_1, "GCC", 0, 0, 0, 0 },
++#endif
++#ifdef CROSS_INCLUDE_DIR_2
++    /* One more place the target system's headers might be.  */
++    { CROSS_INCLUDE_DIR_2, "GCC", 0, 0, 0, 0 },
++#endif
+ #ifdef TOOL_INCLUDE_DIR
+     /* Another place the target system's headers might be.  */
+     { TOOL_INCLUDE_DIR, "BINUTILS", 0, 1, 0, 0 },
+

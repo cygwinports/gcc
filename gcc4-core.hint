@@ -1,4 +1,0 @@
-sdesc: "GCC Release series 4 compiler: core C compiler subpackage"
-category: Devel
-requires: alternatives binutils w32api libgcc1 libgomp1 libssp0 libffi4 libgmp3 libintl8 libmpfr1 libcloog0 libmpc1 libppl
-external-source: gcc4

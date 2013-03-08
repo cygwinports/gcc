@@ -1,0 +1,37 @@
+--- origsrc/gcc-4.7.2/libitm/Makefile.am	2012-02-14 07:14:27.000000000 -0600
++++ src/gcc-4.7.2/libitm/Makefile.am	2013-03-05 15:49:30.894434800 -0600
+@@ -53,8 +53,8 @@ libitm_version_info = -version-info $(li
+ # Force link with C, not C++.  For now, while we're using C++ we don't
+ # want or need libstdc++.
+ libitm_la_DEPENDENCIES = $(libitm_version_dep)
+-libitm_la_LINK = $(LINK) $(libitm_la_LDFLAGS)
+-libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script)
++libitm_la_LINK = $(CXXLINK) $(libitm_la_LDFLAGS)
++libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script) -no-undefined -bindir $(bindir)
+ 
+ libitm_la_SOURCES = \
+ 	aatree.cc alloc.cc alloc_c.cc alloc_cpp.cc barrier.cc beginend.cc \
+--- origsrc/gcc-4.7.2/libitm/Makefile.in	2012-09-20 02:23:55.000000000 -0500
++++ src/gcc-4.7.2/libitm/Makefile.in	2013-03-05 15:49:38.430891800 -0600
+@@ -374,8 +374,8 @@ libitm_version_info = -version-info $(li
+ # Force link with C, not C++.  For now, while we're using C++ we don't
+ # want or need libstdc++.
+ libitm_la_DEPENDENCIES = $(libitm_version_dep)
+-libitm_la_LINK = $(LINK) $(libitm_la_LDFLAGS)
+-libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script)
++libitm_la_LINK = $(CXXLINK) $(libitm_la_LDFLAGS)
++libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script) -no-undefined -bindir $(bindir)
+ libitm_la_SOURCES = aatree.cc alloc.cc alloc_c.cc alloc_cpp.cc \
+ 	barrier.cc beginend.cc clone.cc eh_cpp.cc local.cc query.cc \
+ 	retry.cc rwlock.cc useraction.cc util.cc sjlj.S tls.cc \
+--- origsrc/gcc-4.7.2/libitm/configure.tgt	2012-02-13 15:51:44.000000000 -0600
++++ src/gcc-4.7.2/libitm/configure.tgt	2013-03-05 05:39:29.757102000 -0600
+@@ -131,7 +131,7 @@ case "${target}" in
+   *-*-gnu* | *-*-k*bsd*-gnu \
+   | *-*-netbsd* | *-*-freebsd* | *-*-openbsd* \
+   | *-*-solaris2* | *-*-sysv4* | *-*-irix6* | *-*-osf* | *-*-hpux11* \
+-  | *-*-darwin* | *-*-aix*)
++  | *-*-darwin* | *-*-aix* | *-*-cygwin*)
+ 	# POSIX system.  The OS is supported.
+ 	;;
+ 

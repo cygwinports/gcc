@@ -1,4 +1,0 @@
-sdesc: "GCC Release series 4 compiler: C++ Standard Library shared runtime"
-category: Devel Libs
-requires: libgcc1
-external-source: gcc4

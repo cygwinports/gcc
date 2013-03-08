@@ -1,7 +1,6 @@
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/config/os/mingw32/os_defines.h src/gcc-4.5.0/libstdc++-v3/config/os/mingw32/os_defines.h
---- origsrc/gcc-4.5.0/libstdc++-v3/config/os/mingw32/os_defines.h	2009-11-30 23:22:04.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/config/os/mingw32/os_defines.h	2010-04-19 05:11:01.671875000 +0100
-@@ -60,4 +60,10 @@
+--- origsrc/gcc-4.7.2/libstdc++-v3/config/os/mingw32/os_defines.h	2011-12-17 02:43:06.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/config/os/mingw32/os_defines.h	2013-02-26 19:02:23.475285200 +0800
+@@ -60,6 +60,12 @@
  // See  libstdc++/37522.
  #define _GLIBCXX_HAVE_BROKEN_VSWPRINTF 1
  
@@ -11,24 +10,15 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/config/os/mingw32/os_defines.h src/gcc
 +#define _GLIBCXX_IMPORT
 +#endif
 +
- #endif
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/config/os/newlib/os_defines.h src/gcc-4.5.0/libstdc++-v3/config/os/newlib/os_defines.h
---- origsrc/gcc-4.5.0/libstdc++-v3/config/os/newlib/os_defines.h	2009-11-30 23:22:04.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/config/os/newlib/os_defines.h	2010-04-19 05:11:01.687500000 +0100
-@@ -35,6 +35,8 @@
- 
- #ifdef __CYGWIN__
- #define _GLIBCXX_GTHREAD_USE_WEAK 0
-+#define __GXX_MERGED_TYPEINFO_NAMES 0
-+#define __GXX_TYPEINFO_EQUALITY_INLINE 0
- 
- #if defined (_GLIBCXX_DLL)
- #define _GLIBCXX_PSEUDO_VISIBILITY_default __attribute__ ((__dllimport__))
-@@ -47,6 +49,13 @@
- 
- // See libstdc++/20806.
+ // See libstdc++/43738
+ // On native windows targets there is no ioctl function. And the existing
+ // ioctlsocket function doesn't work for normal file-descriptors.
+--- origsrc/gcc-4.7.2/libstdc++-v3/config/os/newlib/os_defines.h	2011-01-04 04:52:22.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/config/os/newlib/os_defines.h	2013-02-26 19:03:08.252971200 +0800
+@@ -49,4 +49,10 @@
  #define _GLIBCXX_HAVE_DOS_BASED_FILESYSTEM 1
-+
+ #endif
+ 
 +#ifdef _DLL
 +#define _GLIBCXX_IMPORT __attribute__((dllimport))
 +#else
@@ -36,23 +26,19 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/config/os/newlib/os_defines.h src/gcc-
 +#endif
 +
  #endif
- 
- #endif
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/configure.host src/gcc-4.5.0/libstdc++-v3/configure.host
---- origsrc/gcc-4.5.0/libstdc++-v3/configure.host	2009-11-30 23:22:04.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/configure.host	2010-04-19 05:11:01.703125000 +0100
-@@ -209,6 +209,7 @@ case "${host_os}" in
+--- origsrc/gcc-4.7.2/libstdc++-v3/configure.host	2012-02-11 02:10:12.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/configure.host	2013-02-26 19:04:19.589029800 +0800
+@@ -215,6 +215,7 @@ case "${host_os}" in
      ;;
    cygwin*)
      os_include_dir="os/newlib"
-+    OPT_LDFLAGS="-Wl,--exclude-modules-for-implib=\`cd ../libsupc++; ls *type_inf*.o -1  | tr '\012' ':'\`tinfo.o:tinfo2.o"
-     OPT_LDFLAGS="${OPT_LDFLAGS} -no-undefined -bindir \$(bindir)"
++    OPT_LDFLAGS="${OPT_LDFLAGS} -Wl,--exclude-modules-for-implib=\`cd ../libsupc++; ls *type_inf*.o -1  | tr '\012' ':'\`tinfo.o:tinfo2.o"
+     OPT_LDFLAGS="${OPT_LDFLAGS} \$(lt_host_flags)"
      ;;
    darwin | darwin[1-7] | darwin[1-7].*)
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/backward/strstream src/gcc-4.5.0/libstdc++-v3/include/backward/strstream
---- origsrc/gcc-4.5.0/libstdc++-v3/include/backward/strstream	2010-03-16 22:34:53.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/backward/strstream	2010-04-19 05:11:01.703125000 +0100
-@@ -55,7 +55,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/backward/strstream	2011-02-01 09:31:42.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/backward/strstream	2013-02-26 19:05:34.021481500 +0800
+@@ -62,7 +62,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  
    // Class strstreambuf, a streambuf class that manages an array of char.
    // Note that this class is not a template.
@@ -61,7 +47,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/backward/strstream src/gcc-4.5
    {
    public:
      // Types.
-@@ -117,7 +117,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -124,7 +124,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    };
  
    // Class istrstream, an istream that manages a strstreambuf.
@@ -70,7 +56,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/backward/strstream src/gcc-4.5
    {
    public:
      explicit istrstream(char*);
-@@ -134,7 +134,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -141,7 +141,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    };
  
    // Class ostrstream
@@ -79,7 +65,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/backward/strstream src/gcc-4.5
    {
    public:
      ostrstream();
-@@ -151,7 +151,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -158,7 +158,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    };
  
    // Class strstream
@@ -88,12 +74,11 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/backward/strstream src/gcc-4.5
    {
    public:
      typedef char                        char_type;
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/basic_ios.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/basic_ios.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/basic_ios.tcc	2009-04-09 16:00:19.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/basic_ios.tcc	2010-04-19 05:11:01.703125000 +0100
-@@ -175,10 +175,10 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/basic_ios.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/basic_ios.tcc	2013-02-26 19:07:59.406943100 +0800
+@@ -176,10 +176,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB:  This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class basic_ios<char>;
 +  extern template class _GLIBCXX_IMPORT basic_ios<char>;
@@ -104,31 +89,29 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/basic_ios.tcc src/gcc-4.5
  #endif
  #endif
  
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/c++config src/gcc-4.5.0/libstdc++-v3/include/bits/c++config
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/c++config	2009-11-30 23:22:04.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/c++config	2010-04-19 05:11:01.718750000 +0100
-@@ -376,4 +376,8 @@ _GLIBCXX_END_NAMESPACE
- # endif
- #endif
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/c++config	2011-11-02 12:23:33.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/c++config	2013-02-26 19:08:37.223245200 +0800
+@@ -450,4 +450,8 @@ namespace std
+ #undef min
+ #undef max
  
 +#ifndef _GLIBCXX_IMPORT
 +#define _GLIBCXX_IMPORT
 +#endif
 +
- // End of prewritten config; the discovered settings follow.
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/codecvt.h src/gcc-4.5.0/libstdc++-v3/include/bits/codecvt.h
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/codecvt.h	2010-02-10 05:45:24.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/codecvt.h	2010-04-19 05:11:01.750000000 +0100
-@@ -476,7 +476,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+ // End of prewritten config; the settings discovered at configure time follow.
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/codecvt.h	2011-10-14 08:12:40.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/codecvt.h	2013-02-26 19:10:11.743247700 +0800
+@@ -479,7 +479,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB: This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class codecvt_byname<char, char, mbstate_t>;
 +  extern template class _GLIBCXX_IMPORT codecvt_byname<char, char, mbstate_t>;
  
    extern template
      const codecvt<char, char, mbstate_t>&
-@@ -487,7 +487,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -490,7 +490,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
      has_facet<codecvt<char, char, mbstate_t> >(const locale&);
  
  #ifdef _GLIBCXX_USE_WCHAR_T
@@ -137,12 +120,11 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/codecvt.h src/gcc-4.5.0/l
  
    extern template
      const codecvt<wchar_t, char, mbstate_t>&
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/fstream.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/fstream.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/fstream.tcc	2009-04-09 16:00:19.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/fstream.tcc	2010-04-19 05:11:01.750000000 +0100
-@@ -908,16 +908,16 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/fstream.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/fstream.tcc	2013-02-26 19:11:09.914634500 +0800
+@@ -965,16 +965,16 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB:  This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class basic_filebuf<char>;
 -  extern template class basic_ifstream<char>;
@@ -165,10 +147,9 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/fstream.tcc src/gcc-4.5.0
  #endif
  #endif
  
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ios_base.h src/gcc-4.5.0/libstdc++-v3/include/bits/ios_base.h
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ios_base.h	2010-02-17 05:43:24.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/ios_base.h	2010-04-19 05:07:26.125000000 +0100
-@@ -204,7 +204,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/ios_base.h	2011-08-07 15:27:06.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/ios_base.h	2013-02-26 19:12:06.001256600 +0800
+@@ -198,7 +198,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  people will only see @c ios_base when they need to specify the full
     *  name of the various I/O flags (e.g., the openmodes).
    */
@@ -177,7 +158,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ios_base.h src/gcc-4.5.0/
    {
    public:
  
-@@ -214,7 +214,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -208,7 +208,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       *
       *  27.4.2.1.1  Class ios_base::failure
       */
@@ -186,7 +167,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ios_base.h src/gcc-4.5.0/
      {
      public:
        // _GLIBCXX_RESOLVE_LIB_DEFECTS
-@@ -529,7 +529,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -532,7 +532,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
      // Used to initialize standard streams. In theory, g++ could use
      // -finit-priority to order this stuff correctly without going
      // through these machinations.
@@ -195,19 +176,18 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ios_base.h src/gcc-4.5.0/
      {
        friend class ios_base;
      public:
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/istream.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/istream.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/istream.tcc	2009-09-05 01:18:07.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/istream.tcc	2010-04-19 05:11:01.750000000 +0100
-@@ -1018,7 +1018,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/istream.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/istream.tcc	2013-02-26 19:15:17.712100800 +0800
+@@ -1039,7 +1039,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB:  This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class basic_istream<char>;
 +  extern template class _GLIBCXX_IMPORT basic_istream<char>;
    extern template istream& ws(istream&);
    extern template istream& operator>>(istream&, char&);
    extern template istream& operator>>(istream&, char*);
-@@ -1041,10 +1041,10 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -1062,10 +1062,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    extern template istream& istream::_M_extract(long double&);
    extern template istream& istream::_M_extract(void*&);
  
@@ -220,7 +200,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/istream.tcc src/gcc-4.5.0
    extern template wistream& ws(wistream&);
    extern template wistream& operator>>(wistream&, wchar_t&);
    extern template wistream& operator>>(wistream&, wchar_t*);
-@@ -1063,7 +1063,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -1084,7 +1084,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    extern template wistream& wistream::_M_extract(long double&);
    extern template wistream& wistream::_M_extract(void*&);
  
@@ -229,10 +209,9 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/istream.tcc src/gcc-4.5.0
  #endif
  #endif
  
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h src/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h	2010-02-17 05:43:24.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h	2010-04-19 05:11:01.765625000 +0100
-@@ -59,7 +59,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/locale_classes.h	2011-12-10 23:33:06.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/locale_classes.h	2013-02-26 19:15:57.366636300 +0800
+@@ -61,7 +61,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  This library supports efficient construction and copying of locales
     *  through a reference counting implementation of the locale class.
    */
@@ -241,7 +220,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h src/gcc-
    {
    public:
      // Types:
-@@ -67,9 +67,9 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -69,9 +69,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
      typedef int	category;
  
      // Forward decls and friends:
@@ -254,7 +233,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h src/gcc-
  
      friend class facet;
      friend class _Impl;
-@@ -334,7 +334,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -337,7 +337,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *
     *  Facets may not be copied or assigned.
    */
@@ -263,7 +242,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h src/gcc-
    {
    private:
      friend class locale;
-@@ -429,7 +429,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -435,7 +435,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  cannot be used in a locale.  The locale::id ensures that each class
     *  type gets a unique identifier.
    */
@@ -272,7 +251,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h src/gcc-
    {
    private:
      friend class locale;
-@@ -468,7 +468,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -474,7 +474,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  
  
    // Implementation object for locale.
@@ -281,12 +260,11 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.h src/gcc-
    {
    public:
      // Friends.
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.tcc	2009-04-18 22:19:18.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.tcc	2010-04-19 05:11:01.765625000 +0100
-@@ -241,8 +241,8 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/locale_classes.tcc	2011-12-10 23:33:06.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/locale_classes.tcc	2013-02-26 19:18:19.979245800 +0800
+@@ -265,8 +265,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB: This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class collate<char>;
 -  extern template class collate_byname<char>;
@@ -295,7 +273,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.tcc src/gc
  
    extern template
      const collate<char>&
-@@ -253,8 +253,8 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -277,8 +277,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
      has_facet<collate<char> >(const locale&);
  
  #ifdef _GLIBCXX_USE_WCHAR_T
@@ -306,10 +284,9 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_classes.tcc src/gc
  
    extern template
      const collate<wchar_t>&
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.h src/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.h
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.h	2010-02-19 03:30:46.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.h	2010-04-19 05:11:01.765625000 +0100
-@@ -670,7 +670,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/locale_facets.h	2012-02-24 06:14:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/locale_facets.h	2013-02-26 19:18:20.497311600 +0800
+@@ -673,7 +673,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  optimizations as well.
    */
    template<>
@@ -318,7 +295,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.h src/gcc-4
      {
      public:
        // Types:
-@@ -1171,7 +1171,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -1174,7 +1174,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  __ctype_abstract_base<wchar_t>.
    */
    template<>
@@ -327,56 +304,54 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.h src/gcc-4
      {
      public:
        // Types:
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.tcc	2009-07-18 23:58:10.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets.tcc	2010-04-19 05:11:01.781250000 +0100
-@@ -1276,11 +1276,11 @@ _GLIBCXX_END_LDBL_NAMESPACE
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/locale_facets.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/locale_facets.tcc	2013-02-26 19:20:00.177469300 +0800
+@@ -1277,11 +1277,11 @@ _GLIBCXX_END_NAMESPACE_LDBL
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB: This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class numpunct<char>;
 -  extern template class numpunct_byname<char>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE num_get<char>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE num_put<char>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL num_get<char>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL num_put<char>;
 -  extern template class ctype_byname<char>;
 +  extern template class _GLIBCXX_IMPORT numpunct<char>;
 +  extern template class _GLIBCXX_IMPORT numpunct_byname<char>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE num_get<char>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE num_put<char>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL num_get<char>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL num_put<char>;
 +  extern template class _GLIBCXX_IMPORT ctype_byname<char>;
  
    extern template
      const ctype<char>&
-@@ -1315,11 +1315,11 @@ _GLIBCXX_END_LDBL_NAMESPACE
+@@ -1316,11 +1316,11 @@ _GLIBCXX_END_NAMESPACE_LDBL
      has_facet<num_get<char> >(const locale&);
  
  #ifdef _GLIBCXX_USE_WCHAR_T
 -  extern template class numpunct<wchar_t>;
 -  extern template class numpunct_byname<wchar_t>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE num_get<wchar_t>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE num_put<wchar_t>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL num_get<wchar_t>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL num_put<wchar_t>;
 -  extern template class ctype_byname<wchar_t>;
 +  extern template class _GLIBCXX_IMPORT numpunct<wchar_t>;
 +  extern template class _GLIBCXX_IMPORT numpunct_byname<wchar_t>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE num_get<wchar_t>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE num_put<wchar_t>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL num_get<wchar_t>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL num_put<wchar_t>;
 +  extern template class _GLIBCXX_IMPORT ctype_byname<wchar_t>;
  
    extern template
      const ctype<wchar_t>&
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc	2010-01-07 17:20:45.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc	2010-04-19 05:11:01.781250000 +0100
-@@ -1214,19 +1214,19 @@ _GLIBCXX_END_LDBL_NAMESPACE
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/locale_facets_nonio.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/locale_facets_nonio.tcc	2013-02-26 19:22:00.613262700 +0800
+@@ -1216,19 +1216,19 @@ _GLIBCXX_END_NAMESPACE_LDBL
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB: This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class moneypunct<char, false>;
 -  extern template class moneypunct<char, true>;
 -  extern template class moneypunct_byname<char, false>;
 -  extern template class moneypunct_byname<char, true>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE money_get<char>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE money_put<char>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL money_get<char>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL money_put<char>;
 -  extern template class __timepunct<char>;
 -  extern template class time_put<char>;
 -  extern template class time_put_byname<char>;
@@ -388,8 +363,8 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc s
 +  extern template class _GLIBCXX_IMPORT moneypunct<char, true>;
 +  extern template class _GLIBCXX_IMPORT moneypunct_byname<char, false>;
 +  extern template class _GLIBCXX_IMPORT moneypunct_byname<char, true>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE money_get<char>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE money_put<char>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL money_get<char>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL money_put<char>;
 +  extern template class _GLIBCXX_IMPORT __timepunct<char>;
 +  extern template class _GLIBCXX_IMPORT time_put<char>;
 +  extern template class _GLIBCXX_IMPORT time_put_byname<char>;
@@ -400,7 +375,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc s
  
    extern template
      const moneypunct<char, true>&
-@@ -1289,19 +1289,19 @@ _GLIBCXX_END_LDBL_NAMESPACE
+@@ -1291,19 +1291,19 @@ _GLIBCXX_END_NAMESPACE_LDBL
      has_facet<messages<char> >(const locale&);
  
  #ifdef _GLIBCXX_USE_WCHAR_T
@@ -408,8 +383,8 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc s
 -  extern template class moneypunct<wchar_t, true>;
 -  extern template class moneypunct_byname<wchar_t, false>;
 -  extern template class moneypunct_byname<wchar_t, true>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE money_get<wchar_t>;
--  extern template class _GLIBCXX_LDBL_NAMESPACE money_put<wchar_t>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL money_get<wchar_t>;
+-  extern template class _GLIBCXX_NAMESPACE_LDBL money_put<wchar_t>;
 -  extern template class __timepunct<wchar_t>;
 -  extern template class time_put<wchar_t>;
 -  extern template class time_put_byname<wchar_t>;
@@ -421,8 +396,8 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc s
 +  extern template class _GLIBCXX_IMPORT moneypunct<wchar_t, true>;
 +  extern template class _GLIBCXX_IMPORT moneypunct_byname<wchar_t, false>;
 +  extern template class _GLIBCXX_IMPORT moneypunct_byname<wchar_t, true>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE money_get<wchar_t>;
-+  extern template class _GLIBCXX_IMPORT _GLIBCXX_LDBL_NAMESPACE money_put<wchar_t>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL money_get<wchar_t>;
++  extern template class _GLIBCXX_IMPORT _GLIBCXX_NAMESPACE_LDBL money_put<wchar_t>;
 +  extern template class _GLIBCXX_IMPORT __timepunct<wchar_t>;
 +  extern template class _GLIBCXX_IMPORT time_put<wchar_t>;
 +  extern template class _GLIBCXX_IMPORT time_put_byname<wchar_t>;
@@ -433,19 +408,18 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/locale_facets_nonio.tcc s
  
    extern template
      const moneypunct<wchar_t, true>&
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ostream.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/ostream.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ostream.tcc	2009-09-05 01:18:07.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/ostream.tcc	2010-04-19 05:11:01.781250000 +0100
-@@ -357,7 +357,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/ostream.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/ostream.tcc	2013-02-26 19:22:35.219657200 +0800
+@@ -358,7 +358,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB:  This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class basic_ostream<char>;
 +  extern template class _GLIBCXX_IMPORT basic_ostream<char>;
    extern template ostream& endl(ostream&);
    extern template ostream& ends(ostream&);
    extern template ostream& flush(ostream&);
-@@ -380,7 +380,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -381,7 +381,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    extern template ostream& ostream::_M_insert(const void*);
  
  #ifdef _GLIBCXX_USE_WCHAR_T
@@ -454,12 +428,11 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/ostream.tcc src/gcc-4.5.0
    extern template wostream& endl(wostream&);
    extern template wostream& ends(wostream&);
    extern template wostream& flush(wostream&);
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/sstream.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/sstream.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/sstream.tcc	2009-04-09 16:00:19.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/sstream.tcc	2010-04-19 05:11:01.796875000 +0100
-@@ -255,16 +255,16 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/sstream.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/sstream.tcc	2013-02-26 19:22:35.236659400 +0800
+@@ -271,16 +271,16 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB:  This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class basic_stringbuf<char>;
 -  extern template class basic_istringstream<char>;
@@ -482,19 +455,18 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/sstream.tcc src/gcc-4.5.0
  #endif
  #endif
  
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/streambuf.tcc src/gcc-4.5.0/libstdc++-v3/include/bits/streambuf.tcc
---- origsrc/gcc-4.5.0/libstdc++-v3/include/bits/streambuf.tcc	2009-04-09 16:00:19.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/bits/streambuf.tcc	2010-04-19 05:11:01.796875000 +0100
-@@ -146,7 +146,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/bits/streambuf.tcc	2011-03-05 05:51:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/bits/streambuf.tcc	2013-02-26 19:23:35.314288200 +0800
+@@ -147,7 +147,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   // Inhibit implicit instantiations for required instantiations,
    // which are defined via explicit instantiations elsewhere.
-   // NB:  This syntax is a GNU extension.
  #if _GLIBCXX_EXTERN_TEMPLATE
 -  extern template class basic_streambuf<char>;
 +  extern template class _GLIBCXX_IMPORT basic_streambuf<char>;
    extern template
      streamsize
      __copy_streambufs(basic_streambuf<char>*,
-@@ -157,7 +157,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -158,7 +158,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  			  basic_streambuf<char>*, bool&);
  
  #ifdef _GLIBCXX_USE_WCHAR_T
@@ -503,10 +475,9 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/bits/streambuf.tcc src/gcc-4.5
    extern template
      streamsize
      __copy_streambufs(basic_streambuf<wchar_t>*,
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/ext/concurrence.h src/gcc-4.5.0/libstdc++-v3/include/ext/concurrence.h
---- origsrc/gcc-4.5.0/libstdc++-v3/include/ext/concurrence.h	2009-04-09 16:00:19.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/ext/concurrence.h	2010-04-19 05:11:01.796875000 +0100
-@@ -60,7 +60,7 @@ _GLIBCXX_BEGIN_NAMESPACE(__gnu_cxx)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/ext/concurrence.h	2012-07-17 06:34:13.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/ext/concurrence.h	2013-02-26 19:23:35.355293400 +0800
+@@ -65,7 +65,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  
    // NB: As this is used in libsupc++, need to only depend on
    // exception. No stdexception classes, no use of std::string.
@@ -515,7 +486,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/ext/concurrence.h src/gcc-4.5.
    {
    public:
      virtual char const*
-@@ -68,7 +68,7 @@ _GLIBCXX_BEGIN_NAMESPACE(__gnu_cxx)
+@@ -73,7 +73,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
      { return "__gnu_cxx::__concurrence_lock_error"; }
    };
  
@@ -524,38 +495,36 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/ext/concurrence.h src/gcc-4.5.
    {
    public:
      virtual char const*
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/iostream src/gcc-4.5.0/libstdc++-v3/include/std/iostream
---- origsrc/gcc-4.5.0/libstdc++-v3/include/std/iostream	2010-02-04 18:20:34.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/include/std/iostream	2010-04-19 05:11:01.796875000 +0100
-@@ -56,16 +56,16 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/std/iostream	2011-01-31 06:39:36.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/std/iostream	2013-02-26 19:24:33.333155700 +0800
+@@ -58,16 +58,16 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  linked to above.
    */
    //@{
--  extern istream cin;		///< Linked to standard input
--  extern ostream cout;		///< Linked to standard output
--  extern ostream cerr;		///< Linked to standard error (unbuffered)
--  extern ostream clog;		///< Linked to standard error (buffered)
-+  extern _GLIBCXX_IMPORT istream cin;		///< Linked to standard input
-+  extern _GLIBCXX_IMPORT ostream cout;		///< Linked to standard output
-+  extern _GLIBCXX_IMPORT ostream cerr;		///< Linked to standard error (unbuffered)
-+  extern _GLIBCXX_IMPORT ostream clog;		///< Linked to standard error (buffered)
+-  extern istream cin;		/// Linked to standard input
+-  extern ostream cout;		/// Linked to standard output
+-  extern ostream cerr;		/// Linked to standard error (unbuffered)
+-  extern ostream clog;		/// Linked to standard error (buffered)
++  extern _GLIBCXX_IMPORT istream cin;		/// Linked to standard input
++  extern _GLIBCXX_IMPORT ostream cout;		/// Linked to standard output
++  extern _GLIBCXX_IMPORT ostream cerr;		/// Linked to standard error (unbuffered)
++  extern _GLIBCXX_IMPORT ostream clog;		/// Linked to standard error (buffered)
  
  #ifdef _GLIBCXX_USE_WCHAR_T
--  extern wistream wcin;		///< Linked to standard input
--  extern wostream wcout;	///< Linked to standard output
--  extern wostream wcerr;	///< Linked to standard error (unbuffered)
--  extern wostream wclog;	///< Linked to standard error (buffered)
-+  extern _GLIBCXX_IMPORT wistream wcin;		///< Linked to standard input
-+  extern _GLIBCXX_IMPORT wostream wcout;	///< Linked to standard output
-+  extern _GLIBCXX_IMPORT wostream wcerr;	///< Linked to standard error (unbuffered)
-+  extern _GLIBCXX_IMPORT wostream wclog;	///< Linked to standard error (buffered)
+-  extern wistream wcin;		/// Linked to standard input
+-  extern wostream wcout;	/// Linked to standard output
+-  extern wostream wcerr;	/// Linked to standard error (unbuffered)
+-  extern wostream wclog;	/// Linked to standard error (buffered)
++  extern _GLIBCXX_IMPORT wistream wcin;		/// Linked to standard input
++  extern _GLIBCXX_IMPORT wostream wcout;	/// Linked to standard output
++  extern _GLIBCXX_IMPORT wostream wcerr;	/// Linked to standard error (unbuffered)
++  extern _GLIBCXX_IMPORT wostream wclog;	/// Linked to standard error (buffered)
  #endif
    //@}
  
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/libstdc++-v3/include/std/stdexcept
---- origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept	2009-04-09 16:00:19.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/include/std/stdexcept	2010-04-19 05:11:01.812500000 +0100
-@@ -50,7 +50,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+--- origsrc/gcc-4.7.2/libstdc++-v3/include/std/stdexcept	2011-12-07 04:03:25.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/include/std/stdexcept	2013-02-26 19:25:50.191415500 +0800
+@@ -53,7 +53,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  program runs (e.g., violations of class invariants).
     *  @brief One of two subclasses of exception.
     */
@@ -564,7 +533,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/li
    {
      string _M_msg;
  
-@@ -70,14 +70,14 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -72,7 +72,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  
    /** Thrown by the library, or by you, to report domain errors (domain in
     *  the mathematical sense).  */
@@ -573,15 +542,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/li
    {
    public:
      explicit domain_error(const string& __arg);
-   };
- 
-   /** Thrown to report invalid arguments to functions.  */
--  class invalid_argument : public logic_error 
-+  class _GLIBCXX_IMPORT invalid_argument : public logic_error
-   {
-   public:
-     explicit invalid_argument(const string& __arg);
-@@ -85,7 +85,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -89,7 +89,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  
    /** Thrown when an object is constructed that would exceed its maximum
     *  permitted size (e.g., a basic_string instance).  */
@@ -590,7 +551,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/li
    {
    public:
      explicit length_error(const string& __arg);
-@@ -93,7 +93,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -98,7 +98,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  
    /** This represents an argument whose value is not within the expected
     *  range (e.g., boundary checks in basic_string).  */
@@ -599,7 +560,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/li
    {
    public:
      explicit out_of_range(const string& __arg);
-@@ -104,7 +104,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -110,7 +110,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     *  the program executes.
     *  @brief One of two subclasses of exception.
     */
@@ -608,7 +569,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/li
    {
      string _M_msg;
  
-@@ -123,7 +123,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -128,7 +128,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    };
  
    /** Thrown to indicate range errors in internal computations.  */
@@ -617,7 +578,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/li
    {
    public:
      explicit range_error(const string& __arg);
-@@ -137,7 +137,7 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+@@ -144,7 +144,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    };
  
    /** Thrown to indicate arithmetic underflow.  */
@@ -626,37 +587,33 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/include/std/stdexcept src/gcc-4.5.0/li
    {
    public:
      explicit underflow_error(const string& __arg);
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.am src/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.am
---- origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.am	2009-08-23 08:28:35.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.am	2010-04-19 05:11:01.812500000 +0100
-@@ -154,7 +154,8 @@ LTCXXCOMPILE = $(LIBTOOL) --tag CXX --ta
- 	       --mode=compile $(CXX) $(TOPLEVEL_INCLUDES) \
- 	       $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) 
+--- origsrc/gcc-4.7.2/libstdc++-v3/libsupc++/Makefile.in	2012-08-06 09:34:27.000000000 -0500
++++ src/gcc-4.7.2/libstdc++-v3/libsupc++/Makefile.in	2013-03-01 01:43:14.850133600 -0600
+@@ -463,7 +463,8 @@ LTCXXCOMPILE = \
+ 	--mode=compile $(CXX) $(TOPLEVEL_INCLUDES) \
+ 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
  
 -LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS))
 +LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS)) \
-+		-no-undefined -bindir $(bindir)
++	-no-undefined -bindir $(bindir)
  
  # 3) We'd have a problem when building the shared libstdc++ object if
  # the rules automake generates would be used.  We cannot allow g++ to
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.in src/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.in
---- origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.in	2010-04-02 19:18:06.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/libsupc++/Makefile.in	2010-04-19 05:11:01.812500000 +0100
-@@ -466,7 +466,9 @@ LTCXXCOMPILE = $(LIBTOOL) --tag CXX --ta
- 	       --mode=compile $(CXX) $(TOPLEVEL_INCLUDES) \
- 	       $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) 
+--- origsrc/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2012-08-06 09:34:27.000000000 -0500
++++ src/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2013-03-01 01:42:17.174834800 -0600
+@@ -367,7 +367,8 @@ libstdc___la_DEPENDENCIES = \
+ 	$(top_builddir)/src/c++11/libc++11convenience.la
  
--LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS))
-+LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS)) \
-+		-no-undefined -bindir $(bindir)
-+
+ libstdc___la_LDFLAGS = \
+-	-version-info $(libtool_VERSION) ${version_arg} -lm
++	-version-info $(libtool_VERSION) ${version_arg} -lm \
++	-no-undefined -bindir $(bindir)
  
- # 3) We'd have a problem when building the shared libstdc++ object if
- # the rules automake generates would be used.  We cannot allow g++ to
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/exception src/gcc-4.5.0/libstdc++-v3/libsupc++/exception
---- origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/exception	2010-02-18 17:58:53.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/libsupc++/exception	2010-04-19 05:09:20.750000000 +0100
-@@ -58,7 +58,7 @@ namespace std
+ libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
+ 
+--- origsrc/gcc-4.7.2/libstdc++-v3/libsupc++/exception	2011-12-07 04:03:25.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/libsupc++/exception	2013-02-26 19:27:32.575916600 +0800
+@@ -59,7 +59,7 @@ namespace std
     *  your own %exception classes, or use a different hierarchy, or to
     *  throw non-class data (e.g., fundamental types).
     */
@@ -664,8 +621,8 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/exception src/gcc-4.5.0/libs
 +  class _GLIBCXX_IMPORT exception
    {
    public:
-     exception() throw() { }
-@@ -71,7 +71,7 @@ namespace std
+     exception() _GLIBCXX_USE_NOEXCEPT { }
+@@ -72,7 +72,7 @@ namespace std
  
    /** If an %exception is thrown which is not listed in a function's
     *  %exception specification, one of these may be thrown.  */
@@ -673,10 +630,9 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/exception src/gcc-4.5.0/libs
 +  class _GLIBCXX_IMPORT bad_exception : public exception
    {
    public:
-     bad_exception() throw() { }
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/new src/gcc-4.5.0/libstdc++-v3/libsupc++/new
---- origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/new	2010-02-18 17:58:53.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/libsupc++/new	2010-04-19 05:11:01.828125000 +0100
+     bad_exception() _GLIBCXX_USE_NOEXCEPT { }
+--- origsrc/gcc-4.7.2/libstdc++-v3/libsupc++/new	2011-10-13 02:40:58.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/libsupc++/new	2013-02-26 19:27:32.596919300 +0800
 @@ -53,7 +53,7 @@ namespace std
     *
     *  @c bad_alloc (or classes derived from it) is used to report allocation
@@ -686,39 +642,37 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/new src/gcc-4.5.0/libstdc++-
    {
    public:
      bad_alloc() throw() { }
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/typeinfo src/gcc-4.5.0/libstdc++-v3/libsupc++/typeinfo
---- origsrc/gcc-4.5.0/libstdc++-v3/libsupc++/typeinfo	2010-02-18 17:58:53.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/libsupc++/typeinfo	2010-04-19 05:10:35.125000000 +0100
-@@ -84,7 +84,7 @@ namespace std
+--- origsrc/gcc-4.7.2/libstdc++-v3/libsupc++/typeinfo	2012-01-28 03:38:56.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/libsupc++/typeinfo	2013-02-26 19:28:52.157522200 +0800
+@@ -87,7 +87,7 @@ namespace std
     *  The @c type_info class describes type information generated by
     *  an implementation.
    */
--  class type_info 
-+  class _GLIBCXX_IMPORT type_info 
+-  class type_info
++  class _GLIBCXX_IMPORT  type_info
    {
    public:
      /** Destructor first. Being the first non-inline virtual function, this
-@@ -171,7 +171,7 @@ namespace std
+@@ -186,7 +186,7 @@ namespace std
     *
     *  If you attempt an invalid @c dynamic_cast expression, an instance of
     *  this class (or something derived from this class) is thrown.  */
--  class bad_cast : public exception 
-+  class _GLIBCXX_IMPORT bad_cast : public exception 
+-  class bad_cast : public exception
++  class _GLIBCXX_IMPORT  bad_cast : public exception
    {
    public:
-     bad_cast() throw() { }
-@@ -188,7 +188,7 @@ namespace std
+     bad_cast() _GLIBCXX_USE_NOEXCEPT { }
+@@ -203,7 +203,7 @@ namespace std
     *  @brief Thrown when a NULL pointer in a @c typeid expression is used.
     *  @ingroup exceptions
     */
--  class bad_typeid : public exception 
-+  class _GLIBCXX_IMPORT bad_typeid : public exception 
+-  class bad_typeid : public exception
++  class _GLIBCXX_IMPORT bad_typeid : public exception
    {
    public:
-     bad_typeid () throw() { }
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/scripts/testsuite_flags.in src/gcc-4.5.0/libstdc++-v3/scripts/testsuite_flags.in
---- origsrc/gcc-4.5.0/libstdc++-v3/scripts/testsuite_flags.in	2007-09-11 23:32:51.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/scripts/testsuite_flags.in	2010-04-19 05:11:01.828125000 +0100
+     bad_typeid () _GLIBCXX_USE_NOEXCEPT { }
+--- origsrc/gcc-4.7.2/libstdc++-v3/scripts/testsuite_flags.in	2007-09-12 06:32:51.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/scripts/testsuite_flags.in	2013-02-26 19:29:43.370025400 +0800
 @@ -27,6 +27,7 @@ EOF
  BUILD_DIR=@glibcxx_builddir@
  SRC_DIR=@glibcxx_srcdir@
@@ -740,36 +694,33 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/scripts/testsuite_flags.in src/gcc-4.5
        echo ${SECTIONLDFLAGS}
        ;;
      *)
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/src/Makefile.am src/gcc-4.5.0/libstdc++-v3/src/Makefile.am
---- origsrc/gcc-4.5.0/libstdc++-v3/src/Makefile.am	2010-02-22 18:07:07.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/src/Makefile.am	2010-04-19 05:11:01.828125000 +0100
-@@ -210,7 +210,8 @@ libstdc___la_DEPENDENCIES = \
- 	$(top_builddir)/libsupc++/libsupc++convenience.la
+--- origsrc/gcc-4.7.2/libstdc++-v3/src/Makefile.am	2012-08-06 22:34:27.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/src/Makefile.am	2013-02-26 19:30:20.823281300 +0800
+@@ -74,7 +74,8 @@ libstdc___la_DEPENDENCIES = \
+ 	$(top_builddir)/src/c++11/libc++11convenience.la
  
  libstdc___la_LDFLAGS = \
--	-version-info $(libtool_VERSION) ${version_arg} -lm 
+-	-version-info $(libtool_VERSION) ${version_arg} -lm
 +	-version-info $(libtool_VERSION) ${version_arg} -lm \
 +	-no-undefined -bindir $(bindir)
  
  libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
  
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/src/Makefile.in src/gcc-4.5.0/libstdc++-v3/src/Makefile.in
---- origsrc/gcc-4.5.0/libstdc++-v3/src/Makefile.in	2010-04-02 19:18:06.000000000 +0100
-+++ src/gcc-4.5.0/libstdc++-v3/src/Makefile.in	2010-04-19 05:11:01.828125000 +0100
-@@ -452,7 +452,8 @@ libstdc___la_DEPENDENCIES = \
- 	$(top_builddir)/libsupc++/libsupc++convenience.la
+--- origsrc/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2012-08-06 09:34:27.000000000 -0500
++++ src/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2013-03-01 01:42:17.174834800 -0600
+@@ -367,7 +367,8 @@ libstdc___la_DEPENDENCIES = \
+ 	$(top_builddir)/src/c++11/libc++11convenience.la
  
  libstdc___la_LDFLAGS = \
--	-version-info $(libtool_VERSION) ${version_arg} -lm 
+-	-version-info $(libtool_VERSION) ${version_arg} -lm
 +	-version-info $(libtool_VERSION) ${version_arg} -lm \
 +	-no-undefined -bindir $(bindir)
  
  libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
  
-diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/testsuite/lib/libstdc++.exp src/gcc-4.5.0/libstdc++-v3/testsuite/lib/libstdc++.exp
---- origsrc/gcc-4.5.0/libstdc++-v3/testsuite/lib/libstdc++.exp	2010-01-07 00:22:51.000000000 +0000
-+++ src/gcc-4.5.0/libstdc++-v3/testsuite/lib/libstdc++.exp	2010-04-19 05:11:01.843750000 +0100
-@@ -124,6 +124,9 @@ proc libstdc++_init { testfile } {
+--- origsrc/gcc-4.7.2/libstdc++-v3/testsuite/lib/libstdc++.exp	2012-08-06 22:34:27.000000000 +0800
++++ src/gcc-4.7.2/libstdc++-v3/testsuite/lib/libstdc++.exp	2013-02-26 19:31:07.934763700 +0800
+@@ -126,6 +126,9 @@ proc libstdc++_init { testfile } {
  	if { [string match "powerpc-*-darwin*" $target_triplet] } {
  	    append DEFAULT_CXXFLAGS " -multiply_defined suppress"
  	} 
@@ -779,7 +730,7 @@ diff -pruN origsrc/gcc-4.5.0/libstdc++-v3/testsuite/lib/libstdc++.exp src/gcc-4.
      }
      v3track DEFAULT_CXXFLAGS 2
  
-@@ -144,6 +147,9 @@ proc libstdc++_init { testfile } {
+@@ -146,6 +149,9 @@ proc libstdc++_init { testfile } {
          set gccdir [file dirname $gccdir]
  	append ld_library_path_tmp ":${gccdir}"
      }

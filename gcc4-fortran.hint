@@ -1,4 +1,0 @@
-sdesc: "GCC Release series 4 compiler: Fortran subpackage"
-category: Devel
-requires: binutils w32api libgcc1 libgfortran3 libgmp3 libintl8 libmpfr1 gcc4-core libcloog0 libmpc1 libppl
-external-source: gcc4

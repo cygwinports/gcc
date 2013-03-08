@@ -1,6 +1,5 @@
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/a-intnam-cygwin.ads src/gcc-4.5.0/gcc/ada/a-intnam-cygwin.ads
---- origsrc/gcc-4.5.0/gcc/ada/a-intnam-cygwin.ads	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/a-intnam-cygwin.ads	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/a-intnam-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/a-intnam-cygwin.ads	2013-02-25 22:54:36.447141300 +0800
 @@ -0,0 +1,168 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -170,9 +169,8 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/a-intnam-cygwin.ads src/gcc-4.5.0/gcc/ada/a
 +     System.OS_Interface.SIGPWR;        --  Power failure
 +
 +end Ada.Interrupts.Names;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/g-soccon-cygwin.ads src/gcc-4.5.0/gcc/ada/g-soccon-cygwin.ads
---- origsrc/gcc-4.5.0/gcc/ada/g-soccon-cygwin.ads	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/g-soccon-cygwin.ads	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/g-soccon-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/g-soccon-cygwin.ads	2013-02-25 22:55:38.908072800 +0800
 @@ -0,0 +1,196 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -370,184 +368,8 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/g-soccon-cygwin.ads src/gcc-4.5.0/gcc/ada/g
 +   --  Set False for contexts where socket i/o are process blocking
 +
 +end GNAT.Sockets.Constants;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/gcc-interface/Makefile.in src/gcc-4.5.0/gcc/ada/gcc-interface/Makefile.in
---- origsrc/gcc-4.5.0/gcc/ada/gcc-interface/Makefile.in	2010-04-22 12:15:21.859375000 +0100
-+++ src/gcc-4.5.0/gcc/ada/gcc-interface/Makefile.in	2010-04-22 12:20:07.875000000 +0100
-@@ -186,6 +186,13 @@ TARGET_ADA_SRCS =
- # Type of tools build we are doing; default is not compiling tools.
- TOOLSCASE =
- 
-+# Which install goal to use.
-+INSTALL_GNATLIB_MAIN  = install-gnatlib
-+INSTALL_GNATLIB_WIN32 = unused-install-gnatlib
-+
-+# Set shared lib prefix (lib on all systems but cygwin, which uses cyg)
-+LIBGNAT_SHARED_LIB_PREFIX=lib
-+
- # Multilib handling
- MULTISUBDIR =
- RTSDIR = rts$(subst /,_,$(MULTISUBDIR))
-@@ -1594,7 +1601,15 @@ ifeq ($(strip $(filter-out avr none powe
-   indepsw.adb<indepsw-gnu.adb
- endif
- 
--ifeq ($(strip $(filter-out cygwin32% mingw32% pe,$(osys))),)
-+ifeq ($(strip $(filter-out cygwin% mingw32% pe,$(osys))),)
-+
-+  # Set target pair suffix for mingw or cygwin
-+  W32_TARG=mingw
-+  ifneq ($(strip $(filter cygwin%,$(osys))),)
-+    W32_TARG=cygwin
-+    LIBGNAT_SHARED_LIB_PREFIX=cyg
-+  endif
-+
-   LIBGNAT_TARGET_PAIRS = \
-   a-dirval.adb<a-dirval-mingw.adb \
-   a-excpol.adb<a-excpol-abort.adb \
-@@ -1607,8 +1622,6 @@ ifeq ($(strip $(filter-out cygwin32% min
-   s-tasinf.adb<s-tasinf-mingw.adb \
-   s-tasinf.ads<s-tasinf-mingw.ads \
-   g-bytswa.adb<g-bytswa-x86.adb \
--  g-socthi.ads<g-socthi-mingw.ads \
--  g-socthi.adb<g-socthi-mingw.adb \
-   g-stsifd.adb<g-stsifd-sockets.adb \
-   g-soliop.ads<g-soliop-mingw.ads
- 
-@@ -1659,7 +1672,7 @@
- 	  system.ads<system-mingw-x86_64.ads
-       else
- 	LIBGNAT_TARGET_PAIRS += \
--	  system.ads<system-mingw.ads
-+	  system.ads<system-$(W32_TARG).ads
-       endif
-     endif
- 
-@@ -1667,7 +1680,17 @@
- 	s-win32.o s-winext.o g-regist.o g-sse.o g-ssvety.o
-     EXTRA_GNATRTL_TASKING_OBJS = a-exetim.o
- 
--    MISCLIB = -lws2_32
-+    # Which install goal to use.
-+    INSTALL_GNATLIB_MAIN  = unused-install-gnatlib
-+    INSTALL_GNATLIB_WIN32 = install-gnatlib
-+
-+    # Mingw uses winsock-based sockets; cygwin uses POSIX sockets.
-+    ifneq ($(strip $(filter-out cygwin%,$(osys))),)
-+      LIBGNAT_TARGET_PAIRS += \
-+      g-socthi.ads<g-socthi-mingw.ads \
-+      g-socthi.adb<g-socthi-mingw.adb
-+      MISCLIB = -lwsock32
-+    endif
- 
-     # ??? This will be replaced by gnatlib-shared-dual-win32 when GNAT
-     # auto-import support for array/record will be done.
-@@ -1665,10 +1688,11 @@ ifeq ($(strip $(filter-out cygwin32% min
-   endif
- 
-   TOOLS_TARGET_PAIRS= \
--  mlib-tgt-specific.adb<mlib-tgt-specific-mingw.adb \
-+  mlib-tgt-specific.adb<mlib-tgt-specific-$(W32_TARG).adb \
-   indepsw.adb<indepsw-mingw.adb
- 
-   GMEM_LIB = gmemlib
-+  EH_MECHANISM=-gcc
-   EXTRA_GNATTOOLS = ../../gnatdll$(exeext)
-   EXTRA_GNATMAKE_OBJS = mdll.o mdll-utl.o mdll-fil.o
-   soext = .dll
-@@ -2333,7 +2357,7 @@ gnatlink-re:  link.o targext.o
- 	  true; \
- 	fi
- 
--install-gnatlib: ../stamp-gnatlib-$(RTSDIR)
-+$(INSTALL_GNATLIB_MAIN): ../stamp-gnatlib-$(RTSDIR)
- #	Create the directory before deleting it, in case the directory is
- #	a list of directories (as it may be on VMS). This ensures we are
- #	deleting the right one.
-@@ -2381,6 +2405,46 @@ install-gnatlib: ../stamp-gnatlib-$(RTSD
- 	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.adb
- 	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.ads
- 
-+$(INSTALL_GNATLIB_WIN32): ../stamp-gnatlib-$(RTSDIR)
-+#	Create the directory before deleting it, in case the directory is
-+#	a list of directories (as it may be on VMS). This ensures we are
-+#	deleting the right one.
-+	-$(MKDIR) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
-+	-$(MKDIR) $(DESTDIR)$(ADA_INCLUDE_DIR)
-+	$(RMDIR) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
-+	$(RMDIR) $(DESTDIR)$(ADA_INCLUDE_DIR)
-+	-$(MKDIR) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
-+	-$(MKDIR) $(DESTDIR)$(ADA_INCLUDE_DIR)
-+	for file in $(RTSDIR)/*.ali; do \
-+	    $(INSTALL_DATA_DATE) $$file $(DESTDIR)$(ADA_RTL_OBJ_DIR); \
-+	done
-+	-$(INSTALL_DATA) $(RTSDIR)/g-trasym$(objext) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
-+	-cd $(RTSDIR); for file in *$(arext);do \
-+	    $(INSTALL_DATA) $$file $(DESTDIR)$(ADA_RTL_OBJ_DIR); \
-+	    $(RANLIB_FOR_TARGET) $(DESTDIR)$(ADA_RTL_OBJ_DIR)/$$file; \
-+	done
-+	-$(foreach file, $(EXTRA_ADALIB_FILES), \
-+	    $(INSTALL_DATA_DATE) $(RTSDIR)/$(file) $(DESTDIR)$(ADA_RTL_OBJ_DIR) && \
-+	) true
-+#     Install the shared libraries, if any, using $(INSTALL) instead
-+#     of $(INSTALL_DATA). The latter may force a mode inappropriate
-+#     for shared libraries on some targets, e.g. on HP-UX where the x
-+#     permission is required.  We are win32 here.
-+	for file in gnat gnarl; do \
-+	   if [ -f $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) ]; then \
-+	      $(INSTALL) $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) \
-+			 $(DESTDIR)$(bindir); \
-+	      $(LN_S) $(bindir)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) \
-+	      $(DESTDIR)$(ADA_RTL_OBJ_DIR)/lib$${file}$(hyphen)$(LIBRARY_VERSION).dll.a; \
-+	   fi; \
-+	done
-+# This copy must be done preserving the date on the original file.
-+	for file in $(RTSDIR)/*.ad?; do \
-+	    $(INSTALL_DATA_DATE) $$file $(DESTDIR)$(ADA_INCLUDE_DIR); \
-+	done
-+	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.adb
-+	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.ads
-+
- ../stamp-gnatlib2-$(RTSDIR):
- 	$(RM) $(RTSDIR)/s-*.ali
- 	$(RM) $(RTSDIR)/s-*$(objext)
-@@ -2545,16 +2611,16 @@ gnatlib-shared-win32:
- 	     MULTISUBDIR="$(MULTISUBDIR)" \
- 	     THREAD_KIND="$(THREAD_KIND)" \
-              gnatlib
--	$(RM) $(RTSDIR)/libgna*$(soext)
-+	$(RM) $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)gna*$(soext)
- 	cd $(RTSDIR); ../../xgcc -B../../ -shared $(TARGET_LIBGCC2_CFLAGS) \
--		-o libgnat$(hyphen)$(LIBRARY_VERSION)$(soext) \
-+		-o $(LIBGNAT_SHARED_LIB_PREFIX)gnat$(hyphen)$(LIBRARY_VERSION)$(soext) \
- 		$(GNATRTL_NONTASKING_OBJS) $(LIBGNAT_OBJS) \
--		$(SO_OPTS)libgnat$(hyphen)$(LIBRARY_VERSION)$(soext) $(MISCLIB)
-+		$(SO_OPTS)$(LIBGNAT_SHARED_LIB_PREFIX)gnat$(hyphen)$(LIBRARY_VERSION)$(soext) $(MISCLIB)
- 	cd $(RTSDIR); ../../xgcc -B../../ -shared $(TARGET_LIBGCC2_CFLAGS) \
--		-o libgnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
-+		-o $(LIBGNAT_SHARED_LIB_PREFIX)gnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
- 		$(GNATRTL_TASKING_OBJS) \
--		$(SO_OPTS)libgnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
--		$(THREADSLIB) -Wl,libgnat$(hyphen)$(LIBRARY_VERSION)$(soext)
-+		$(SO_OPTS)$(LIBGNAT_SHARED_LIB_PREFIX)gnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
-+		$(THREADSLIB) -Wl,$(LIBGNAT_SHARED_LIB_PREFIX)gnat$(hyphen)$(LIBRARY_VERSION)$(soext)
- 
- gnatlib-shared-darwin:
- 	$(MAKE) $(FLAGS_TO_PASS) \
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/gsocket.h src/gcc-4.5.0/gcc/ada/gsocket.h
---- origsrc/gcc-4.5.0/gcc/ada/gsocket.h	2010-04-22 12:15:21.890625000 +0100
-+++ src/gcc-4.5.0/gcc/ada/gsocket.h	2010-04-22 12:16:07.312500000 +0100
-@@ -217,7 +217,7 @@
-  * VxWorks and VMS).
-  */
- 
--#if defined (_AIX) || defined (__FreeBSD__) || defined (__hpux__) || defined (__osf__) || defined (_WIN32) || defined (__APPLE__)
-+#if defined (_AIX) || defined (__FreeBSD__) || defined (__hpux__) || defined (__osf__) || defined (__CYGWIN__) || defined (_WIN32) || defined (__APPLE__)
- # define HAVE_THREAD_SAFE_GETxxxBYyyy 1
- #elif defined (sgi) || defined (linux) || defined (__GLIBC__) || (defined (sun) && defined (__SVR4) && !defined (__vxworks)) || defined(__rtems__)
- # define HAVE_GETxxxBYyyy_R 1
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/indepsw-cygwin.adb src/gcc-4.5.0/gcc/ada/indepsw-cygwin.adb
---- origsrc/gcc-4.5.0/gcc/ada/indepsw-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/indepsw-cygwin.adb	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/indepsw-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/indepsw-cygwin.adb	2013-02-25 22:56:27.015181700 +0800
 @@ -0,0 +1,69 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -618,13 +440,12 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/indepsw-cygwin.adb src/gcc-4.5.0/gcc/ada/in
 +   end Is_Supported;
 +
 +end Indepsw;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/initialize.c src/gcc-4.5.0/gcc/ada/initialize.c
---- origsrc/gcc-4.5.0/gcc/ada/initialize.c	2010-04-22 12:15:21.921875000 +0100
-+++ src/gcc-4.5.0/gcc/ada/initialize.c	2010-04-19 06:08:12.000000000 +0100
-@@ -348,6 +348,40 @@ __gnat_initialize (void *eh ATTRIBUTE_UN
+--- origsrc/gcc-4.7.2/gcc/ada/initialize.c	2011-07-13 01:23:04.000000000 +0800
++++ src/gcc-4.7.2/gcc/ada/initialize.c	2013-02-25 22:57:26.560743000 +0800
+@@ -347,6 +347,39 @@ __gnat_initialize (void *eh ATTRIBUTE_UN
+ {
    __main ();
  }
- 
 +#elif defined (__CYGWIN__)
 +
 +/***************************************/
@@ -658,13 +479,11 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/initialize.c src/gcc-4.5.0/gcc/ada/initiali
 +     __gnat_install_SEH_handler (eh);
 +#endif
 +}
-+
+ 
  #else
  
- /* For all other versions of GNAT, the initialize routine and handler
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/mlib-tgt-cygwin.adb src/gcc-4.5.0/gcc/ada/mlib-tgt-cygwin.adb
---- origsrc/gcc-4.5.0/gcc/ada/mlib-tgt-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/mlib-tgt-cygwin.adb	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/mlib-tgt-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/mlib-tgt-cygwin.adb	2013-02-25 22:58:26.986916100 +0800
 @@ -0,0 +1,160 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -826,9 +645,8 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/mlib-tgt-cygwin.adb src/gcc-4.5.0/gcc/ada/m
 +   Library_Major_Minor_Id_Supported_Ptr :=
 +                                Library_Major_Minor_Id_Supported'Access;
 +end MLib.Tgt.Specific;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/s-gloloc-cygwin.adb src/gcc-4.5.0/gcc/ada/s-gloloc-cygwin.adb
---- origsrc/gcc-4.5.0/gcc/ada/s-gloloc-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/s-gloloc-cygwin.adb	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/s-gloloc-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/s-gloloc-cygwin.adb	2013-02-25 22:59:32.067680300 +0800
 @@ -0,0 +1,113 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -943,9 +761,8 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/s-gloloc-cygwin.adb src/gcc-4.5.0/gcc/ada/s
 +   end Release_Lock;
 +
 +end System.Global_Locks;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/s-osinte-cygwin.ads src/gcc-4.5.0/gcc/ada/s-osinte-cygwin.ads
---- origsrc/gcc-4.5.0/gcc/ada/s-osinte-cygwin.ads	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/s-osinte-cygwin.ads	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/s-osinte-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/s-osinte-cygwin.ads	2013-02-25 23:01:34.615742000 +0800
 @@ -0,0 +1,952 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -1899,9 +1716,8 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/s-osinte-cygwin.ads src/gcc-4.5.0/gcc/ada/s
 +   end record;
 +
 +end System.OS_Interface;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/s-taprop-cygwin.adb src/gcc-4.5.0/gcc/ada/s-taprop-cygwin.adb
---- origsrc/gcc-4.5.0/gcc/ada/s-taprop-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/s-taprop-cygwin.adb	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/s-taprop-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/s-taprop-cygwin.adb	2013-02-25 23:02:32.360074600 +0800
 @@ -0,0 +1,1339 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -3242,52 +3058,27 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/s-taprop-cygwin.adb src/gcc-4.5.0/gcc/ada/s
 +   end Initialize;
 +
 +end System.Task_Primitives.Operations;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/sysdep.c src/gcc-4.5.0/gcc/ada/sysdep.c
---- origsrc/gcc-4.5.0/gcc/ada/sysdep.c	2010-04-22 12:15:22.093750000 +0100
-+++ src/gcc-4.5.0/gcc/ada/sysdep.c	2010-04-19 06:08:12.000000000 +0100
-@@ -405,7 +405,7 @@ getc_immediate_common (FILE *stream,
+--- origsrc/gcc-4.7.2/gcc/ada/sysdep.c	2012-01-23 16:51:38.000000000 +0800
++++ src/gcc-4.7.2/gcc/ada/sysdep.c	2013-02-26 06:14:03.597344200 +0800
+@@ -311,7 +311,7 @@ getc_immediate_common (FILE *stream,
  {
- #if defined (linux) || defined (sun) || defined (sgi) || defined (__EMX__) \
+ #if defined (linux) || defined (sun) || defined (sgi) \
      || (defined (__osf__) && ! defined (__alpha_vxworks)) \
 -    || defined (__CYGWIN32__) || defined (__MACHTEN__) || defined (__hpux__) \
 +    || defined (__CYGWIN__) || defined (__MACHTEN__) || defined (__hpux__) \
      || defined (_AIX) || (defined (__svr4__) && defined (i386)) \
      || defined (__Lynx__) || defined (__FreeBSD__) || defined (__OpenBSD__) \
      || defined (__GLIBC__) || defined (__APPLE__)
-@@ -694,6 +694,40 @@ rts_get_nShowCmd (void)
+@@ -592,6 +592,16 @@ rts_get_nShowCmd (void)
  }
  
  #endif /* WINNT */
 +
 +#ifdef __CYGWIN__
-+
++#include <malloc.h>
 +size_t _msize(void *memblock)
 +{
 +  return (size_t) malloc_usable_size (memblock);
-+}
-+
-+#include <windows.h>
-+
-+int
-+__gnat_is_windows_xp (void)
-+{
-+  static int is_win_xp=0, is_win_xp_checked=0;
-+
-+  if (!is_win_xp_checked)
-+    {
-+      OSVERSIONINFO version;
-+
-+      is_win_xp_checked = 1;
-+
-+      memset (&version, 0, sizeof (version));
-+      version.dwOSVersionInfoSize = sizeof (version);
-+
-+      is_win_xp = GetVersionEx (&version)
-+        && version.dwPlatformId == VER_PLATFORM_WIN32_NT
-+        && (version.dwMajorVersion > 5
-+            || (version.dwMajorVersion == 5 && version.dwMinorVersion >= 1));
-+    }
-+  return is_win_xp;
 +}
 +
 +#endif /* __CYGWIN__ */
@@ -3295,9 +3086,8 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/sysdep.c src/gcc-4.5.0/gcc/ada/sysdep.c
  #ifdef VMS
  
  /* This gets around a problem with using the old threads library on VMS 7.0. */
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/system-cygwin.ads src/gcc-4.5.0/gcc/ada/system-cygwin.ads
---- origsrc/gcc-4.5.0/gcc/ada/system-cygwin.ads	1970-01-01 00:00:00.000000000 +0000
-+++ src/gcc-4.5.0/gcc/ada/system-cygwin.ads	2010-04-19 06:08:12.000000000 +0100
+--- origsrc/gcc-4.7.2/gcc/ada/system-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
++++ src/gcc-4.7.2/gcc/ada/system-cygwin.ads	2013-02-25 23:05:31.530326300 +0800
 @@ -0,0 +1,199 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
@@ -3498,15 +3288,4 @@ diff -pruN origsrc/gcc-4.5.0/gcc/ada/system-cygwin.ads src/gcc-4.5.0/gcc/ada/sys
 +   --  System.Task_Primitives.Operations.
 +
 +end System;
-diff -pruN origsrc/gcc-4.5.0/gcc/ada/system-mingw.ads src/gcc-4.5.0/gcc/ada/system-mingw.ads
---- origsrc/gcc-4.5.0/gcc/ada/system-mingw.ads	2010-04-22 12:15:22.140625000 +0100
-+++ src/gcc-4.5.0/gcc/ada/system-mingw.ads	2010-04-19 06:08:12.000000000 +0100
-@@ -139,7 +139,7 @@ private
-    Always_Compatible_Rep     : constant Boolean := False;
-    Suppress_Standard_Library : constant Boolean := False;
-    Use_Ada_Main_Program_Name : constant Boolean := False;
--   ZCX_By_Default            : constant Boolean := False;
-+   ZCX_By_Default            : constant Boolean := True;
-    GCC_ZCX_Support           : constant Boolean := True;
- 
-    ---------------------------
+

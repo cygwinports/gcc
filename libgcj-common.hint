@@ -1,4 +1,0 @@
-sdesc: "GCC Release series 4 compiler: Java runtime configuration files"
-category: Devel
-requires: bash
-external-source: gcc4

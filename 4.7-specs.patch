@@ -1,0 +1,33 @@
+Accept -pthread and -rdynamic for compatibility with Linux.
+Add --large-address-aware, and use --tsaware, only with EXEs.
+
+--- origsrc/gcc-4.7.2/gcc/config/i386/cygwin.h	2012-02-13 15:46:38.000000000 -0600
++++ src/gcc-4.7.2/gcc/config/i386/cygwin.h	2013-03-06 00:13:25.986558800 -0600
+@@ -22,7 +22,7 @@ along with GCC; see the file COPYING3.
+ #define EXTRA_OS_CPP_BUILTINS()  /* Nothing.  */
+ 
+ #undef CPP_SPEC
+-#define CPP_SPEC "%(cpp_cpu) %{posix:-D_POSIX_SOURCE} \
++#define CPP_SPEC "%(cpp_cpu) %{posix:-D_POSIX_SOURCE} ${pthread: } \
+   -D__CYGWIN32__ -D__CYGWIN__ %{!ansi:-Dunix} -D__unix__ -D__unix \
+   %{mwin32:-DWIN32 -D_WIN32 -D__WIN32 -D__WIN32__ %{!ansi:-DWINNT}} \
+   %{!nostdinc:%{!mno-win32:-idirafter ../include/w32api%s -idirafter ../../include/w32api%s}}\
+@@ -72,6 +72,7 @@ along with GCC; see the file COPYING3.
+ #undef LIB_SPEC
+ #define LIB_SPEC "\
+   %{pg:-lgmon} \
++  %{pthread: }
+   -lcygwin \
+   %{mwindows:-lgdi32 -lcomdlg32} \
+   -ladvapi32 -lshell32 -luser32 -lkernel32"
+@@ -115,7 +116,9 @@ along with GCC; see the file COPYING3.
+   %{shared: --shared} %{mdll:--dll} \
+   %{static:-Bstatic} %{!static:-Bdynamic} \
+   %{shared|mdll: --enable-auto-image-base -e __cygwin_dll_entry@12} \
+-  --dll-search-prefix=cyg -tsaware"
++  --dll-search-prefix=cyg \
++  %{rdynamic: --export-all-symbols} \
++  %{!shared: %{!mdll: --large-address-aware --tsaware}}"
+ 
+ /* Binutils does not handle weak symbols from dlls correctly.  For now,
+    do not use them unnecessarily in gthr-posix.h.  */
