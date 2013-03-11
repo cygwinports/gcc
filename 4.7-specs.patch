@@ -1,6 +1,17 @@
 Accept -pthread and -rdynamic for compatibility with Linux.
 Add --large-address-aware, and use --tsaware, only with EXEs.
 
+--- origsrc/gcc-4.7.2/gcc/config.gcc	2012-09-12 04:03:54.000000000 -0500
++++ src/gcc-4.7.2/gcc/config.gcc	2013-03-11 03:41:03.674656700 -0500
+@@ -1417,7 +1417,7 @@ i[34567]86-*-cygwin*)
+ 	xm_file=i386/xm-cygwin.h
+ 	tmake_file="${tmake_file} i386/t-cygming t-slibgcc"
+ 	target_gtfiles="\$(srcdir)/config/i386/winnt.c"
+-	extra_options="${extra_options} i386/cygming.opt"
++	extra_options="${extra_options} i386/cygming.opt i386/cygwin.opt"
+ 	extra_objs="winnt.o winnt-stubs.o"
+ 	c_target_objs="${c_target_objs} msformat-c.o"
+ 	cxx_target_objs="${cxx_target_objs} winnt-cxx.o msformat-c.o"
 --- origsrc/gcc-4.7.2/gcc/config/i386/cygwin.h	2012-02-13 15:46:38.000000000 -0600
 +++ src/gcc-4.7.2/gcc/config/i386/cygwin.h	2013-03-06 00:13:25.986558800 -0600
 @@ -22,7 +22,7 @@ along with GCC; see the file COPYING3.
@@ -31,3 +42,33 @@ Add --large-address-aware, and use --tsaware, only with EXEs.
  
  /* Binutils does not handle weak symbols from dlls correctly.  For now,
     do not use them unnecessarily in gthr-posix.h.  */
+--- origsrc/gcc-4.7.2/gcc/config/i386/cygwin.opt	1969-12-31 18:00:00.000000000 -0600
++++ src/gcc-4.7.2/gcc/config/i386/cygwin.opt	2013-03-11 03:36:36.556378400 -0500
+@@ -0,0 +1,27 @@
++; Cygwin-specific options.
++
++; Copyright (C) 2005, 2007, 2009, 2010, 2011 Free Software Foundation, Inc.
++;
++; This file is part of GCC.
++;
++; GCC is free software; you can redistribute it and/or modify it under
++; the terms of the GNU General Public License as published by the Free
++; Software Foundation; either version 3, or (at your option) any later
++; version.
++;
++; GCC is distributed in the hope that it will be useful, but WITHOUT ANY
++; WARRANTY; without even the implied warranty of MERCHANTABILITY or
++; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++; for more details.
++;
++; You should have received a copy of the GNU General Public License
++; along with GCC; see the file COPYING3.  If not see
++; <http://www.gnu.org/licenses/>.
++
++pthread
++Driver
++
++rdynamic
++Driver
++
++; Retain blank line above
