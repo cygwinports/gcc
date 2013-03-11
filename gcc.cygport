@@ -41,6 +41,7 @@ PATCH_URI="
 	4.5-java-FIONREAD.patch
 	4.7-java-jni.patch
 	4.7-java-libgc-win32.patch
+	4.7-libffi-noinst.patch
 	4.7-libitm-cygwin.patch
 	4.7-libstdc.patch
 	4.7-misc-core.patch
@@ -48,8 +49,8 @@ PATCH_URI="
 	4.5-skiptest.patch
 "
 
-# new files created by ada.patch, need to be removed if re-prep'ing
-DISTCLEANFILES="gcc/ada/*-cygwin.*"
+# new files created by patches, need to be removed if re-prep'ing
+DISTCLEANFILES="gcc/ada/*-cygwin.* gcc/config/i386/cygwin.opt"
 
 # These must not be set in the environment, but main cygport
 # script tries to be too helpful here and confuses auto-detection
@@ -77,6 +78,8 @@ CYGCONF_ARGS="
 	--enable-threads=posix
 	--enable-libgomp
 	--disable-libitm
+	--enable-libquadmath
+	--enable-libquadmath-support
 	--enable-libssp
 	--enable-libada
 	--enable-libjava
@@ -97,7 +100,6 @@ src_test() {
 	local gccpath
 
 	gccpath="${B}/gcc/ada/rts:"
-	gccpath+="${B}/${TOOLCHAIN_TARGET}/libffi/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgcc/shlib:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgfortran/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
@@ -137,7 +139,7 @@ src_install() {
 KEEP_LA_FILES="none"
 
 PKG_NAMES="${NAME}  ${NAME}-core ${NAME}-g++ ${NAME}-java ${NAME}-fortran ${NAME}-objc ${NAME}-objc++ ${NAME}-ada"
-PKG_NAMES+=" libgcc1 libgomp1 libssp0 libgfortran3 libffi4 libgcj-common libobjc4 libstdc++6 libstdc++6-devel libgnat${VERSION%[-\.]*} libgcj11 libquadmath0"
+PKG_NAMES+=" libgcc1 libgomp1 libssp0 libgfortran3 libgcj-common libobjc4 libstdc++6 libstdc++6-devel libgnat${VERSION%[-\.]*} libgcj13 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils w32api-headers w32api-runtime"
@@ -315,8 +317,6 @@ gcc_ada_CONTENTS="
     usr/share/info/gnat_rm.info* \
     usr/share/info/gnat_ugn.info* \
 "
-libffi4_SUMMARY="Foreign Function Interface library (runtime)"
-libffi4_CONTENTS="usr/bin/cygffi-4.dll"
 libgcc1_SUMMARY="GCC C runtime library"
 libgcc1_CONTENTS="usr/bin/cyggcc_s-1.dll"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
