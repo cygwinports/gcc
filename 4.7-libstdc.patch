@@ -599,18 +599,6 @@
  
  # 3) We'd have a problem when building the shared libstdc++ object if
  # the rules automake generates would be used.  We cannot allow g++ to
---- origsrc/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2012-08-06 09:34:27.000000000 -0500
-+++ src/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2013-03-01 01:42:17.174834800 -0600
-@@ -367,7 +367,8 @@ libstdc___la_DEPENDENCIES = \
- 	$(top_builddir)/src/c++11/libc++11convenience.la
- 
- libstdc___la_LDFLAGS = \
--	-version-info $(libtool_VERSION) ${version_arg} -lm
-+	-version-info $(libtool_VERSION) ${version_arg} -lm \
-+	-no-undefined -bindir $(bindir)
- 
- libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
- 
 --- origsrc/gcc-4.7.2/libstdc++-v3/libsupc++/exception	2011-12-07 04:03:25.000000000 +0800
 +++ src/gcc-4.7.2/libstdc++-v3/libsupc++/exception	2013-02-26 19:27:32.575916600 +0800
 @@ -59,7 +59,7 @@ namespace std
