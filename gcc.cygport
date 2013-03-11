@@ -267,14 +267,12 @@ gcc_java_CONTENTS="
     usr/share/man/man1/jcf-dump.1* \
     usr/share/man/man1/jv-convert.1* \
     usr/share/man/man1/rebuild-gcj-db.1* \
-    usr/share/python/aotcompile.py \
-    usr/share/python/classfile.py \
+    usr/share/gcc-${VERSION}/python/libjava/aotcompile.py \
+    usr/share/gcc-${VERSION}/python/libjava/classfile.py \
 "
 gcc_fortran_SUMMARY="${SUMMARY} (Fortran)"
 gcc_fortran_REQUIRES="${NAME}-core"
 gcc_fortran_CONTENTS="
-    etc/postinstall/gcc-fortran.sh \
-    etc/preremove/gcc-fortran.sh
     usr/bin/gfortran.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gfortran.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/finclude/ \
@@ -287,7 +285,7 @@ gcc_objc_SUMMARY="${SUMMARY} (Objective-C)"
 gcc_objc_REQUIRES="${NAME}-core"
 gcc_objc_CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/objc/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cc1objc.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cc1obj.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libobjc.*
 "
 gcc_objc___SUMMARY="${SUMMARY} (Objective-C++)"
@@ -322,7 +320,7 @@ libgcc1_CONTENTS="usr/bin/cyggcc_s-1.dll"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
 libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
 libgnat4_7_SUMMARY="GCC Ada runtime library"
-libgnat4_7_CONTENTS="usr/bin/cyggnarl-4.7.dll usr/bin/cyggnat-4.7.dll"
+libgnat4_7_CONTENTS="usr/bin/libgnarl-4.7.dll usr/bin/libgnat-4.7.dll"
 libgcj13_SUMMARY="GCC Java runtime library"
 libgcj13_REQUIRES="libgcj-common"
 libgcj13_CONTENTS="usr/bin/cyggcj*-13.dll usr/bin/cyggij-13.dll"
@@ -343,3 +341,4 @@ libstdc__6_SUMMARY="GCC C++ runtime library"
 libstdc__6_CONTENTS="usr/bin/cygstdc++-6.dll"
 libquadmath0_SUMMARY="GCC Quad-Precision Math runtime library"
 libquadmath0_CONTENTS="usr/bin/cygquadmath-0.dll"
+PKG_IGNORE="usr/lib/libiberty.*"
