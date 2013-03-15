@@ -3061,9 +3061,9 @@
 --- origsrc/gcc-4.7.2/gcc/ada/sysdep.c	2012-01-23 16:51:38.000000000 +0800
 +++ src/gcc-4.7.2/gcc/ada/sysdep.c	2013-02-26 06:14:03.597344200 +0800
 @@ -311,7 +311,7 @@ getc_immediate_common (FILE *stream,
+                        int waiting)
  {
- #if defined (linux) || defined (sun) || defined (sgi) \
-     || (defined (__osf__) && ! defined (__alpha_vxworks)) \
+ #if defined (linux) || defined (sun) \
 -    || defined (__CYGWIN32__) || defined (__MACHTEN__) || defined (__hpux__) \
 +    || defined (__CYGWIN__) || defined (__MACHTEN__) || defined (__hpux__) \
      || defined (_AIX) || (defined (__svr4__) && defined (i386)) \

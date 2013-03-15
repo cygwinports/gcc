@@ -22,35 +22,39 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.7.2
-RELEASE=2
+VERSION=4.8-20130310
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
 Objective-C, Fortran, Java, Ada, and Go, as well as libraries for these
 languages (libstdc++, libgcj,...)."
 HOMEPAGE="http://gcc.gnu.org/"
-SRC_URI="http://ftp.gnu.org/gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.bz2 \
-         http://ftp.gnu.org/gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.bz2.sig"
+case ${VERSION} in
+*.*-20[1-9][0-9][0-1][0-9][0-3][0-9])
+	SRC_URI="mirror://gcc/snapshots/${VERSION}/gcc-${VERSION}.tar.bz2" ;;
+*)	SRC_URI="mirror://gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.bz2" ;;
+esac
 SRC_DIR="gcc-${VERSION}"
 
 PATCH_URI="
-	config-rpath.patch
+	ftp://ftp.cygwin.com/pub/cygwin/64bit/x86_64-pc-cygwin-gcc-20130305.patch
 	4.7-ada.patch
 	4.7-java-awt.patch
 	4.5-java-FIONREAD.patch
 	4.7-java-jni.patch
 	4.7-java-libgc-win32.patch
+	4.8-libffi-cygwin64.patch
 	4.7-libffi-noinst.patch
 	4.7-libitm-cygwin.patch
 	4.7-libstdc.patch
 	4.7-misc-core.patch
-	4.7-specs.patch
+	4.8-specs.patch
 	4.5-skiptest.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
-DISTCLEANFILES="gcc/ada/*-cygwin.* gcc/config/i386/cygwin.opt"
+DISTCLEANFILES="gcc/ada/*-cygwin.* gcc/config/i386/cygwin.opt gcc/config/i386/*cygwin-w64*"
 
 # These must not be set in the environment, but main cygport
 # script tries to be too helpful here and confuses auto-detection
@@ -88,7 +92,7 @@ CYGCONF_ARGS="
 	--disable-symvers
 	--with-ecj-jar=/usr/share/java/ecj.jar
 	--with-gnu-ld --with-gnu-as
-	--with-cloog-include=/usr/include/cloog-ppl
+	--with-cloog-include=/usr/include/cloog-isl
 	--without-libiconv-prefix
 	--without-libintl-prefix
 	--with-system-zlib
@@ -139,7 +143,7 @@ src_install() {
 KEEP_LA_FILES="none"
 
 PKG_NAMES="${NAME}  ${NAME}-core ${NAME}-g++ ${NAME}-java ${NAME}-fortran ${NAME}-objc ${NAME}-objc++ ${NAME}-ada"
-PKG_NAMES+=" libgcc1 libgomp1 libssp0 libgfortran3 libgcj-common libobjc4 libstdc++6 libstdc++6-devel libgnat${VERSION%[-\.]*} libgcj13 libquadmath0"
+PKG_NAMES+=" libgcc1 libgomp1 libssp0 libgfortran3 libgcj-common libobjc4 libstdc++6 libstdc++6-devel libgnat${VERSION%[-\.]*} libgcj14 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils w32api-headers w32api-runtime"
@@ -150,26 +154,26 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/bin/gcc-nm.exe \
     usr/bin/gcc-ranlib.exe \
     usr/bin/gcov.exe \
-    usr/bin/${TOOLCHAIN_TARGET}-gcc-${VERSION}.exe \
+    usr/bin/${TOOLCHAIN_TARGET}-gcc-${VERSION/-*/.*}.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-ar.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-nm.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-ranlib.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/*.h \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/ssp/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include-fixed \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/install-tools \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cc1.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/collect2.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/crt*.o \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cyglto_plugin-0.dll \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libcaf_single.a \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgcc* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgcov.* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgomp.* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libquadmath.* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libssp* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/lto*.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/*.h \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/ssp/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include-fixed \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/install-tools \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/collect2.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/crt*.o \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cyglto_plugin-0.dll \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libcaf_single.a \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcc* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcov.* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp.* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libquadmath.* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libssp* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/lto*.exe \
     usr/sbin/fix-libtool-scripts-for-latest-gcc-runtimes.sh \
     usr/share/doc/${NAME}/ \
     usr/share/info/cpp.info* \
@@ -195,11 +199,11 @@ gcc_g___CONTENTS="
     usr/bin/g++.exe \
     usr/bin/${TOOLCHAIN_TARGET}-c++.exe \
     usr/bin/${TOOLCHAIN_TARGET}-g++.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cc1plus.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libstdc++* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libsupc++* \
-    usr/share/gcc-${VERSION}/python/libstdcxx/
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1plus.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libstdc++* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libsupc++* \
+    usr/share/gcc-${VERSION/-*/.*}/python/libstdcxx/
     usr/share/man/man1/g++.1* \
 "
 gcc_java_SUMMARY="${SUMMARY} (Java)"
@@ -229,22 +233,22 @@ gcc_java_CONTENTS="
     usr/bin/jv-convert.exe \
     usr/bin/rebuild-gcj-db \
     usr/bin/${TOOLCHAIN_TARGET}-gcj.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/gcj/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/gnu/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/java*/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/org/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/gcj/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/jni*.h \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/ecj1.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/jc1.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/jvgenmain.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgcj* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgij* \
-    usr/lib/gcj-${VERSION}-$((PV[2] + 6))/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/gcj/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/gnu/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/java*/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/org/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/gcj/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/jni*.h \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/ecj1.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/jc1.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/jvgenmain.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcj* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgij* \
+    usr/lib/gcj-${VERSION/-*/.*}-$((PV[2] + 6))/ \
     usr/lib/pkgconfig/libgcj-${VERSION%[-\.]*}.pc \
     usr/share/info/cp-tools.info* \
     usr/share/info/gcj.info* \
-    usr/share/java/libgcj*-${VERSION}.jar \
+    usr/share/java/libgcj*-${VERSION/-*/.*}.jar \
     usr/share/man/man1/aot-compile.1* \
     usr/share/man/man1/gappletviewer.1* \
     usr/share/man/man1/gc-analyze.1* \
@@ -267,31 +271,31 @@ gcc_java_CONTENTS="
     usr/share/man/man1/jcf-dump.1* \
     usr/share/man/man1/jv-convert.1* \
     usr/share/man/man1/rebuild-gcj-db.1* \
-    usr/share/gcc-${VERSION}/python/libjava/aotcompile.py \
-    usr/share/gcc-${VERSION}/python/libjava/classfile.py \
+    usr/share/gcc-${VERSION/-*/.*}/python/libjava/aotcompile.py \
+    usr/share/gcc-${VERSION/-*/.*}/python/libjava/classfile.py \
 "
 gcc_fortran_SUMMARY="${SUMMARY} (Fortran)"
 gcc_fortran_REQUIRES="${NAME}-core"
 gcc_fortran_CONTENTS="
     usr/bin/gfortran.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gfortran.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/finclude/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/f951.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgfortran* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/finclude/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/f951.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgfortran* \
     usr/share/info/gfortran.info* \
     usr/share/man/man1/gfortran.1* \
 "
 gcc_objc_SUMMARY="${SUMMARY} (Objective-C)"
 gcc_objc_REQUIRES="${NAME}-core"
 gcc_objc_CONTENTS="
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/objc/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cc1obj.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libobjc.*
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/objc/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1obj.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libobjc.*
 "
 gcc_objc___SUMMARY="${SUMMARY} (Objective-C++)"
 gcc_objc___REQUIRES="${NAME}-core ${NAME}-g++ ${NAME}-objc"
 gcc_objc___CONTENTS="
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cc1objplus.exe
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1objplus.exe
 "
 gcc_ada_SUMMARY="${SUMMARY} (Ada)"
 gcc_ada_REQUIRES="${NAME}-core"
@@ -308,22 +312,22 @@ gcc_ada_CONTENTS="
     usr/bin/gnatname.exe \
     usr/bin/gnatprep.exe \
     usr/bin/gnatxref.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adainclude \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/gnat1.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/adainclude \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/adalib \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/gnat1.exe \
     usr/share/info/gnat-style.info* \
     usr/share/info/gnat_rm.info* \
     usr/share/info/gnat_ugn.info* \
 "
 libgcc1_SUMMARY="GCC C runtime library"
-libgcc1_CONTENTS="usr/bin/cyggcc_s-1.dll"
+libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
 libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
-libgnat4_7_SUMMARY="GCC Ada runtime library"
-libgnat4_7_CONTENTS="usr/bin/libgnarl-4.7.dll usr/bin/libgnat-4.7.dll"
-libgcj13_SUMMARY="GCC Java runtime library"
-libgcj13_REQUIRES="libgcj-common"
-libgcj13_CONTENTS="usr/bin/cyggcj*-13.dll usr/bin/cyggij-13.dll"
+libgnat4_8_SUMMARY="GCC Ada runtime library"
+libgnat4_8_CONTENTS="usr/bin/libgnarl-4.8.dll usr/bin/libgnat-4.8.dll"
+libgcj14_SUMMARY="GCC Java runtime library"
+libgcj14_REQUIRES="libgcj-common"
+libgcj14_CONTENTS="usr/bin/cyggcj*-14.dll usr/bin/cyggij-14.dll"
 libgcj_common_SUMMARY="GCC Java runtime data"
 libgcj_common_CONTENTS="
     etc/defaults/usr/lib/logging.properties \
