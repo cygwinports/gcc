@@ -1,29 +1,62 @@
---- origsrc/gcc-4.7.2/libitm/Makefile.am	2012-02-14 07:14:27.000000000 -0600
-+++ src/gcc-4.7.2/libitm/Makefile.am	2013-03-05 15:49:30.894434800 -0600
-@@ -53,8 +53,8 @@ libitm_version_info = -version-info $(li
- # Force link with C, not C++.  For now, while we're using C++ we don't
- # want or need libstdc++.
- libitm_la_DEPENDENCIES = $(libitm_version_dep)
--libitm_la_LINK = $(LINK) $(libitm_la_LDFLAGS)
--libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script)
-+libitm_la_LINK = $(CXXLINK) $(libitm_la_LDFLAGS)
-+libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script) -no-undefined -bindir $(bindir)
+--- origsrc/gcc-4.8-20130310/libitm/aclocal.m4	2013-03-10 17:37:36.000000000 -0500
++++ src/gcc-4.8-20130310/libitm/aclocal.m4	2013-03-17 03:01:59.966866400 -0500
+@@ -996,6 +996,7 @@ m4_include([../config/depstand.m4])
+ m4_include([../config/enable.m4])
+ m4_include([../config/futex.m4])
+ m4_include([../config/lead-dot.m4])
++m4_include([../config/lthostflags.m4])
+ m4_include([../config/mmap.m4])
+ m4_include([../config/multi.m4])
+ m4_include([../config/override.m4])
+--- origsrc/gcc-4.8-20130310/libitm/configure	2013-03-10 17:37:36.000000000 -0500
++++ src/gcc-4.8-20130310/libitm/configure	2013-03-17 03:02:07.416876700 -0500
+@@ -630,6 +630,7 @@ MAINTAINER_MODE_FALSE
+ MAINTAINER_MODE_TRUE
+ enable_static
+ enable_shared
++lt_host_flags
+ CXXCPP
+ CPP
+ OTOOL64
+@@ -15139,6 +15140,28 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
  
- libitm_la_SOURCES = \
- 	aatree.cc alloc.cc alloc_c.cc alloc_cpp.cc barrier.cc beginend.cc \
---- origsrc/gcc-4.7.2/libitm/Makefile.in	2012-09-20 02:23:55.000000000 -0500
-+++ src/gcc-4.7.2/libitm/Makefile.in	2013-03-05 15:49:38.430891800 -0600
-@@ -374,8 +374,8 @@ libitm_version_info = -version-info $(li
- # Force link with C, not C++.  For now, while we're using C++ we don't
- # want or need libstdc++.
- libitm_la_DEPENDENCIES = $(libitm_version_dep)
--libitm_la_LINK = $(LINK) $(libitm_la_LDFLAGS)
--libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script)
-+libitm_la_LINK = $(CXXLINK) $(libitm_la_LDFLAGS)
-+libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script) -no-undefined -bindir $(bindir)
- libitm_la_SOURCES = aatree.cc alloc.cc alloc_c.cc alloc_cpp.cc \
- 	barrier.cc beginend.cc clone.cc eh_cpp.cc local.cc query.cc \
- 	retry.cc rwlock.cc useraction.cc util.cc sjlj.S tls.cc \
+ 
+ 
++
++
++case $host in
++  *-cygwin* | *-mingw*)
++    # 'host' will be top-level target in the case of a target lib,
++    # we must compare to with_cross_host to decide if this is a native
++    # or cross-compiler and select where to install dlls appropriately.
++    if test -n "$with_cross_host" &&
++	test x"$with_cross_host" != x"no"; then
++      lt_host_flags='-no-undefined -bindir "$(toolexeclibdir)"';
++    else
++      lt_host_flags='-no-undefined -bindir "$(bindir)"';
++    fi
++    ;;
++  *)
++    lt_host_flags=
++    ;;
++esac
++
++
++
++
+ 
+ 
+ 
+--- origsrc/gcc-4.8-20130310/libitm/configure.ac	2013-02-03 11:46:11.000000000 -0600
++++ src/gcc-4.8-20130310/libitm/configure.ac	2013-03-17 02:56:04.926376500 -0500
+@@ -147,6 +147,7 @@ AM_CONDITIONAL(BUILD_INFO, test $gcc_cv_
+ 
+ # Configure libtool
+ AM_PROG_LIBTOOL
++ACX_LT_HOST_FLAGS
+ AC_SUBST(enable_shared)
+ AC_SUBST(enable_static)
+ 
 --- origsrc/gcc-4.7.2/libitm/configure.tgt	2012-02-13 15:51:44.000000000 -0600
 +++ src/gcc-4.7.2/libitm/configure.tgt	2013-03-05 05:39:29.757102000 -0600
 @@ -131,7 +131,7 @@ case "${target}" in
