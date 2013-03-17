@@ -82,7 +82,7 @@ CYGCONF_ARGS="
 	--with-dwarf2
 	${ARCH_i686+--with-arch=i686} --with-tune=generic
 	${ARCH_i686+--disable-sjlj-exceptions}
-	--enable-languages=${ARCH_i686+ada,}c,c++,fortran,java,lto,objc,obj-c++
+	--enable-languages=${ARCH_i686+ada,}c,c++,fortran,${ARCH_i686+java,}lto,objc,obj-c++
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
@@ -92,7 +92,7 @@ CYGCONF_ARGS="
 	--enable-libquadmath-support
 	--enable-libssp
 	${ARCH_i686+--enable-libada}
-	--enable-libjava
+	${ARCH_i686+--enable-libjava}
 	--enable-libgcj-sublibs
 	--disable-java-awt
 	--disable-symvers
@@ -134,8 +134,7 @@ src_install() {
 	mkdir -p ${D}/usr/share/doc/${NAME}
 	tar -cj -C ${S} INSTALL | tar -xj -C ${D}/usr/share/doc/${NAME}/
 
-	# Create defaults of libgcj-common config files.
-	make_etc_defaults /usr/lib/logging.properties /usr/lib/security/classpath.security
+	if defined ARCH_i686; then
 
 	# Install the helper scripts for fixing up existing .la files
 	dosbin ${C}/fix-libtool-scripts-for-latest-gcc-runtimes.sh
@@ -144,12 +143,21 @@ src_install() {
 	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/*.dll ${D}/usr/bin/
 	dosym ../../../../bin/libgnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
 	dosym ../../../../bin/libgnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
+
+	# Create defaults of libgcj-common config files.
+	make_etc_defaults /usr/lib/logging.properties /usr/lib/security/classpath.security
+
+	fi # ARCH_i686
 }
 
 KEEP_LA_FILES="none"
 
-PKG_NAMES="${NAME}  ${NAME}-core ${NAME}-g++ ${NAME}-java ${NAME}-fortran ${NAME}-objc ${NAME}-objc++ ${NAME}-ada"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgcj-common libobjc4 libstdc++6 libstdc++6-devel libgnat${VERSION%[-\.]*} libgcj14 libquadmath0"
+PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-objc ${NAME}-objc++"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libobjc4 libstdc++6 libquadmath0"
+if defined ARCH_i686
+then
+	PKG_NAMES+="${NAME}-ada ${NAME}-java libgcj-common libgcj14 libgnat${VERSION%[-\.]*} libstdc++6-devel"
+fi
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils w32api-headers w32api-runtime"
@@ -180,7 +188,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libquadmath.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libssp* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/lto*.exe \
-    usr/sbin/fix-libtool-scripts-for-latest-gcc-runtimes.sh \
+    ${ARCH_i686+usr/sbin/fix-libtool-scripts-for-latest-gcc-runtimes.sh} \
     usr/share/doc/${NAME}/ \
     usr/share/info/cpp.info* \
     usr/share/info/cppinternals.info* \
