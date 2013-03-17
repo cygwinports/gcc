@@ -44,6 +44,7 @@ PATCH_URI="
 	4.7-java-jni.patch
 	4.7-java-libgc-win32.patch
 	4.8-java-soname.patch
+	4.8-libatomic-cygwin.patch
 	4.8-libdecnumber-cygwin64.patch
 	4.8-libffi-cygwin64.patch
 	4.7-libffi-noinst.patch
@@ -84,6 +85,7 @@ CYGCONF_ARGS="
 	--enable-languages=${ARCH_i686+ada,}c,c++,fortran,java,lto,objc,obj-c++
 	--enable-graphite
 	--enable-threads=posix
+	--enable-libatomic
 	--enable-libgomp
 	--disable-libitm
 	--enable-libquadmath
@@ -147,7 +149,7 @@ src_install() {
 KEEP_LA_FILES="none"
 
 PKG_NAMES="${NAME}  ${NAME}-core ${NAME}-g++ ${NAME}-java ${NAME}-fortran ${NAME}-objc ${NAME}-objc++ ${NAME}-ada"
-PKG_NAMES+=" libgcc1 libgomp1 libssp0 libgfortran3 libgcj-common libobjc4 libstdc++6 libstdc++6-devel libgnat${VERSION%[-\.]*} libgcj14 libquadmath0"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgcj-common libobjc4 libstdc++6 libstdc++6-devel libgnat${VERSION%[-\.]*} libgcj14 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils w32api-headers w32api-runtime"
@@ -171,7 +173,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/collect2.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/crt*.o \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cyglto_plugin.dll \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libcaf_single.a \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libatomic.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcc* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcov.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp.* \
@@ -285,6 +287,7 @@ gcc_fortran_CONTENTS="
     usr/bin/${TOOLCHAIN_TARGET}-gfortran.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/finclude/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/f951.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libcaf_single.a \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgfortran* \
     usr/share/info/gfortran.info* \
     usr/share/man/man1/gfortran.1* \
@@ -323,6 +326,8 @@ gcc_ada_CONTENTS="
     usr/share/info/gnat_rm.info* \
     usr/share/info/gnat_ugn.info* \
 "
+libatomic1_SUMMARY="GCC C11/C++11 locked atomics runtime library"
+libatomic1_CONTENTS="usr/bin/cygatomic-1.dll"
 libgcc1_SUMMARY="GCC C runtime library"
 libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
