@@ -130,6 +130,13 @@ src_install() {
 	# ends up empty somehow.
 	cyginstall -j1
 
+	# Workaround GCC install bug
+	if defined ARCH_x86_64
+	then
+		mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib/libgcc_s.dll.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/
+#		mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib32/libgcc_s.dll.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/32/
+	fi
+
 	# Now move docs to correct location
 	mkdir -p ${D}/usr/share/doc/${NAME}
 	tar -cj -C ${S} INSTALL | tar -xj -C ${D}/usr/share/doc/${NAME}/
