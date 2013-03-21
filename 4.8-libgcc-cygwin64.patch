@@ -21,9 +21,9 @@
 +		       __attribute__((unused)) struct object *o)
 +{}
  
-+TARGET_ATTRIBUTE_WEAK void
++TARGET_ATTRIBUTE_WEAK void*
 +__deregister_frame_info (__attribute__((unused)) const void *p)
-+{}
++{ return NULL; }
 +#endif /* DWARF2_UNWIND_INFO */
 +
 +#if TARGET_USE_JCR_SECTION

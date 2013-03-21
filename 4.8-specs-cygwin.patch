@@ -11,7 +11,7 @@
      ;;
 --- gcc/config.gcc	2012-09-12 04:03:54.000000000 -0500
 +++ gcc/config.gcc	2013-03-11 03:41:03.674656700 -0500
-@@ -1438,15 +1438,31 @@ i[34567]86-*-cygwin*)
+@@ -1438,15 +1438,30 @@ i[34567]86-*-cygwin*)
  	xm_file=i386/xm-cygwin.h
  	tmake_file="${tmake_file} i386/t-cygming t-slibgcc"
  	target_gtfiles="\$(srcdir)/config/i386/winnt.c"
@@ -39,7 +39,6 @@
 +		thread_file='posix'
 +	fi
 +	use_gcc_stdint=wrap
-+	tm_defines="${tm_defines} TARGET_CYGWIN64=1"
 +	;;
  i[34567]86-*-mingw* | x86_64-*-mingw*)
  	tm_file="${tm_file} i386/unix.h i386/bsd.h i386/gas.h dbxcoff.h i386/cygming.h"
@@ -152,7 +151,7 @@
 +  do								\
 +    {								\
 +      builtin_define ("__CYGWIN__");				\
-+      if (!TARGET_CYGWIN64)					\
++      if (!TARGET_64BIT)					\
 +	builtin_define ("__CYGWIN32__");			\
 +      builtin_define ("__unix__");				\
 +      builtin_define ("__unix");				\
