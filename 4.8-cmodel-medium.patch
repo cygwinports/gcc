@@ -1,14 +1,29 @@
---- gcc/config/i386/i386-protos.h	(revision 196430)
-+++ gcc/config/i386/i386-protos.h	(working copy)
-@@ -260,6 +260,7 @@
- extern void i386_pe_assemble_visibility (tree, int);
- extern tree i386_pe_mangle_decl_assembler_name (tree, tree);
- extern tree i386_pe_mangle_assembler_name (const char *);
-+extern void i386_pe_record_stub (const char *);
+Index: gcc/config/i386/predicates.md
+===================================================================
+--- gcc/config/i386/predicates.md	(revision 196791)
++++ gcc/config/i386/predicates.md	(working copy)
+@@ -137,6 +137,8 @@
+ 	switch (XINT (XEXP (op, 0), 1))
+ 	  {
+ 	  case UNSPEC_GOTPCREL:
++	    if (DEFAULT_ABI == MS_ABI)
++	      break;
+ 	  case UNSPEC_DTPOFF:
+ 	  case UNSPEC_GOTNTPOFF:
+ 	  case UNSPEC_NTPOFF:
+@@ -436,6 +438,9 @@
+   if (SYMBOL_REF_TLS_MODEL (op))
+     return false;
  
- extern void i386_pe_seh_init (FILE *);
- extern void i386_pe_seh_end_prologue (FILE *);
---- gcc/config/i386/winnt.c	(revision 196430)
++  /* Dll-imported symbols are always external.  */
++  if (TARGET_DLLIMPORT_DECL_ATTRIBUTES && SYMBOL_REF_DLLIMPORT_P (op))
++    return false;
+   if (SYMBOL_REF_LOCAL_P (op))
+     return true;
+ 
+Index: gcc/config/i386/winnt.c
+===================================================================
+--- gcc/config/i386/winnt.c	(revision 196791)
 +++ gcc/config/i386/winnt.c	(working copy)
 @@ -646,8 +646,18 @@
    int is_data;		/* used to type tag exported symbols.  */
@@ -51,17 +66,7 @@
  #ifdef CXX_WRAP_SPEC_LIST
  
  /*  Hash table equality helper function.  */
-@@ -736,6 +761,9 @@
- 
- #endif /* CXX_WRAP_SPEC_LIST */
- 
-+void
-+ix86_pecoff_decl_stub (void);
-+
- /* This is called at the end of assembly.  For each external function
-    which has not been defined, we output a declaration now.  We also
-    output the .drectve section.  */
-@@ -781,6 +809,30 @@
+@@ -781,6 +806,30 @@
  		   (q->is_data ? ",data" : ""));
  	}
      }
@@ -92,7 +97,9 @@
  }
  
  
---- gcc/config/i386/xm-mingw32.h	(revision 196430)
+Index: gcc/config/i386/xm-mingw32.h
+===================================================================
+--- gcc/config/i386/xm-mingw32.h	(revision 196791)
 +++ gcc/config/i386/xm-mingw32.h	(working copy)
 @@ -29,6 +29,12 @@
  /*  The st_ino field of struct stat is always 0.  */
@@ -107,22 +114,21 @@
  #define HOST_LONG_LONG_FORMAT "I64"
 +#endif
 +
-Index: gcc/config/i386/cygming.h
+Index: gcc/config/i386/i386-protos.h
 ===================================================================
---- gcc/config/i386/cygming.h	(revision 196430)
-+++ gcc/config/i386/cygming.h	(working copy)
-@@ -474,5 +474,8 @@
- #undef TARGET_ASM_ASSEMBLE_VISIBILITY
- #define TARGET_ASM_ASSEMBLE_VISIBILITY i386_pe_assemble_visibility
+--- gcc/config/i386/i386-protos.h	(revision 196791)
++++ gcc/config/i386/i386-protos.h	(working copy)
+@@ -260,6 +260,7 @@
+ extern void i386_pe_assemble_visibility (tree, int);
+ extern tree i386_pe_mangle_decl_assembler_name (tree, tree);
+ extern tree i386_pe_mangle_assembler_name (const char *);
++extern void i386_pe_record_stub (const char *);
  
-+#undef SUB_TARGET_RECORD_STUB
-+#define SUB_TARGET_RECORD_STUB i386_pe_record_stub
-+
- /* Static stack checking is supported by means of probes.  */
- #define STACK_CHECK_STATIC_BUILTIN 1
+ extern void i386_pe_seh_init (FILE *);
+ extern void i386_pe_seh_end_prologue (FILE *);
 Index: gcc/config/i386/i386.c
 ===================================================================
---- gcc/config/i386/i386.c	(revision 196430)
+--- gcc/config/i386/i386.c	(revision 196791)
 +++ gcc/config/i386/i386.c	(working copy)
 @@ -64,6 +64,8 @@
  #include "tree-flow.h"
@@ -133,26 +139,30 @@ Index: gcc/config/i386/i386.c
  
  #ifndef CHECK_STACK_LIMIT
  #define CHECK_STACK_LIMIT (-1)
-@@ -3234,7 +3236,7 @@
+@@ -3234,7 +3236,11 @@
  	 would otherwise be needed if this object is to be placed in a
  	 DLL, and is essentially just as efficient as direct addressing.  */
        if (TARGET_64BIT && DEFAULT_ABI == MS_ABI)
 -	ix86_cmodel = CM_SMALL_PIC, flag_pic = 1;
++#ifdef TARGET_CYGWIN64
 +	ix86_cmodel = CM_MEDIUM_PIC, flag_pic = 1;
++#else
++	ix86_cmodel = CM_MEDIUM_PIC, flag_pic = 1;
++#endif
        else if (TARGET_64BIT && TARGET_RDOS)
  	ix86_cmodel = CM_MEDIUM_PIC, flag_pic = 1;
        else if (TARGET_64BIT)
-@@ -10575,7 +10577,9 @@
+@@ -10575,7 +10581,9 @@
      ix86_emit_save_sse_regs_using_mov (frame.sse_reg_save_offset);
  
    pic_reg_used = false;
-+  /* We don't use pic-register for pe-coff target.  */
++  /* We don't use pic-register for x64 pe-coff target.  */
    if (pic_offset_table_rtx
 +      && DEFAULT_ABI != MS_ABI
        && (df_regs_ever_live_p (REAL_PIC_OFFSET_TABLE_REGNUM)
  	  || crtl->profile))
      {
-@@ -11380,7 +11384,8 @@
+@@ -11380,7 +11388,8 @@
  	  use_reg (&call_fusage, rax);
  	}
  
@@ -162,35 +172,28 @@ Index: gcc/config/i386/i386.c
  	{
  	  HOST_WIDE_INT argval;
  
-@@ -11999,6 +12004,27 @@
+@@ -11998,7 +12007,20 @@
+   return !ix86_legitimate_constant_p (mode, x);
  }
  
++/*  Nonzero if the symbol is marked as dllimport, or as stub-variable,
++    otherwise zero.  */
  
 +static bool
 +is_imported_p (rtx x)
 +{
-+  const char *name;
-+
 +  if (!TARGET_DLLIMPORT_DECL_ATTRIBUTES
 +      || GET_CODE (x) != SYMBOL_REF)
 +    return false;
 +
-+  if (SYMBOL_REF_DLLIMPORT_P (x))
-+    return true;
-+
-+  if ((name = XSTR (x, 0)) != NULL
-+      && (!strncmp (name, "*__imp_", 7)
-+          || !strncmp (name, "*.refptr.", 9)
-+          || !strncmp (name, "*refptr.", 8)))
-+    return true;
-+  return false;
++  return SYMBOL_REF_DLLIMPORT_P (x) || SYMBOL_REF_STUBVAR_P (x);
 +}
 +
 +
  /* Nonzero if the constant value X is a legitimate general operand
     when generating PIC code.  It is given that flag_pic is on and
     that X satisfies CONSTANT_P or is a CONST_DOUBLE.  */
-@@ -12086,11 +12112,32 @@
+@@ -12086,11 +12108,39 @@
  	  /* FALLTHRU */
  
  	case SYMBOL_REF:
@@ -203,22 +206,29 @@ Index: gcc/config/i386/i386.c
  	    return false;
 -	  if (!SYMBOL_REF_FAR_ADDR_P (op0) && SYMBOL_REF_LOCAL_P (op0)
 -	      && ix86_cmodel != CM_LARGE_PIC)
++
 +	  if (DEFAULT_ABI == MS_ABI)
 +	    {
 +	      if (is_imported_p (op0))
 +		return true;
-+	      if (SYMBOL_REF_FUNCTION_P (op0)
-+		  && ix86_cmodel != CM_LARGE_PIC
-+		  && !SYMBOL_REF_FAR_ADDR_P (op0)
-+		  && SYMBOL_REF_LOCAL_P (op0))
++
++	      if (SYMBOL_REF_FAR_ADDR_P (op0)
++		  || !SYMBOL_REF_LOCAL_P (op0))
++		break;
++
++	      /* Function-symbols need to be resolved only for
++	         large-model.
++	         For the small-model we don't need to resolve anything
++	         here.  */
++	      if ((ix86_cmodel != CM_LARGE_PIC
++	           && SYMBOL_REF_FUNCTION_P (op0))
++		  || ix86_cmodel == CM_SMALL_PIC)
 +		return true;
-+	      if (!SYMBOL_REF_EXTERNAL_P (op0)
-+		  && (ix86_cmodel == CM_LARGE_PIC
-+		      || ix86_cmodel == CM_MEDIUM_PIC)
-+		  && !SYMBOL_REF_FAR_ADDR_P (op0) && SYMBOL_REF_LOCAL_P (op0))
-+		return true;
-+	      if ((ix86_cmodel == CM_SMALL_PIC)
-+		  && !SYMBOL_REF_FAR_ADDR_P (op0) && SYMBOL_REF_LOCAL_P (op0))
++	      /* Non-external symbols don't need to be resolved for
++	         large, and medium-model.  */
++	      if ((ix86_cmodel == CM_LARGE_PIC
++		   || ix86_cmodel == CM_MEDIUM_PIC)
++		  && !SYMBOL_REF_EXTERNAL_P (op0))
 +		return true;
 +	    }
 +	  else if (!SYMBOL_REF_FAR_ADDR_P (op0)
@@ -227,7 +237,7 @@ Index: gcc/config/i386/i386.c
  	    return true;
  	  break;
  
-@@ -12151,7 +12198,7 @@
+@@ -12151,7 +12201,7 @@
        if ((GET_CODE (XVECEXP (disp, 0, 0)) == SYMBOL_REF
  	   || GET_CODE (XVECEXP (disp, 0, 0)) == LABEL_REF)
  	  && !TARGET_64BIT)
@@ -236,7 +246,7 @@ Index: gcc/config/i386/i386.c
        return false;
      case UNSPEC_GOTTPOFF:
      case UNSPEC_GOTNTPOFF:
-@@ -12486,11 +12533,17 @@
+@@ -12486,11 +12536,17 @@
      }
  #endif
  
@@ -257,7 +267,7 @@ Index: gcc/config/i386/i386.c
      {
        rtx tmpreg;
        /* This symbol may be referenced via a displacement from the PIC
-@@ -12521,9 +12574,10 @@
+@@ -12521,9 +12577,10 @@
  					 tmpreg, 1, OPTAB_DIRECT);
  	  new_rtx = reg;
  	}
@@ -270,7 +280,7 @@ Index: gcc/config/i386/i386.c
      {
        /* This symbol may be referenced via a displacement from the PIC
  	 base address (@GOTOFF).  */
-@@ -12554,31 +12604,22 @@
+@@ -12554,31 +12611,22 @@
  	      see gotoff_operand.  */
  	   || (TARGET_VXWORKS_RTP && GET_CODE (addr) == LABEL_REF))
      {
@@ -308,7 +318,7 @@ Index: gcc/config/i386/i386.c
        else if (TARGET_64BIT && ix86_cmodel != CM_LARGE_PIC)
  	{
  	  new_rtx = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, addr), UNSPEC_GOTPCREL);
-@@ -12647,7 +12692,7 @@
+@@ -12647,7 +12695,7 @@
  
  	  /* Check first to see if this is a constant offset from a @GOTOFF
  	     symbol reference.  */
@@ -317,7 +327,7 @@ Index: gcc/config/i386/i386.c
  	      && CONST_INT_P (op1))
  	    {
  	      if (!TARGET_64BIT)
-@@ -12791,7 +12836,7 @@
+@@ -12791,7 +12839,7 @@
  
        if (!TARGET_64BIT)
  	{
@@ -326,7 +336,7 @@ Index: gcc/config/i386/i386.c
  	    pic = pic_offset_table_rtx;
  	  else
  	    {
-@@ -13006,7 +13051,7 @@
+@@ -13006,7 +13054,7 @@
    htab_t dllimport_map;
  
  static tree
@@ -335,7 +345,7 @@ Index: gcc/config/i386/i386.c
  {
    struct tree_map *h, in;
    void **loc;
-@@ -13039,8 +13084,11 @@
+@@ -13039,8 +13087,11 @@
  
    name = IDENTIFIER_POINTER (DECL_ASSEMBLER_NAME (decl));
    name = targetm.strip_name_encoding (name);
@@ -349,10 +359,12 @@ Index: gcc/config/i386/i386.c
    namelen = strlen (name);
    prefixlen = strlen (prefix);
    imp_name = (char *) alloca (namelen + prefixlen + 1);
-@@ -13051,6 +13103,13 @@
+@@ -13050,7 +13101,14 @@
+   name = ggc_alloc_string (imp_name, namelen + prefixlen);
    rtl = gen_rtx_SYMBOL_REF (Pmode, name);
    SET_SYMBOL_REF_DECL (rtl, to);
-   SYMBOL_REF_FLAGS (rtl) = SYMBOL_FLAG_LOCAL;
+-  SYMBOL_REF_FLAGS (rtl) = SYMBOL_FLAG_LOCAL;
++  SYMBOL_REF_FLAGS (rtl) = SYMBOL_FLAG_LOCAL | SYMBOL_FLAG_STUBVAR;
 +  if (!beimport)
 +    {
 +      SYMBOL_REF_FLAGS (rtl) |= SYMBOL_FLAG_EXTERNAL;
@@ -363,7 +375,7 @@ Index: gcc/config/i386/i386.c
  
    rtl = gen_const_mem (Pmode, rtl);
    set_mem_alias_set (rtl, ix86_GOT_alias_set ());
-@@ -13061,6 +13116,24 @@
+@@ -13061,6 +13119,24 @@
    return to;
  }
  
@@ -388,7 +400,7 @@ Index: gcc/config/i386/i386.c
  /* Expand SYMBOL into its corresponding dllimport symbol.  WANT_REG is
     true if we require the result be a register.  */
  
-@@ -13071,7 +13144,7 @@
+@@ -13071,7 +13147,7 @@
    rtx x;
  
    gcc_assert (SYMBOL_REF_DECL (symbol));
@@ -397,7 +409,7 @@ Index: gcc/config/i386/i386.c
  
    x = DECL_RTL (imp_decl);
    if (want_reg)
-@@ -13079,6 +13152,47 @@
+@@ -13079,6 +13155,47 @@
    return x;
  }
  
@@ -445,7 +457,7 @@ Index: gcc/config/i386/i386.c
  /* Try machine-dependent ways of modifying an illegitimate address
     to be legitimate.  If we find one, return the new, valid address.
     This macro is used in only one place: `memory_address' in explow.c.
-@@ -13119,16 +13233,9 @@
+@@ -13119,16 +13236,9 @@
  
    if (TARGET_DLLIMPORT_DECL_ATTRIBUTES)
      {
@@ -465,7 +477,7 @@ Index: gcc/config/i386/i386.c
      }
  
    if (flag_pic && SYMBOLIC_CONST (x))
-@@ -15944,6 +16051,8 @@
+@@ -15944,6 +16054,8 @@
  
    if (GET_CODE (op1) == SYMBOL_REF)
      {
@@ -474,7 +486,7 @@ Index: gcc/config/i386/i386.c
        model = SYMBOL_REF_TLS_MODEL (op1);
        if (model)
  	{
-@@ -15953,9 +16062,8 @@
+@@ -15953,9 +16065,8 @@
  	    return;
  	  op1 = convert_to_mode (mode, op1, 1);
  	}
@@ -486,7 +498,7 @@ Index: gcc/config/i386/i386.c
      }
    else if (GET_CODE (op1) == CONST
  	   && GET_CODE (XEXP (op1, 0)) == PLUS
-@@ -15963,14 +16071,13 @@
+@@ -15963,14 +16074,13 @@
      {
        rtx addend = XEXP (XEXP (op1, 0), 1);
        rtx symbol = XEXP (XEXP (op1, 0), 0);
@@ -504,7 +516,7 @@ Index: gcc/config/i386/i386.c
  
        if (tmp)
  	{
-@@ -23576,7 +23683,7 @@
+@@ -23576,7 +23686,7 @@
    rtx tmp, unspec;
  
    gcc_assert (GET_CODE (symbol) == SYMBOL_REF);
@@ -513,7 +525,7 @@ Index: gcc/config/i386/i386.c
    gcc_assert (Pmode == DImode);
  
    tmp = gen_reg_rtx (Pmode);
-@@ -23618,7 +23725,8 @@
+@@ -23618,7 +23728,8 @@
    else
      {
        /* Static functions and indirect calls don't need the pic register.  */
@@ -523,7 +535,7 @@ Index: gcc/config/i386/i386.c
  	  && GET_CODE (XEXP (fnaddr, 0)) == SYMBOL_REF
  	  && ! SYMBOL_REF_LOCAL_P (XEXP (fnaddr, 0)))
  	use_reg (&use, pic_offset_table_rtx);
-@@ -23632,6 +23740,7 @@
+@@ -23632,6 +23743,7 @@
      }
  
    if (ix86_cmodel == CM_LARGE_PIC
@@ -531,7 +543,7 @@ Index: gcc/config/i386/i386.c
        && MEM_P (fnaddr)
        && GET_CODE (XEXP (fnaddr, 0)) == SYMBOL_REF
        && !local_symbolic_operand (XEXP (fnaddr, 0), VOIDmode))
-@@ -34959,7 +35068,7 @@
+@@ -34959,7 +35071,7 @@
    if (TARGET_64BIT)
      {
        if (!flag_pic || targetm.binds_local_p (function)
@@ -542,7 +554,7 @@ Index: gcc/config/i386/i386.c
  	{
 Index: gcc/config/i386/i386.h
 ===================================================================
---- gcc/config/i386/i386.h	(revision 196430)
+--- gcc/config/i386/i386.h	(revision 196791)
 +++ gcc/config/i386/i386.h	(working copy)
 @@ -1179,7 +1179,8 @@
  #define REAL_PIC_OFFSET_TABLE_REGNUM  BX_REG
@@ -554,34 +566,27 @@ Index: gcc/config/i386/i386.h
     || !flag_pic ? INVALID_REGNUM			\
     : reload_completed ? REGNO (pic_offset_table_rtx)	\
     : REAL_PIC_OFFSET_TABLE_REGNUM)
-Index: gcc/config/i386/predicates.md
+@@ -2379,6 +2380,10 @@
+ #define SYMBOL_REF_DLLEXPORT_P(X) \
+ 	((SYMBOL_REF_FLAGS (X) & SYMBOL_FLAG_DLLEXPORT) != 0)
+ 
++#define SYMBOL_FLAG_STUBVAR	(SYMBOL_FLAG_MACH_DEP << 4)
++#define SYMBOL_REF_STUBVAR_P(X) \
++	((SYMBOL_REF_FLAGS (X) & SYMBOL_FLAG_STUBVAR) != 0)
++
+ extern void debug_ready_dispatch (void);
+ extern void debug_dispatch_window (int);
+ 
+Index: gcc/config/i386/cygming.h
 ===================================================================
---- gcc/config/i386/predicates.md	(revision 196430)
-+++ gcc/config/i386/predicates.md	(working copy)
-@@ -137,6 +137,8 @@
- 	switch (XINT (XEXP (op, 0), 1))
- 	  {
- 	  case UNSPEC_GOTPCREL:
-+	    if (DEFAULT_ABI == MS_ABI)
-+	      break;
- 	  case UNSPEC_DTPOFF:
- 	  case UNSPEC_GOTNTPOFF:
- 	  case UNSPEC_NTPOFF:
-@@ -436,6 +438,9 @@
-   if (SYMBOL_REF_TLS_MODEL (op))
-     return false;
+--- gcc/config/i386/cygming.h	(revision 196791)
++++ gcc/config/i386/cygming.h	(working copy)
+@@ -474,5 +474,8 @@
+ #undef TARGET_ASM_ASSEMBLE_VISIBILITY
+ #define TARGET_ASM_ASSEMBLE_VISIBILITY i386_pe_assemble_visibility
  
-+  /* Dll-imported symbols are always external.  */
-+  if (TARGET_DLLIMPORT_DECL_ATTRIBUTES && SYMBOL_REF_DLLIMPORT_P (op))
-+    return false;
-   if (SYMBOL_REF_LOCAL_P (op))
-     return true;
- 
-@@ -459,6 +464,7 @@
- ;; same segment as the GOT.  Unfortunately, the flexibility of linker
- ;; scripts means that we can't be sure of that in general, so assume
- ;; that @GOTOFF is never valid on VxWorks.
-+;; For x64 we don't have got-table, so disallow it.
- (define_predicate "gotoff_operand"
-   (and (not (match_test "TARGET_VXWORKS_RTP"))
-        (match_operand 0 "local_symbolic_operand")))
++#undef SUB_TARGET_RECORD_STUB
++#define SUB_TARGET_RECORD_STUB i386_pe_record_stub
++
+ /* Static stack checking is supported by means of probes.  */
+ #define STACK_CHECK_STATIC_BUILTIN 1

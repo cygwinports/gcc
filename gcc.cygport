@@ -22,7 +22,7 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.8-20130310
+VERSION=4.8-20130319
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
@@ -111,6 +111,7 @@ src_test() {
 
 	gccpath="${B}/gcc/ada/rts:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgcc/shlib:"
+	gccpath+="${B}/${TOOLCHAIN_TARGET}/libatomic/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgfortran/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libjava/.libs:"
