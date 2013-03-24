@@ -22,7 +22,7 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.8-20130319
+VERSION=4.8.0
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
@@ -50,7 +50,7 @@ PATCH_URI="
 	4.7-libffi-noinst.patch
 	4.8-libgcc-cygwin64.patch
 	4.7-libitm-cygwin.patch
-	4.7-libstdc.patch
+	4.7-libstdc-cygwin.patch
 	4.8-lto-plugin-soname.patch
 	4.8-picflag-cygwin64.patch
 	4.8-specs-cygwin.patch

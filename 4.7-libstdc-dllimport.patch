@@ -26,17 +26,6 @@
 +#endif
 +
  #endif
---- origsrc/gcc-4.8-20130310/libstdc++-v3/configure	2013-03-15 02:47:51.930826600 -0500
-+++ src/gcc-4.8-20130310/libstdc++-v3/configure	2013-03-17 00:43:35.146679400 -0500
-@@ -46017,7 +46017,7 @@ $as_echo "#define HAVE_TLS 1" >>confdefs
- 	;;
-     esac
-     ;;
--  *-linux* | *-uclinux* | *-gnu* | *-kfreebsd*-gnu | *-knetbsd*-gnu)
-+  *-linux* | *-uclinux* | *-gnu* | *-kfreebsd*-gnu | *-knetbsd*-gnu | *-cygwin*)
- 
-   # All these tests are for C++; save the language and the compiler flags.
-   # The CXXFLAGS thing is suspicious, but based on similar bits previously
 --- origsrc/gcc-4.7.2/libstdc++-v3/configure.host	2012-02-11 02:10:12.000000000 +0800
 +++ src/gcc-4.7.2/libstdc++-v3/configure.host	2013-02-26 19:04:19.589029800 +0800
 @@ -215,6 +215,7 @@ case "${host_os}" in
@@ -47,17 +36,6 @@
      OPT_LDFLAGS="${OPT_LDFLAGS} \$(lt_host_flags)"
      ;;
    darwin | darwin[1-7] | darwin[1-7].*)
---- origsrc/gcc-4.8-20130310/libstdc++-v3/crossconfig.m4	2013-03-15 02:47:51.723814700 -0500
-+++ src/gcc-4.8-20130310/libstdc++-v3/crossconfig.m4	2013-03-17 00:40:59.084753200 -0500
-@@ -141,7 +141,7 @@ case "${host}" in
- 	;;
-     esac
-     ;;
--  *-linux* | *-uclinux* | *-gnu* | *-kfreebsd*-gnu | *-knetbsd*-gnu)
-+  *-linux* | *-uclinux* | *-gnu* | *-kfreebsd*-gnu | *-knetbsd*-gnu | *-cygwin*)
-     GLIBCXX_CHECK_COMPILER_FEATURES
-     GLIBCXX_CHECK_LINKER_FEATURES
-     GLIBCXX_CHECK_MATH_SUPPORT
 --- origsrc/gcc-4.7.2/libstdc++-v3/include/backward/strstream	2011-02-01 09:31:42.000000000 +0800
 +++ src/gcc-4.7.2/libstdc++-v3/include/backward/strstream	2013-02-26 19:05:34.021481500 +0800
 @@ -62,7 +62,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
@@ -609,18 +587,6 @@
    {
    public:
      explicit underflow_error(const string& __arg);
---- origsrc/gcc-4.7.2/libstdc++-v3/libsupc++/Makefile.in	2012-08-06 09:34:27.000000000 -0500
-+++ src/gcc-4.7.2/libstdc++-v3/libsupc++/Makefile.in	2013-03-01 01:43:14.850133600 -0600
-@@ -463,7 +463,8 @@ LTCXXCOMPILE = \
- 	--mode=compile $(CXX) $(TOPLEVEL_INCLUDES) \
- 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
- 
--LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS))
-+LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS)) \
-+	-no-undefined -bindir $(bindir)
- 
- # 3) We'd have a problem when building the shared libstdc++ object if
- # the rules automake generates would be used.  We cannot allow g++ to
 --- origsrc/gcc-4.7.2/libstdc++-v3/libsupc++/exception	2011-12-07 04:03:25.000000000 +0800
 +++ src/gcc-4.7.2/libstdc++-v3/libsupc++/exception	2013-02-26 19:27:32.575916600 +0800
 @@ -59,7 +59,7 @@ namespace std
@@ -681,72 +647,3 @@
    {
    public:
      bad_typeid () _GLIBCXX_USE_NOEXCEPT { }
---- origsrc/gcc-4.7.2/libstdc++-v3/scripts/testsuite_flags.in	2007-09-12 06:32:51.000000000 +0800
-+++ src/gcc-4.7.2/libstdc++-v3/scripts/testsuite_flags.in	2013-02-26 19:29:43.370025400 +0800
-@@ -27,6 +27,7 @@ EOF
- BUILD_DIR=@glibcxx_builddir@
- SRC_DIR=@glibcxx_srcdir@
- PREFIX_DIR=@glibcxx_prefixdir@
-+target=@target@
- query=$1
- 
- case ${query} in
-@@ -71,6 +72,12 @@ case ${query} in
-       ;;
-     --cxxldflags)
-       SECTIONLDFLAGS="@SECTION_LDFLAGS@ @LIBICONV@"
-+      case ${target} in
-+	  *cygwin*)
-+	  SECTIONLDFLAGS="${SECTIONLDFLAGS} -Wl,--enable-auto-import"
-+	  ;;
-+      esac
-+
-       echo ${SECTIONLDFLAGS}
-       ;;
-     *)
---- origsrc/gcc-4.7.2/libstdc++-v3/src/Makefile.am	2012-08-06 22:34:27.000000000 +0800
-+++ src/gcc-4.7.2/libstdc++-v3/src/Makefile.am	2013-02-26 19:30:20.823281300 +0800
-@@ -74,7 +74,8 @@ libstdc___la_DEPENDENCIES = \
- 	$(top_builddir)/src/c++11/libc++11convenience.la
- 
- libstdc___la_LDFLAGS = \
--	-version-info $(libtool_VERSION) ${version_arg} -lm
-+	-version-info $(libtool_VERSION) ${version_arg} -lm \
-+	-no-undefined -bindir $(bindir)
- 
- libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
- 
---- origsrc/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2012-08-06 09:34:27.000000000 -0500
-+++ src/gcc-4.7.2/libstdc++-v3/src/Makefile.in	2013-03-01 01:42:17.174834800 -0600
-@@ -367,7 +367,8 @@ libstdc___la_DEPENDENCIES = \
- 	$(top_builddir)/src/c++11/libc++11convenience.la
- 
- libstdc___la_LDFLAGS = \
--	-version-info $(libtool_VERSION) ${version_arg} -lm
-+	-version-info $(libtool_VERSION) ${version_arg} -lm \
-+	-no-undefined -bindir $(bindir)
- 
- libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
- 
---- origsrc/gcc-4.7.2/libstdc++-v3/testsuite/lib/libstdc++.exp	2012-08-06 22:34:27.000000000 +0800
-+++ src/gcc-4.7.2/libstdc++-v3/testsuite/lib/libstdc++.exp	2013-02-26 19:31:07.934763700 +0800
-@@ -126,6 +126,9 @@ proc libstdc++_init { testfile } {
- 	if { [string match "powerpc-*-darwin*" $target_triplet] } {
- 	    append DEFAULT_CXXFLAGS " -multiply_defined suppress"
- 	} 
-+	if { [string match "*-*-cygwin*" $target_triplet] } {
-+	    append DEFAULT_CXXFLAGS " -Wl,--enable-auto-import"
-+	} 
-     }
-     v3track DEFAULT_CXXFLAGS 2
- 
-@@ -146,6 +149,9 @@ proc libstdc++_init { testfile } {
-         set gccdir [file dirname $gccdir]
- 	append ld_library_path_tmp ":${gccdir}"
-     }
-+    if { [string match "*-*-cygwin*" $target_triplet] } {
-+	append ld_library_path_tmp ":${blddir}/../libgcc"
-+    }
-     v3track gccdir 3
- 
-     # Locate libgomp. This is only required for parallel mode.
