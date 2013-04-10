@@ -26,16 +26,6 @@
 +#endif
 +
  #endif
---- origsrc/gcc-4.7.2/libstdc++-v3/configure.host	2012-02-11 02:10:12.000000000 +0800
-+++ src/gcc-4.7.2/libstdc++-v3/configure.host	2013-02-26 19:04:19.589029800 +0800
-@@ -215,6 +215,7 @@ case "${host_os}" in
-     ;;
-   cygwin*)
-     os_include_dir="os/newlib"
-+    OPT_LDFLAGS="${OPT_LDFLAGS} -Wl,--exclude-modules-for-implib=\`cd ../libsupc++; ls *type_inf*.o -1  | tr '\012' ':'\`tinfo.o:tinfo2.o"
-     OPT_LDFLAGS="${OPT_LDFLAGS} \$(lt_host_flags)"
-     ;;
-   darwin | darwin[1-7] | darwin[1-7].*)
 --- origsrc/gcc-4.7.2/libstdc++-v3/include/backward/strstream	2011-02-01 09:31:42.000000000 +0800
 +++ src/gcc-4.7.2/libstdc++-v3/include/backward/strstream	2013-02-26 19:05:34.021481500 +0800
 @@ -62,7 +62,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
