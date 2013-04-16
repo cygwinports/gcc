@@ -1,6 +1,6 @@
---- origsrc/gcc-4.7.2/gcc/ada/a-intnam-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/a-intnam-cygwin.ads	2013-02-25 22:54:36.447141300 +0800
-@@ -0,0 +1,168 @@
+--- origsrc/gcc-4.7.2/gcc/ada//a-intnam-cygwin.ads	1970-01-01 00:00:00.000000000 +0000
++++ src/gcc-4.7.2/gcc/ada//a-intnam-cygwin.ads	2012-11-01 21:17:31.000000000 +0000
+@@ -0,0 +1,170 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
 +--                 GNAT RUN-TIME LIBRARY (GNARL) COMPONENTS                 --
@@ -9,25 +9,23 @@
 +--                                                                          --
 +--                                  S p e c                                 --
 +--                                                                          --
-+--          Copyright (C) 1991-2005, Free Software Foundation, Inc.         --
++--          Copyright (C) 1991-2011, Free Software Foundation, Inc.         --
 +--                                                                          --
 +-- GNARL is free software; you can  redistribute it  and/or modify it under --
 +-- terms of the  GNU General Public License as published  by the Free Soft- --
-+-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
-+-- sion. GNARL is distributed in the hope that it will be useful, but WITH- --
++-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
++-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
 +-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
-+-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
-+-- for  more details.  You should have  received  a copy of the GNU General --
-+-- Public License  distributed with GNARL; see file COPYING.  If not, write --
-+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
-+-- Boston, MA 02110-1301, USA.                                              --
++-- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
 +--                                                                          --
-+-- As a special exception,  if other files  instantiate  generics from this --
-+-- unit, or you link  this unit with other files  to produce an executable, --
-+-- this  unit  does not  by itself cause  the resulting  executable  to  be --
-+-- covered  by the  GNU  General  Public  License.  This exception does not --
-+-- however invalidate  any other reasons why  the executable file  might be --
-+-- covered by the  GNU Public License.                                      --
++-- As a special exception under Section 7 of GPL version 3, you are granted --
++-- additional permissions described in the GCC Runtime Library Exception,   --
++-- version 3.1, as published by the Free Software Foundation.               --
++--                                                                          --
++-- You should have received a copy of the GNU General Public License and    --
++-- a copy of the GCC Runtime Library Exception along with this program;     --
++-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
++-- <http://www.gnu.org/licenses/>.                                          --
 +--                                                                          --
 +-- GNARL was developed by the GNARL team at Florida State University.       --
 +-- Extensive contributions were provided by Ada Core Technologies, Inc.     --
@@ -58,6 +56,10 @@
 +--  used for names of interrupts
 +
 +package Ada.Interrupts.Names is
++
++   --  All identifiers in this unit are implementation defined
++
++   pragma Implementation_Defined;
 +
 +   --  Beware that the mapping of names to signals may be many-to-one. There
 +   --  may be aliases. Also, for all signal names that are not supported on the
@@ -169,208 +171,192 @@
 +     System.OS_Interface.SIGPWR;        --  Power failure
 +
 +end Ada.Interrupts.Names;
---- origsrc/gcc-4.7.2/gcc/ada/g-soccon-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/g-soccon-cygwin.ads	2013-02-25 22:55:38.908072800 +0800
-@@ -0,0 +1,196 @@
-+------------------------------------------------------------------------------
-+--                                                                          --
-+--                         GNAT COMPILER COMPONENTS                         --
-+--                                                                          --
-+--               G N A T . S O C K E T S . C O N S T A N T S                --
-+--                                                                          --
-+--                                 S p e c                                  --
-+--                                                                          --
-+--          Copyright (C) 2000-2007, Free Software Foundation, Inc.         --
-+--                                                                          --
-+-- GNAT is free software;  you can  redistribute it  and/or modify it under --
-+-- terms of the  GNU General Public License as published  by the Free Soft- --
-+-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
-+-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
-+-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
-+-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
-+-- for  more details.  You should have  received  a copy of the GNU General --
-+-- Public License  distributed with GNAT;  see file COPYING.  If not, write --
-+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
-+-- Boston, MA 02110-1301, USA.                                              --
-+--                                                                          --
-+-- As a special exception,  if other files  instantiate  generics from this --
-+-- unit, or you link  this unit with other files  to produce an executable, --
-+-- this  unit  does not  by itself cause  the resulting  executable  to  be --
-+-- covered  by the  GNU  General  Public  License.  This exception does not --
-+-- however invalidate  any other reasons why  the executable file  might be --
-+-- covered by the  GNU Public License.                                      --
-+--                                                                          --
-+-- GNAT was originally developed  by the GNAT team at  New York University. --
-+-- Extensive contributions were provided by Ada Core Technologies Inc.      --
-+--                                                                          --
-+------------------------------------------------------------------------------
+--- origsrc/gcc-4.7.2/gcc/ada//gcc-interface/Makefile.in	2012-11-02 15:16:49.765625000 +0000
++++ src/gcc-4.7.2/gcc/ada//gcc-interface/Makefile.in	2012-11-01 21:17:31.000000000 +0000
+@@ -191,6 +191,13 @@ TARGET_ADA_SRCS =
+ # Type of tools build we are doing; default is not compiling tools.
+ TOOLSCASE =
+ 
++# Which install goal to use.
++INSTALL_GNATLIB_MAIN  = install-gnatlib
++INSTALL_GNATLIB_WIN32 = unused-install-gnatlib
 +
-+--  This package provides target dependent definitions of constant for use
-+--  by the GNAT.Sockets package (g-socket.ads). This package should not be
-+--  directly with'ed by an applications program.
++# Set shared lib prefix (lib on all systems but cygwin, which uses cyg)
++LIBGNAT_SHARED_LIB_PREFIX=lib
 +
-+--  This is the version for Cygwin
-+--  This file is generated automatically, do not modify it by hand! Instead,
-+--  make changes to gen-soccon.c and re-run it on each target.
+ # Multilib handling
+ MULTISUBDIR =
+ RTSDIR = rts$(subst /,_,$(MULTISUBDIR))
+@@ -1583,6 +1590,12 @@ ifeq ($(strip $(filter-out avr none powe
+ endif
+ 
+ ifeq ($(strip $(filter-out cygwin% mingw32% pe,$(osys))),)
++  # Set target pair suffix for mingw or cygwin
++  W32_TARG=mingw
++  ifneq ($(strip $(filter cygwin%,$(osys))),)
++    W32_TARG=cygwin
++    LIBGNAT_SHARED_LIB_PREFIX=cyg
++  endif
+   # Cygwin provides a full Posix environment, and so we use the default
+   # versions of s-memory and g-socthi rather than the Windows-specific
+   # MinGW versions.  Ideally we would use all the default versions for
+@@ -1651,24 +1664,24 @@ ifeq ($(strip $(filter-out cygwin% mingw
+       ifeq ($(strip $(MULTISUBDIR)),/32)
+ 	LIBGNAT_TARGET_PAIRS += \
+ 	  $(X86_TARGET_PAIRS) \
+-	  system.ads<system-mingw.ads
++	  system.ads<system-$(W32_TARG).ads
+ 	SO_OPTS= -m32 -Wl,-soname,
+       else
+ 	LIBGNAT_TARGET_PAIRS += \
+ 	  $(X86_64_TARGET_PAIRS) \
+-	  system.ads<system-mingw-x86_64.ads
++	  system.ads<system-$(W32_TARG)-x86_64.ads
+ 	SO_OPTS = -m64 -Wl,-soname,
+       endif
+     else
+       ifeq ($(strip $(MULTISUBDIR)),/64)
+ 	LIBGNAT_TARGET_PAIRS += \
+ 	  $(X86_64_TARGET_PAIRS) \
+-	  system.ads<system-mingw-x86_64.ads
++	  system.ads<system-$(W32_TARG)-x86_64.ads
+ 	SO_OPTS = -m64 -Wl,-soname,
+       else
+ 	LIBGNAT_TARGET_PAIRS += \
+ 	  $(X86_TARGET_PAIRS) \
+-	  system.ads<system-mingw.ads
++	  system.ads<system-$(W32_TARG).ads
+ 	SO_OPTS = -m32 -Wl,-soname,
+       endif
+     endif
+@@ -1677,7 +1690,14 @@ ifeq ($(strip $(filter-out cygwin% mingw
+ 	s-win32.o s-winext.o g-regist.o g-sse.o g-ssvety.o
+     EXTRA_GNATRTL_TASKING_OBJS = a-exetim.o
+ 
+-    MISCLIB = -lws2_32
++    # Which install goal to use.
++    INSTALL_GNATLIB_MAIN  = unused-install-gnatlib
++    INSTALL_GNATLIB_WIN32 = install-gnatlib
 +
-+package GNAT.Sockets.Constants is
++    # Mingw uses winsock-based sockets; cygwin uses POSIX sockets.
++    ifneq ($(strip $(filter-out cygwin%,$(osys))),)
++      MISCLIB = -lwsock32
++    endif
+ 
+     # ??? This will be replaced by gnatlib-shared-dual-win32 when GNAT
+     # auto-import support for array/record will be done.
+@@ -1687,10 +1707,11 @@ ifeq ($(strip $(filter-out cygwin% mingw
+   endif
+ 
+   TOOLS_TARGET_PAIRS= \
+-  mlib-tgt-specific.adb<mlib-tgt-specific-mingw.adb \
+-  indepsw.adb<indepsw-mingw.adb
++  mlib-tgt-specific.adb<mlib-tgt-specific-$(W32_TARG).adb \
++  indepsw.adb<indepsw-$(W32_TARG).adb
+ 
+   GMEM_LIB = gmemlib
++  EH_MECHANISM=-gcc
+   EXTRA_GNATTOOLS = ../../gnatdll$(exeext)
+   EXTRA_GNATMAKE_OBJS = mdll.o mdll-utl.o mdll-fil.o
+   soext = .dll
+@@ -2425,7 +2446,7 @@ gnatlink-re: ../stamp-tools link.o targe
+ 	  true; \
+ 	fi
+ 
+-install-gnatlib: ../stamp-gnatlib-$(RTSDIR)
++$(INSTALL_GNATLIB_MAIN): ../stamp-gnatlib-$(RTSDIR)
+ #	Create the directory before deleting it, in case the directory is
+ #	a list of directories (as it may be on VMS). This ensures we are
+ #	deleting the right one.
+@@ -2472,6 +2493,46 @@ install-gnatlib: ../stamp-gnatlib-$(RTSD
+ 	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.adb
+ 	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.ads
+ 
++$(INSTALL_GNATLIB_WIN32): ../stamp-gnatlib-$(RTSDIR)
++#	Create the directory before deleting it, in case the directory is
++#	a list of directories (as it may be on VMS). This ensures we are
++#	deleting the right one.
++	-$(MKDIR) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
++	-$(MKDIR) $(DESTDIR)$(ADA_INCLUDE_DIR)
++	$(RMDIR) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
++	$(RMDIR) $(DESTDIR)$(ADA_INCLUDE_DIR)
++	-$(MKDIR) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
++	-$(MKDIR) $(DESTDIR)$(ADA_INCLUDE_DIR)
++	for file in $(RTSDIR)/*.ali; do \
++	    $(INSTALL_DATA_DATE) $$file $(DESTDIR)$(ADA_RTL_OBJ_DIR); \
++	done
++	-$(INSTALL_DATA) $(RTSDIR)/g-trasym$(objext) $(DESTDIR)$(ADA_RTL_OBJ_DIR)
++	-cd $(RTSDIR); for file in *$(arext);do \
++	    $(INSTALL_DATA) $$file $(DESTDIR)$(ADA_RTL_OBJ_DIR); \
++	    $(RANLIB_FOR_TARGET) $(DESTDIR)$(ADA_RTL_OBJ_DIR)/$$file; \
++	done
++	-$(foreach file, $(EXTRA_ADALIB_FILES), \
++	    $(INSTALL_DATA_DATE) $(RTSDIR)/$(file) $(DESTDIR)$(ADA_RTL_OBJ_DIR) && \
++	) true
++#     Install the shared libraries, if any, using $(INSTALL) instead
++#     of $(INSTALL_DATA). The latter may force a mode inappropriate
++#     for shared libraries on some targets, e.g. on HP-UX where the x
++#     permission is required.  We are win32 here.
++	for file in gnat gnarl; do \
++	   if [ -f $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) ]; then \
++	      $(INSTALL) $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) \
++			 $(DESTDIR)$(bindir); \
++	      $(LN_S) $(bindir)/$(LIBGNAT_SHARED_LIB_PREFIX)$${file}$(hyphen)$(LIBRARY_VERSION)$(soext) \
++	      $(DESTDIR)$(ADA_RTL_OBJ_DIR)/lib$${file}$(hyphen)$(LIBRARY_VERSION).dll.a; \
++	   fi; \
++	done
++# This copy must be done preserving the date on the original file.
++	for file in $(RTSDIR)/*.ad?; do \
++	    $(INSTALL_DATA_DATE) $$file $(DESTDIR)$(ADA_INCLUDE_DIR); \
++	done
++	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.adb
++	cd $(DESTDIR)$(ADA_INCLUDE_DIR); $(CHMOD) a-wx *.ads
 +
-+   --------------
-+   -- Families --
-+   --------------
-+
-+   AF_INET            : constant :=           2; --  IPv4 address family
-+   AF_INET6           : constant :=          23; --  IPv6 address family
-+
-+   -----------
-+   -- Modes --
-+   -----------
-+
-+   SOCK_STREAM        : constant :=           1; --  Stream socket
-+   SOCK_DGRAM         : constant :=           2; --  Datagram socket
-+
-+   -------------------
-+   -- Socket errors --
-+   -------------------
-+
-+   EACCES             : constant :=          13; --  Permission denied
-+   EADDRINUSE         : constant :=         112; --  Address already in use
-+   EADDRNOTAVAIL      : constant :=         125; --  Cannot assign address
-+   EAFNOSUPPORT       : constant :=         106; --  Addr family not supported
-+   EALREADY           : constant :=         120; --  Operation in progress
-+   EBADF              : constant :=           9; --  Bad file descriptor
-+   ECONNABORTED       : constant :=         113; --  Connection aborted
-+   ECONNREFUSED       : constant :=         111; --  Connection refused
-+   ECONNRESET         : constant :=         104; --  Connection reset by peer
-+   EDESTADDRREQ       : constant :=         121; --  Destination addr required
-+   EFAULT             : constant :=          14; --  Bad address
-+   EHOSTDOWN          : constant :=         117; --  Host is down
-+   EHOSTUNREACH       : constant :=         118; --  No route to host
-+   EINPROGRESS        : constant :=         119; --  Operation now in progress
-+   EINTR              : constant :=           4; --  Interrupted system call
-+   EINVAL             : constant :=          22; --  Invalid argument
-+   EIO                : constant :=           5; --  Input output error
-+   EISCONN            : constant :=         127; --  Socket already connected
-+   ELOOP              : constant :=          92; --  Too many symbolic lynks
-+   EMFILE             : constant :=          24; --  Too many open files
-+   EMSGSIZE           : constant :=         122; --  Message too long
-+   ENAMETOOLONG       : constant :=          91; --  Name too long
-+   ENETDOWN           : constant :=         115; --  Network is down
-+   ENETRESET          : constant :=         126; --  Disconn. on network reset
-+   ENETUNREACH        : constant :=         114; --  Network is unreachable
-+   ENOBUFS            : constant :=         105; --  No buffer space available
-+   ENOPROTOOPT        : constant :=         109; --  Protocol not available
-+   ENOTCONN           : constant :=         128; --  Socket not connected
-+   ENOTSOCK           : constant :=         108; --  Operation on non socket
-+   EOPNOTSUPP         : constant :=          95; --  Operation not supported
-+   EPFNOSUPPORT       : constant :=          96; --  Unknown protocol family
-+   EPROTONOSUPPORT    : constant :=         123; --  Unknown protocol
-+   EPROTOTYPE         : constant :=         107; --  Unknown protocol type
-+   ESHUTDOWN          : constant :=         110; --  Cannot send once shutdown
-+   ESOCKTNOSUPPORT    : constant :=         124; --  Socket type not supported
-+   ETIMEDOUT          : constant :=         116; --  Connection timed out
-+   ETOOMANYREFS       : constant :=         129; --  Too many references
-+   EWOULDBLOCK        : constant :=          11; --  Operation would block
-+
-+   -----------------
-+   -- Host errors --
-+   -----------------
-+
-+   HOST_NOT_FOUND     : constant :=           1; --  Unknown host
-+   TRY_AGAIN          : constant :=           2; --  Host name lookup failure
-+   NO_DATA            : constant :=           4; --  No data record for name
-+   NO_RECOVERY        : constant :=           3; --  Non recoverable errors
-+
-+   -------------------
-+   -- Control flags --
-+   -------------------
-+
-+   FIONBIO            : constant := -2147195266; --  Set/clear non-blocking io
-+   FIONREAD           : constant :=  1074030207; --  How many bytes to read
-+
-+   --------------------
-+   -- Shutdown modes --
-+   --------------------
-+
-+   SHUT_RD            : constant :=           0; --  No more recv
-+   SHUT_WR            : constant :=           1; --  No more send
-+   SHUT_RDWR          : constant :=           2; --  No more recv/send
-+
-+   ---------------------
-+   -- Protocol levels --
-+   ---------------------
-+
-+   SOL_SOCKET         : constant :=       65535; --  Options for socket level
-+   IPPROTO_IP         : constant :=           0; --  Dummy protocol for IP
-+   IPPROTO_UDP        : constant :=          17; --  UDP
-+   IPPROTO_TCP        : constant :=           6; --  TCP
-+
-+   -------------------
-+   -- Request flags --
-+   -------------------
-+
-+   MSG_OOB            : constant :=           1; --  Process out-of-band data
-+   MSG_PEEK           : constant :=           2; --  Peek at incoming data
-+   MSG_EOR            : constant :=          -1; --  Send end of record
-+   MSG_WAITALL        : constant :=           8; --  Wait for full reception
-+   MSG_NOSIGNAL       : constant :=          32; --  No SIGPIPE on send
-+   MSG_Forced_Flags   : constant :=           0;
-+   --  Flags set on all send(2) calls
-+
-+   --------------------
-+   -- Socket options --
-+   --------------------
-+
-+   TCP_NODELAY        : constant :=           1; --  Do not coalesce packets
-+   SO_REUSEADDR       : constant :=           4; --  Bind reuse local address
-+   SO_REUSEPORT       : constant :=          -1; --  Bind reuse port number
-+   SO_KEEPALIVE       : constant :=           8; --  Enable keep-alive msgs
-+   SO_LINGER          : constant :=         128; --  Defer close to flush data
-+   SO_BROADCAST       : constant :=          32; --  Can send broadcast msgs
-+   SO_SNDBUF          : constant :=        4097; --  Set/get send buffer size
-+   SO_RCVBUF          : constant :=        4098; --  Set/get recv buffer size
-+   SO_SNDTIMEO        : constant :=        4101; --  Emission timeout
-+   SO_RCVTIMEO        : constant :=        4102; --  Reception timeout
-+   SO_ERROR           : constant :=        4103; --  Get/clear error status
-+   IP_MULTICAST_IF    : constant :=           9; --  Set/get mcast interface
-+   IP_MULTICAST_TTL   : constant :=          10; --  Set/get multicast TTL
-+   IP_MULTICAST_LOOP  : constant :=          11; --  Set/get mcast loopback
-+   IP_ADD_MEMBERSHIP  : constant :=          12; --  Join a multicast group
-+   IP_DROP_MEMBERSHIP : constant :=          13; --  Leave a multicast group
-+   IP_PKTINFO         : constant :=          19; --  Get datagram info
-+
-+   -------------------
-+   -- System limits --
-+   -------------------
-+
-+   IOV_MAX            : constant :=        1024; --  Maximum writev iovcnt
-+
-+   ----------------------
-+   -- Type definitions --
-+   ----------------------
-+
-+   --  Sizes (in bytes) of the components of struct timeval
-+
-+   SIZEOF_tv_sec      : constant :=           4; --  tv_sec
-+   SIZEOF_tv_usec     : constant :=           4; --  tv_usec
-+
-+   ----------------------------------------
-+   -- Properties of supported interfaces --
-+   ----------------------------------------
-+
-+   Need_Netdb_Buffer  : constant :=           0; --  Need buffer for Netdb ops
-+
-+   ----------------------
-+   -- Additional flags --
-+   ----------------------
-+
-+   Thread_Blocking_IO : constant Boolean := True;
-+   --  Set False for contexts where socket i/o are process blocking
-+
-+end GNAT.Sockets.Constants;
---- origsrc/gcc-4.7.2/gcc/ada/indepsw-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/indepsw-cygwin.adb	2013-02-25 22:56:27.015181700 +0800
-@@ -0,0 +1,69 @@
+ ../stamp-gnatlib2-$(RTSDIR):
+ 	$(RM) $(RTSDIR)/s-*.ali
+ 	$(RM) $(RTSDIR)/s-*$(objext)
+@@ -2672,20 +2733,20 @@ gnatlib-shared-win32:
+ 	     MULTISUBDIR="$(MULTISUBDIR)" \
+ 	     THREAD_KIND="$(THREAD_KIND)" \
+              gnatlib
+-	$(RM) $(RTSDIR)/libgna*$(soext)
++	$(RM) $(RTSDIR)/$(LIBGNAT_SHARED_LIB_PREFIX)gna*$(soext)
+ 	cd $(RTSDIR); `echo "$(GCC_FOR_TARGET)" \
+                 | sed -e 's,\./xgcc,../../xgcc,' -e 's,-B\./,-B../../,'` -shared -shared-libgcc \
+ 		$(PICFLAG_FOR_TARGET) \
+-		-o libgnat$(hyphen)$(LIBRARY_VERSION)$(soext) \
++		-o $(LIBGNAT_SHARED_LIB_PREFIX)gnat$(hyphen)$(LIBRARY_VERSION)$(soext) \
+ 		$(GNATRTL_NONTASKING_OBJS) $(LIBGNAT_OBJS) \
+-		$(SO_OPTS)libgnat$(hyphen)$(LIBRARY_VERSION)$(soext) $(MISCLIB)
++		$(SO_OPTS)$(LIBGNAT_SHARED_LIB_PREFIX)gnat$(hyphen)$(LIBRARY_VERSION)$(soext) $(MISCLIB)
+ 	cd $(RTSDIR); `echo "$(GCC_FOR_TARGET)" \
+                 | sed -e 's,\./xgcc,../../xgcc,' -e 's,-B\./,-B../../,'` -shared -shared-libgcc \
+ 		$(PICFLAG_FOR_TARGET) \
+-		-o libgnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
++		-o $(LIBGNAT_SHARED_LIB_PREFIX)gnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
+ 		$(GNATRTL_TASKING_OBJS) \
+-		$(SO_OPTS)libgnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
+-		$(THREADSLIB) -Wl,libgnat$(hyphen)$(LIBRARY_VERSION)$(soext)
++		$(SO_OPTS)$(LIBGNAT_SHARED_LIB_PREFIX)gnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
++		$(THREADSLIB) -Wl,$(LIBGNAT_SHARED_LIB_PREFIX)gnat$(hyphen)$(LIBRARY_VERSION)$(soext)
+ 
+ gnatlib-shared-darwin:
+ 	$(MAKE) $(FLAGS_TO_PASS) \
+--- origsrc/gcc-4.7.2/gcc/ada//gsocket.h	2012-11-02 15:16:49.781250000 +0000
++++ src/gcc-4.7.2/gcc/ada//gsocket.h	2012-11-01 21:17:31.000000000 +0000
+@@ -204,7 +204,8 @@
+ #endif
+ 
+ #if defined (_AIX) || defined (__FreeBSD__) || defined (__hpux__) || \
+-    defined (__osf__) || defined (_WIN32) || defined (__APPLE__)
++    defined (__osf__) || defined (_WIN32) || defined (__APPLE__) || \
++    defined (__CYGWIN__)
+ # define HAVE_THREAD_SAFE_GETxxxBYyyy 1
+ 
+ #elif defined (sgi) || defined (linux) || defined (__GLIBC__) || \
+--- origsrc/gcc-4.7.2/gcc/ada//indepsw-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
++++ src/gcc-4.7.2/gcc/ada//indepsw-cygwin.adb	2012-11-01 21:17:31.000000000 +0000
+@@ -0,0 +1,67 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
 +--                         GNAT COMPILER COMPONENTS                         --
@@ -380,25 +366,23 @@
 +--                                 B o d y                                  --
 +--                            (Windows version)                             --
 +--                                                                          --
-+--            Copyright (C) 2004 Free Software Foundation, Inc.             --
++--            Copyright (C) 2009 Free Software Foundation, Inc.             --
 +--                                                                          --
 +-- GNAT is free software;  you can  redistribute it  and/or modify it under --
 +-- terms of the  GNU General Public License as published  by the Free Soft- --
-+-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
++-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
 +-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
 +-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
-+-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
-+-- for  more details.  You should have  received  a copy of the GNU General --
-+-- Public License  distributed with GNAT;  see file COPYING.  If not, write --
-+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
-+-- Boston, MA 02110-1301, USA.                                              --
++-- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
 +--                                                                          --
-+-- As a special exception,  if other files  instantiate  generics from this --
-+-- unit, or you link  this unit with other files  to produce an executable, --
-+-- this  unit  does not  by itself cause  the resulting  executable  to  be --
-+-- covered  by the  GNU  General  Public  License.  This exception does not --
-+-- however invalidate  any other reasons why  the executable file  might be --
-+-- covered by the  GNU Public License.                                      --
++-- As a special exception under Section 7 of GPL version 3, you are granted --
++-- additional permissions described in the GCC Runtime Library Exception,   --
++-- version 3.1, as published by the Free Software Foundation.               --
++--                                                                          --
++-- You should have received a copy of the GNU General Public License and    --
++-- a copy of the GCC Runtime Library Exception along with this program;     --
++-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
++-- <http://www.gnu.org/licenses/>.                                          --
 +--                                                                          --
 +-- GNAT was originally developed  by the GNAT team at  New York University. --
 +-- Extensive contributions were provided by Ada Core Technologies Inc.      --
@@ -440,12 +424,12 @@
 +   end Is_Supported;
 +
 +end Indepsw;
---- origsrc/gcc-4.7.2/gcc/ada/initialize.c	2011-07-13 01:23:04.000000000 +0800
-+++ src/gcc-4.7.2/gcc/ada/initialize.c	2013-02-25 22:57:26.560743000 +0800
-@@ -347,6 +347,39 @@ __gnat_initialize (void *eh ATTRIBUTE_UN
- {
+--- origsrc/gcc-4.7.2/gcc/ada//initialize.c	2012-11-02 15:16:50.031250000 +0000
++++ src/gcc-4.7.2/gcc/ada//initialize.c	2012-11-01 21:17:31.000000000 +0000
+@@ -348,6 +348,40 @@ __gnat_initialize (void *eh ATTRIBUTE_UN
    __main ();
  }
+ 
 +#elif defined (__CYGWIN__)
 +
 +/***************************************/
@@ -479,12 +463,13 @@
 +     __gnat_install_SEH_handler (eh);
 +#endif
 +}
- 
++
  #else
  
---- origsrc/gcc-4.7.2/gcc/ada/mlib-tgt-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/mlib-tgt-cygwin.adb	2013-02-25 22:58:26.986916100 +0800
-@@ -0,0 +1,160 @@
+ /* For all other versions of GNAT, the initialize routine and handler
+--- origsrc/gcc-4.7.2/gcc/ada//mlib-tgt-specific-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
++++ src/gcc-4.7.2/gcc/ada//mlib-tgt-specific-cygwin.adb	2012-11-01 21:17:31.000000000 +0000
+@@ -0,0 +1,162 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
 +--                         GNAT COMPILER COMPONENTS                         --
@@ -494,7 +479,7 @@
 +--                                                                          --
 +--                                 B o d y                                  --
 +--                                                                          --
-+--          Copyright (C) 2002-2009, Free Software Foundation, Inc.         --
++--          Copyright (C) 2002-2010, Free Software Foundation, Inc.         --
 +--                                                                          --
 +-- GNAT is free software;  you can  redistribute it  and/or modify it under --
 +-- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -548,8 +533,10 @@
 +
 +   function PIC_Option return String;
 +
-+   No_Argument_List : constant String_List := (1 .. 0 => null);
-+   --  Used as value of parameter Options or Options2 in calls to Gcc
++   Shared_Libgcc : aliased String := "-shared-libgcc";
++
++   Shared_Libgcc_Switch : constant Argument_List :=
++                            (1 => Shared_Libgcc'Access);
 +
 +   ---------------------------
 +   -- Build_Dynamic_Library --
@@ -586,7 +573,7 @@
 +      Tools.Gcc
 +        (Output_File => Lib_File,
 +         Objects     => Ofiles,
-+         Options     => No_Argument_List,
++         Options     => Shared_Libgcc_Switch,
 +         Options_2   => Options,
 +         Driver_Name => Driver_Name);
 +   end Build_Dynamic_Library;
@@ -645,9 +632,9 @@
 +   Library_Major_Minor_Id_Supported_Ptr :=
 +                                Library_Major_Minor_Id_Supported'Access;
 +end MLib.Tgt.Specific;
---- origsrc/gcc-4.7.2/gcc/ada/s-gloloc-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/s-gloloc-cygwin.adb	2013-02-25 22:59:32.067680300 +0800
-@@ -0,0 +1,113 @@
+--- origsrc/gcc-4.7.2/gcc/ada//s-gloloc-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
++++ src/gcc-4.7.2/gcc/ada//s-gloloc-cygwin.adb	2012-11-01 21:17:31.000000000 +0000
+@@ -0,0 +1,107 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
 +--                         GNAT COMPILER COMPONENTS                         --
@@ -656,25 +643,23 @@
 +--                                                                          --
 +--                                 B o d y                                  --
 +--                                                                          --
-+--                     Copyright (C) 1999-2007, AdaCore                     --
++--                     Copyright (C) 1999-2010, AdaCore                     --
 +--                                                                          --
 +-- GNAT is free software;  you can  redistribute it  and/or modify it under --
 +-- terms of the  GNU General Public License as published  by the Free Soft- --
-+-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
++-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
 +-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
 +-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
-+-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
-+-- for  more details.  You should have  received  a copy of the GNU General --
-+-- Public License  distributed with GNAT;  see file COPYING.  If not, write --
-+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
-+-- Boston, MA 02110-1301, USA.                                              --
++-- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
 +--                                                                          --
-+-- As a special exception,  if other files  instantiate  generics from this --
-+-- unit, or you link  this unit with other files  to produce an executable, --
-+-- this  unit  does not  by itself cause  the resulting  executable  to  be --
-+-- covered  by the  GNU  General  Public  License.  This exception does not --
-+-- however invalidate  any other reasons why  the executable file  might be --
-+-- covered by the  GNU Public License.                                      --
++-- As a special exception under Section 7 of GPL version 3, you are granted --
++-- additional permissions described in the GCC Runtime Library Exception,   --
++-- version 3.1, as published by the Free Software Foundation.               --
++--                                                                          --
++-- You should have received a copy of the GNU General Public License and    --
++-- a copy of the GCC Runtime Library Exception along with this program;     --
++-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
++-- <http://www.gnu.org/licenses/>.                                          --
 +--                                                                          --
 +-- GNAT was originally developed  by the GNAT team at  New York University. --
 +-- Extensive contributions were provided by Ada Core Technologies Inc.      --
@@ -683,10 +668,11 @@
 +
 +--  This implementation is specific to NT
 +
++with System.OS_Interface;
 +with System.Task_Lock;
++with System.Win32;
 +
 +with Interfaces.C.Strings;
-+with System.OS_Interface;
 +
 +package body System.Global_Locks is
 +
@@ -694,7 +680,7 @@
 +   package OSI renames System.OS_Interface;
 +   package ICS renames Interfaces.C.Strings;
 +
-+   subtype Lock_File_Entry is OSI.HANDLE;
++   subtype Lock_File_Entry is Win32.HANDLE;
 +
 +   Last_Lock  : Lock_Type := Null_Lock;
 +   Lock_Table : array (Lock_Type range 1 .. 15) of Lock_File_Entry;
@@ -703,10 +689,7 @@
 +   -- Create_Lock --
 +   -----------------
 +
-+   procedure Create_Lock
-+     (Lock : out Lock_Type;
-+      Name : String)
-+   is
++   procedure Create_Lock (Lock : out Lock_Type; Name : String) is
 +      L : Lock_Type;
 +
 +   begin
@@ -720,7 +703,7 @@
 +      end if;
 +
 +      Lock_Table (L) :=
-+        OSI.CreateMutex (null, OSI.BOOL (False), ICS.New_String (Name));
++        OSI.CreateMutex (null, Win32.FALSE, ICS.New_String (Name));
 +      Lock := L;
 +   end Create_Lock;
 +
@@ -728,12 +711,11 @@
 +   -- Acquire_Lock --
 +   ------------------
 +
-+   procedure Acquire_Lock
-+     (Lock : in out Lock_Type)
-+   is
-+      use type OSI.DWORD;
++   procedure Acquire_Lock (Lock : in out Lock_Type) is
++      use type Win32.DWORD;
 +
-+      Res : OSI.DWORD;
++      Res : Win32.DWORD;
++
 +   begin
 +      Res := OSI.WaitForSingleObject (Lock_Table (Lock), OSI.Wait_Infinite);
 +
@@ -746,24 +728,23 @@
 +   -- Release_Lock --
 +   ------------------
 +
-+   procedure Release_Lock
-+     (Lock : in out Lock_Type)
-+   is
-+      use type OSI.BOOL;
++   procedure Release_Lock (Lock : in out Lock_Type) is
++      use type Win32.BOOL;
 +
-+      Res : OSI.BOOL;
++      Res : Win32.BOOL;
++
 +   begin
 +      Res := OSI.ReleaseMutex (Lock_Table (Lock));
 +
-+      if Res = OSI.False then
++      if Res = Win32.FALSE then
 +         raise Lock_Error;
 +      end if;
 +   end Release_Lock;
 +
 +end System.Global_Locks;
---- origsrc/gcc-4.7.2/gcc/ada/s-osinte-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/s-osinte-cygwin.ads	2013-02-25 23:01:34.615742000 +0800
-@@ -0,0 +1,952 @@
+--- origsrc/gcc-4.7.2/gcc/ada//s-osinte-cygwin.ads	1970-01-01 00:00:00.000000000 +0000
++++ src/gcc-4.7.2/gcc/ada//s-osinte-cygwin.ads	2012-11-01 21:17:31.000000000 +0000
+@@ -0,0 +1,951 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
 +--                 GNAT RUN-TIME LIBRARY (GNARL) COMPONENTS                 --
@@ -773,28 +754,26 @@
 +--                                  S p e c                                 --
 +--                                                                          --
 +--             Copyright (C) 1991-1994, Florida State University            --
-+--          Copyright (C) 1995-2007, Free Software Foundation, Inc.         --
++--          Copyright (C) 1995-2010, Free Software Foundation, Inc.         --
 +--                                                                          --
-+-- GNARL is free software; you can  redistribute it  and/or modify it under --
++-- GNAT is free software;  you can  redistribute it  and/or modify it under --
 +-- terms of the  GNU General Public License as published  by the Free Soft- --
-+-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
-+-- sion. GNARL is distributed in the hope that it will be useful, but WITH- --
++-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
++-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
 +-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
-+-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
-+-- for  more details.  You should have  received  a copy of the GNU General --
-+-- Public License  distributed with GNARL; see file COPYING.  If not, write --
-+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
-+-- Boston, MA 02110-1301, USA.                                              --
++-- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
 +--                                                                          --
-+-- As a special exception,  if other files  instantiate  generics from this --
-+-- unit, or you link  this unit with other files  to produce an executable, --
-+-- this  unit  does not  by itself cause  the resulting  executable  to  be --
-+-- covered  by the  GNU  General  Public  License.  This exception does not --
-+-- however invalidate  any other reasons why  the executable file  might be --
-+-- covered by the  GNU Public License.                                      --
++-- As a special exception under Section 7 of GPL version 3, you are granted --
++-- additional permissions described in the GCC Runtime Library Exception,   --
++-- version 3.1, as published by the Free Software Foundation.               --
++--                                                                          --
++-- You should have received a copy of the GNU General Public License and    --
++-- a copy of the GCC Runtime Library Exception along with this program;     --
++-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
++-- <http://www.gnu.org/licenses/>.                                          --
 +--                                                                          --
 +-- GNARL was developed by the GNARL team at Florida State University.       --
-+-- Extensive contributions were provided by Ada Core Technologies, Inc.     --
++-- Extensive contributions were provided by Ada Core Technologies Inc.      --
 +--                                                                          --
 +------------------------------------------------------------------------------
 +
@@ -891,7 +870,7 @@
 +
 +   type Signal_Set is array (Natural range <>) of Signal;
 +
-+   Unmasked    : constant Signal_Set := (
++   Unmasked : constant Signal_Set := (
 +      SIGTRAP,
 +      --  To enable debugging on multithreaded applications, mark SIGTRAP to
 +      --  be kept unmasked.
@@ -945,12 +924,13 @@
 +   pragma Convention (C, siginfo_t);
 +
 +   type struct_sigaction is record
-+      sa_handler   : System.Address;
-+      sa_mask      : sigset_t;
-+      sa_flags     : unsigned_long;
-+      sa_restorer  : System.Address;
++      sa_handler  : System.Address;
++      sa_mask     : sigset_t;
++      sa_flags    : unsigned_long;
++      sa_restorer : System.Address;
 +   end record;
 +   pragma Convention (C, struct_sigaction);
++
 +   type struct_sigaction_ptr is access all struct_sigaction;
 +
 +   type Machine_State is record
@@ -1045,17 +1025,17 @@
 +     Ada.Unchecked_Conversion (System.Address, Thread_Body);
 +
 +   type pthread_t is new unsigned_long;
-+   subtype Thread_Id        is pthread_t;
++   subtype Thread_Id is pthread_t;
 +
-+   function To_pthread_t is new Ada.Unchecked_Conversion
-+     (unsigned_long, pthread_t);
++   function To_pthread_t is
++     new Ada.Unchecked_Conversion (unsigned_long, pthread_t);
 +
-+   type pthread_mutex_t     is limited private;
-+   type pthread_cond_t      is limited private;
-+   type pthread_attr_t      is limited private;
-+   type pthread_mutexattr_t is limited private;
-+   type pthread_condattr_t  is limited private;
-+   type pthread_key_t       is private;
++   type pthread_mutex_t      is limited private;
++   type pthread_cond_t       is limited private;
++   type pthread_attr_t       is limited private;
++   type pthread_mutexattr_t  is limited private;
++   type pthread_condattr_t   is limited private;
++   type pthread_key_t        is private;
 +
 +   PTHREAD_CREATE_DETACHED : constant := 1;
 +
@@ -1716,9 +1696,9 @@
 +   end record;
 +
 +end System.OS_Interface;
---- origsrc/gcc-4.7.2/gcc/ada/s-taprop-cygwin.adb	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/s-taprop-cygwin.adb	2013-02-25 23:02:32.360074600 +0800
-@@ -0,0 +1,1339 @@
+--- origsrc/gcc-4.7.2/gcc/ada//s-taprop-cygwin.adb	1970-01-01 00:00:00.000000000 +0000
++++ src/gcc-4.7.2/gcc/ada//s-taprop-cygwin.adb	2012-11-01 21:17:31.000000000 +0000
+@@ -0,0 +1,1337 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
 +--                GNU ADA RUN-TIME LIBRARY (GNARL) COMPONENTS               --
@@ -1727,25 +1707,23 @@
 +--                                                                          --
 +--                                  B o d y                                 --
 +--                                                                          --
-+--         Copyright (C) 1992-2007, Free Software Foundation, Inc.          --
++--         Copyright (C) 1992-2011, Free Software Foundation, Inc.          --
 +--                                                                          --
 +-- GNARL is free software; you can  redistribute it  and/or modify it under --
 +-- terms of the  GNU General Public License as published  by the Free Soft- --
-+-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
-+-- sion. GNARL is distributed in the hope that it will be useful, but WITH- --
++-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
++-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
 +-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
-+-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
-+-- for  more details.  You should have  received  a copy of the GNU General --
-+-- Public License  distributed with GNARL; see file COPYING.  If not, write --
-+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
-+-- Boston, MA 02110-1301, USA.                                              --
++-- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
 +--                                                                          --
-+-- As a special exception,  if other files  instantiate  generics from this --
-+-- unit, or you link  this unit with other files  to produce an executable, --
-+-- this  unit  does not  by itself cause  the resulting  executable  to  be --
-+-- covered  by the  GNU  General  Public  License.  This exception does not --
-+-- however invalidate  any other reasons why  the executable file  might be --
-+-- covered by the  GNU Public License.                                      --
++-- As a special exception under Section 7 of GPL version 3, you are granted --
++-- additional permissions described in the GCC Runtime Library Exception,   --
++-- version 3.1, as published by the Free Software Foundation.               --
++--                                                                          --
++-- You should have received a copy of the GNU General Public License and    --
++-- a copy of the GCC Runtime Library Exception along with this program;     --
++-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
++-- <http://www.gnu.org/licenses/>.                                          --
 +--                                                                          --
 +-- GNARL was developed by the GNARL team at Florida State University.       --
 +-- Extensive contributions were provided by Ada Core Technologies, Inc.     --
@@ -3058,8 +3036,8 @@
 +   end Initialize;
 +
 +end System.Task_Primitives.Operations;
---- origsrc/gcc-4.7.2/gcc/ada/sysdep.c	2012-01-23 16:51:38.000000000 +0800
-+++ src/gcc-4.7.2/gcc/ada/sysdep.c	2013-02-26 06:14:03.597344200 +0800
+--- origsrc/gcc-4.7.2/gcc/ada//sysdep.c	2012-11-02 15:16:50.062500000 +0000
++++ src/gcc-4.7.2/gcc/ada//sysdep.c	2012-11-02 15:50:59.968750000 +0000
 @@ -311,7 +311,7 @@ getc_immediate_common (FILE *stream,
  {
  #if defined (linux) || defined (sun) || defined (sgi) \
@@ -3069,13 +3047,15 @@
      || defined (_AIX) || (defined (__svr4__) && defined (i386)) \
      || defined (__Lynx__) || defined (__FreeBSD__) || defined (__OpenBSD__) \
      || defined (__GLIBC__) || defined (__APPLE__)
-@@ -592,6 +592,16 @@ rts_get_nShowCmd (void)
+@@ -592,6 +592,18 @@ rts_get_nShowCmd (void)
  }
  
  #endif /* WINNT */
 +
 +#ifdef __CYGWIN__
++
 +#include <malloc.h>
++
 +size_t _msize(void *memblock)
 +{
 +  return (size_t) malloc_usable_size (memblock);
@@ -3086,9 +3066,9 @@
  #ifdef VMS
  
  /* This gets around a problem with using the old threads library on VMS 7.0. */
---- origsrc/gcc-4.7.2/gcc/ada/system-cygwin.ads	1970-01-01 07:30:00.000000000 +0730
-+++ src/gcc-4.7.2/gcc/ada/system-cygwin.ads	2013-02-25 23:05:31.530326300 +0800
-@@ -0,0 +1,199 @@
+--- origsrc/gcc-4.7.2/gcc/ada//system-cygwin.ads	1970-01-01 00:00:00.000000000 +0000
++++ src/gcc-4.7.2/gcc/ada//system-cygwin.ads	2012-11-01 21:17:31.000000000 +0000
+@@ -0,0 +1,198 @@
 +------------------------------------------------------------------------------
 +--                                                                          --
 +--                        GNAT RUN-TIME COMPONENTS                          --
@@ -3233,7 +3213,6 @@
 +   Suppress_Standard_Library : constant Boolean := False;
 +   Use_Ada_Main_Program_Name : constant Boolean := False;
 +   ZCX_By_Default            : constant Boolean := True;
-+   GCC_ZCX_Support           : constant Boolean := True;
 +
 +   ---------------------------
 +   -- Underlying Priorities --
@@ -3288,4 +3267,3 @@
 +   --  System.Task_Primitives.Operations.
 +
 +end System;
-
