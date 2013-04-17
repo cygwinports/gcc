@@ -1,0 +1,22 @@
+--- origsrc/gcc-4.8.0/gcc/config/i386/i386.c	2013-03-23 23:59:41.174657500 -0500
++++ src/gcc-4.8.0/gcc/config/i386/i386.c	2013-03-30 22:48:22.204298800 -0500
+@@ -3947,6 +3947,19 @@ ix86_option_override (void)
+   register_pass (&insert_vzeroupper_info);
+ }
+ 
++/* Implement TARGET_CANNOT_MODIFY_JUMPS_P.  */
++static bool
++ix86_cannot_modify_jumps_p (void)
++{
++  if (TARGET_SEH && reload_completed && cfun && cfun->eh
++      && cfun->eh->region_tree)
++    return true;
++  return false;
++}
++
++#undef  TARGET_CANNOT_MODIFY_JUMPS_P
++#define TARGET_CANNOT_MODIFY_JUMPS_P ix86_cannot_modify_jumps_p
++
+ /* Update register usage after having seen the compiler flags.  */
+ 
+ static void
