@@ -21,10 +21,6 @@
 +#define HAVE_ENABLE_EXECUTE_STACK
 +#undef  CHECK_EXECUTE_STACK_ENABLED
 +#define CHECK_EXECUTE_STACK_ENABLED flag_setstackexecutable
-+
-+#ifdef IN_LIBGCC2
-+#include <windows.h>
-+#endif
 --- origsrc/gcc-4.7.2/gcc/config/i386//mingw.opt	2011-04-01 15:43:22.000000000 +0100
 +++ src/gcc-4.7.2/gcc/config/i386//mingw.opt	2012-11-01 20:57:00.296875000 +0000
 @@ -28,8 +28,4 @@ Wpedantic-ms-format
