@@ -10,7 +10,7 @@
 +  pthread_t my_pthread;
 +
 +  my_pthread = pthread_self();
-+#   ifdef DEBUG_CYGWIN_THREADS
++#   if DEBUG_CYGWIN_THREADS
 +      GC_printf1("Attaching thread 0x%lx\n", my_pthread);
 +      GC_printf1("pid = %ld\n", (long) getpid());
 +#   endif
@@ -21,7 +21,7 @@
 +  UNLOCK();
 +  if (me != 0)
 +    {
-+#   ifdef DEBUG_CYGWIN_THREADS
++#   if DEBUG_CYGWIN_THREADS
 +      GC_printf1("Attempt to re-attach known thread 0x%lx\n", my_pthread);
 +#   endif
 +      return;
@@ -41,7 +41,7 @@
 +
 +  my_pthread = pthread_self();
 +
-+#   ifdef DEBUG_CYGWIN_THREADS
++#   if DEBUG_CYGWIN_THREADS
 +      GC_printf1("Detaching thread 0x%lx\n", my_pthread);
 +#   endif
 +
