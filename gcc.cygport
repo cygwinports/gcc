@@ -23,7 +23,7 @@ inherit toolchain
 
 NAME="gcc"
 VERSION=4.8.0
-RELEASE=1
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -39,10 +39,11 @@ SRC_DIR="gcc-${VERSION}"
 
 PATCH_URI="
 	4.7-ada.patch
+	4.7-boehm-gc-cygwin.patch
+	4.7-execstack.patch
 	4.7-java-awt.patch
 	4.5-java-FIONREAD.patch
 	4.7-java-jni.patch
-	4.7-java-libgc-win32.patch
 	4.8-java-soname.patch
 	4.8-libatomic-cygwin.patch
 	4.8-libdecnumber-cygwin64.patch
@@ -56,6 +57,8 @@ PATCH_URI="
 	4.8-specs-cygwin.patch
 	4.8-cmodel-medium.patch
 	4.5-skiptest.patch
+	4.8-duplicate-symbols.patch
+	4.8-pr56742.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
@@ -149,8 +152,8 @@ src_install() {
 
 	# Move Ada DLLs
 	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/*.dll ${D}/usr/bin/
-	dosym ../../../../bin/libgnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
-	dosym ../../../../bin/libgnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
+	dosym ../../../../../bin/cyggnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
+	dosym ../../../../../bin/cyggnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
 
 	# Create defaults of libgcj-common config files.
 	make_etc_defaults /usr/lib/logging.properties /usr/lib/security/classpath.security
@@ -216,7 +219,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
 gcc_g___SUMMARY="${SUMMARY} (C++)"
 gcc_g___REQUIRES="${NAME}-core"
 gcc_g___CONTENTS="
-    --exclude=gcj --exclude=gnu --exclude=java --exclude=javax --exclude=org
+    --exclude=gcj --exclude=gnu --exclude=java --exclude=javax --exclude=org --exclude=sun
     usr/bin/c++.exe \
     usr/bin/g++.exe \
     usr/bin/${TOOLCHAIN_TARGET}-c++.exe \
@@ -259,6 +262,7 @@ gcc_java_CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/gnu/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/java*/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/org/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/sun/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/gcj/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/jni*.h \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/ecj1.exe \
@@ -349,7 +353,7 @@ libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
 libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
 libgnat4_8_SUMMARY="GCC Ada runtime library"
-libgnat4_8_CONTENTS="usr/bin/libgnarl-4.8.dll usr/bin/libgnat-4.8.dll"
+libgnat4_8_CONTENTS="usr/bin/cyggnarl-4.8.dll usr/bin/cyggnat-4.8.dll"
 libgcj14_SUMMARY="GCC Java runtime library"
 libgcj14_REQUIRES="libgcj-common"
 libgcj14_CONTENTS="usr/bin/cyggcj*-14.dll usr/bin/cyggij-14.dll"
