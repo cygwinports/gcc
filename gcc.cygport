@@ -22,8 +22,8 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.7.2
-RELEASE=2
+VERSION=4.7.3
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -35,16 +35,16 @@ SRC_URI="http://ftp.gnu.org/gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.bz2 \
 SRC_DIR="gcc-${VERSION}"
 
 PATCH_URI="
-	config-rpath.patch
 	4.7-ada.patch
+	4.7-boehm-gc-cygwin.patch
+	4.7-execstack.patch
 	4.7-java-awt.patch
 	4.5-java-FIONREAD.patch
 	4.7-java-jni.patch
-	4.7-java-libgc-win32.patch
 	4.7-libffi-noinst.patch
 	4.7-libitm-cygwin.patch
 	4.7-libstdc.patch
-	4.7-misc-core.patch
+	4.8-lto-plugin-soname.patch
 	4.7-specs.patch
 	4.5-skiptest.patch
 "
@@ -89,8 +89,6 @@ CYGCONF_ARGS="
 	--with-ecj-jar=/usr/share/java/ecj.jar
 	--with-gnu-ld --with-gnu-as
 	--with-cloog-include=/usr/include/cloog-ppl
-	--without-libiconv-prefix
-	--without-libintl-prefix
 	--with-system-zlib
 "
 
@@ -132,8 +130,8 @@ src_install() {
 
 	# Move Ada DLLs
 	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/*.dll ${D}/usr/bin/
-	dosym ../../../../bin/libgnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
-	dosym ../../../../bin/libgnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
+	dosym ../../../../../bin/cyggnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
+	dosym ../../../../../bin/cyggnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
 }
 
 KEEP_LA_FILES="none"
@@ -162,8 +160,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cc1.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/collect2.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/crt*.o \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cyglto_plugin-0.dll \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libcaf_single.a \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/cyglto_plugin.dll \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgcc* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgcov.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgomp.* \
@@ -190,7 +187,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
 gcc_g___SUMMARY="${SUMMARY} (C++)"
 gcc_g___REQUIRES="${NAME}-core"
 gcc_g___CONTENTS="
-    --exclude=gcj --exclude=gnu --exclude=java --exclude=javax --exclude=org
+    --exclude=gcj --exclude=gnu --exclude=java --exclude=javax --exclude=org --exclude=sun
     usr/bin/c++.exe \
     usr/bin/g++.exe \
     usr/bin/${TOOLCHAIN_TARGET}-c++.exe \
@@ -233,6 +230,7 @@ gcc_java_CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/gnu/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/java*/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/org/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/c++/sun/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/gcj/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/jni*.h \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/ecj1.exe \
@@ -277,6 +275,7 @@ gcc_fortran_CONTENTS="
     usr/bin/${TOOLCHAIN_TARGET}-gfortran.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/finclude/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/f951.exe \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libcaf_single.a \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libgfortran* \
     usr/share/info/gfortran.info* \
     usr/share/man/man1/gfortran.1* \
@@ -320,7 +319,7 @@ libgcc1_CONTENTS="usr/bin/cyggcc_s-1.dll"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
 libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
 libgnat4_7_SUMMARY="GCC Ada runtime library"
-libgnat4_7_CONTENTS="usr/bin/libgnarl-4.7.dll usr/bin/libgnat-4.7.dll"
+libgnat4_7_CONTENTS="usr/bin/cyggnarl-4.7.dll usr/bin/cyggnat-4.7.dll"
 libgcj13_SUMMARY="GCC Java runtime library"
 libgcj13_REQUIRES="libgcj-common"
 libgcj13_CONTENTS="usr/bin/cyggcj*-13.dll usr/bin/cyggij-13.dll"
