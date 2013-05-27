@@ -22,8 +22,8 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.8.0
-RELEASE=2
+VERSION=4.8-20130523
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
