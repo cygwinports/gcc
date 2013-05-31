@@ -22,7 +22,7 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.8-20130523
+VERSION=4.8.1
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
