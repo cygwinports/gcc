@@ -344,13 +344,12 @@
  	$(MAKE) $(FLAGS_TO_PASS) \
 --- origsrc/gcc-4.7.2/gcc/ada//gsocket.h	2012-11-02 15:16:49.781250000 +0000
 +++ src/gcc-4.7.2/gcc/ada//gsocket.h	2012-11-01 21:17:31.000000000 +0000
-@@ -204,7 +204,8 @@
+@@ -204,7 +204,7 @@
  #endif
  
  #if defined (_AIX) || defined (__FreeBSD__) || defined (__hpux__) || \
--    defined (__osf__) || defined (_WIN32) || defined (__APPLE__)
-+    defined (__osf__) || defined (_WIN32) || defined (__APPLE__) || \
-+    defined (__CYGWIN__)
+-    defined (_WIN32) || defined (__APPLE__)
++    defined (_WIN32) || defined (__APPLE__) || defined (__CYGWIN__)
  # define HAVE_THREAD_SAFE_GETxxxBYyyy 1
  
  #elif defined (sgi) || defined (linux) || defined (__GLIBC__) || \
@@ -3039,9 +3038,9 @@
 --- origsrc/gcc-4.7.2/gcc/ada//sysdep.c	2012-11-02 15:16:50.062500000 +0000
 +++ src/gcc-4.7.2/gcc/ada//sysdep.c	2012-11-02 15:50:59.968750000 +0000
 @@ -311,7 +311,7 @@ getc_immediate_common (FILE *stream,
+                        int waiting)
  {
- #if defined (linux) || defined (sun) || defined (sgi) \
-     || (defined (__osf__) && ! defined (__alpha_vxworks)) \
+ #if defined (linux) || defined (sun) \
 -    || defined (__CYGWIN32__) || defined (__MACHTEN__) || defined (__hpux__) \
 +    || defined (__CYGWIN__) || defined (__MACHTEN__) || defined (__hpux__) \
      || defined (_AIX) || (defined (__svr4__) && defined (i386)) \
