@@ -22,8 +22,8 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.8.1
-RELEASE=1
+VERSION=4.8.2
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -38,6 +38,7 @@ esac
 SRC_DIR="gcc-${VERSION}"
 
 PATCH_URI="
+	4.0-latest-gcc-runtimes.patch
 	4.7-ada.patch
 	4.7-boehm-gc-cygwin.patch
 	4.7-execstack.patch
@@ -49,16 +50,17 @@ PATCH_URI="
 	4.8-libdecnumber-cygwin64.patch
 	4.8-libffi-cygwin64.patch
 	4.7-libffi-noinst.patch
-	4.8-libgcc-cygwin64.patch
+	${ARCH_x86_64+4.8-libgcc-cygwin64.patch}
 	4.7-libitm-cygwin.patch
 	4.7-libstdc-cygwin.patch
 	4.8-lto-plugin-soname.patch
 	4.8-picflag-cygwin64.patch
 	4.8-specs-cygwin.patch
-	4.8-cmodel-medium.patch
+	${ARCH_x86_64+4.8-cmodel-medium.patch}
 	4.5-skiptest.patch
-	4.8-duplicate-symbols.patch
-	4.8-pr56742.patch
+	${ARCH_x86_64+4.8-duplicate-symbols.patch}
+	4.8-libgcc-references.patch
+	4.8-gcc-ada-DTR.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
@@ -77,7 +79,9 @@ src_unpack_hook() {
 # gccgo: requires <ucontext.h>
 # libitm: test programs segfault
 # java-awt: requires GTK+, large deps for little use
+# libexecdir: http://cygwin.com/ml/cygwin/2013-11/msg00018.html et al
 CYGCONF_ARGS="
+	--libexecdir=/usr/lib
 	--enable-shared --enable-shared-libgcc --enable-static
 	--enable-version-specific-runtime-libs
 	$(cross_compiling || echo --enable-bootstrap)
