@@ -60,6 +60,7 @@ PATCH_URI="
 	${ARCH_x86_64+4.8-duplicate-symbols.patch}
 	4.8-libgcc-references.patch
 	4.8-gcc-ada-DTR.patch
+	4.8-Wimplicit-decls.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
