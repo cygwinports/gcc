@@ -61,10 +61,11 @@ PATCH_URI="
 	4.8-libgcc-references.patch
 	4.8-gcc-ada-DTR.patch
 	4.8-Wimplicit-decls.patch
+	4.8-ada-cygwin64.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
-DISTCLEANFILES="gcc/ada/*-cygwin.* gcc/config/i386/cygwin.opt gcc/config/i386/*cygwin-w64*"
+DISTCLEANFILES="gcc/ada/*-cygwin* gcc/config/i386/cygwin.opt gcc/config/i386/*cygwin-w64*"
 
 # These must not be set in the environment, but main cygport
 # script tries to be too helpful here and confuses auto-detection
@@ -89,7 +90,7 @@ CYGCONF_ARGS="
 	--with-dwarf2
 	${ARCH_i686+--with-arch=i686} --with-tune=generic
 	${ARCH_i686+--disable-sjlj-exceptions}
-	--enable-languages=${ARCH_i686+ada,}c,c++,fortran,${ARCH_i686+java,}lto,objc,obj-c++
+	--enable-languages=ada,c,c++,fortran,${ARCH_i686+java,}lto,objc,obj-c++
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
@@ -98,7 +99,7 @@ CYGCONF_ARGS="
 	--enable-libquadmath
 	--enable-libquadmath-support
 	--enable-libssp
-	${ARCH_i686+--enable-libada}
+	--enable-libada
 	${ARCH_i686+--enable-libjava}
 	--enable-libgcj-sublibs
 	--disable-java-awt
@@ -153,15 +154,15 @@ src_install() {
 	dosym gcc.exe /usr/bin/cc
 	dosym ../bin/cpp.exe /usr/lib/cpp
 
+	# Move Ada DLLs
+	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/*.dll ${D}/usr/bin/
+	dosym ../../../../../bin/cyggnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
+	dosym ../../../../../bin/cyggnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
+
 	if defined ARCH_i686; then
 
 	# Install the helper scripts for fixing up existing .la files
 	dosbin ${C}/fix-libtool-scripts-for-latest-gcc-runtimes.sh
-
-	# Move Ada DLLs
-	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/*.dll ${D}/usr/bin/
-	dosym ../../../../../bin/cyggnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
-	dosym ../../../../../bin/cyggnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${PV}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
 
 	# Create defaults of libgcj-common config files.
 	make_etc_defaults /usr/lib/logging.properties /usr/lib/security/classpath.security
@@ -171,11 +172,11 @@ src_install() {
 
 KEEP_LA_FILES="none"
 
-PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libobjc4 libstdc++6 libquadmath0"
+PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat${VERSION%[-\.]*} ${ARCH_i686+libobjc4} libstdc++6 libquadmath0"
 if defined ARCH_i686
 then
-	PKG_NAMES+=" ${NAME}-ada ${NAME}-java libgcj-common libgcj14 libgnat${VERSION%[-\.]*} libstdc++6-devel"
+	PKG_NAMES+=" ${NAME}-java libgcj-common libgcj14 libstdc++6-devel"
 fi
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
