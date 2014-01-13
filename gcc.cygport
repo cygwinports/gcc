@@ -112,6 +112,12 @@ CYGCONF_ARGS="
 	--with-system-zlib
 "
 
+src_compile() {
+	cd ${B}
+	cygconf # CYGCONF_ARGS defined above
+	cygmake BOOT_CFLAGS="${CXXFLAGS}"
+}
+
 # override default src_test, as we need to ignore failures and
 # add build subdirectories to path so DLLs can definitely be found.
 src_test() {
