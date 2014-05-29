@@ -38,8 +38,29 @@
  m4_include([../config/multi.m4])
  m4_include([../config/override.m4])
  m4_include([../config/stdint.m4])
---- origsrc/gcc-4.8-20130310/libatomic/configure	2013-03-10 17:37:36.000000000 -0500
-+++ src/gcc-4.8-20130310/libatomic/configure	2013-03-17 05:29:38.288507000 -0500
+--- origsrc/gcc-4.8-20130310/libatomic/configure.ac	2013-01-14 12:16:23.000000000 -0600
++++ src/gcc-4.8-20130310/libatomic/configure.ac	2013-03-17 05:29:30.655070400 -0500
+@@ -143,6 +143,7 @@
+ 
+ # Configure libtool
+ AM_PROG_LIBTOOL
++ACX_LT_HOST_FLAGS
+ AC_SUBST(enable_shared)
+ AC_SUBST(enable_static)
+ AM_MAINTAINER_MODE
+--- origsrc/gcc-4.8-20130310/libatomic/configure.tgt	2013-01-14 12:16:23.000000000 -0600
++++ src/gcc-4.8-20130310/libatomic/configure.tgt	2013-03-17 04:50:09.727033000 -0500
+@@ -108,7 +108,7 @@
+   *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu \
+   | *-*-netbsd* | *-*-freebsd* | *-*-openbsd* \
+   | *-*-solaris2* | *-*-sysv4* | *-*-irix6* | *-*-osf* | *-*-hpux11* \
+-  | *-*-darwin* | *-*-aix*)
++  | *-*-darwin* | *-*-aix* | *-*-cygwin*)
+ 	# POSIX system.  The OS is supported.
+ 	config_path="${config_path} posix"
+ 	;;
+--- origsrc/gcc-4.8-20130310/libatomic/configure	2014-05-22 17:13:49.000000000 +0800
++++ src/gcc-4.8-20130310/libatomic/configure	2014-05-24 12:40:30.720760000 +0800
 @@ -627,6 +627,7 @@
  MAINTAINER_MODE_TRUE
  enable_static
@@ -48,25 +69,25 @@
  CPP
  OTOOL64
  OTOOL
-@@ -11013,7 +11014,7 @@
+@@ -11019,7 +11020,7 @@
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 11016 "configure"
-+#line 11017 "configure"
+-#line 11022 "configure"
++#line 11023 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -11119,7 +11120,7 @@
+@@ -11125,7 +11126,7 @@
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 11122 "configure"
-+#line 11123 "configure"
+-#line 11128 "configure"
++#line 11129 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -11357,6 +11358,28 @@
+@@ -11363,6 +11364,28 @@
  
  
  
@@ -95,24 +116,3 @@
  
  
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
---- origsrc/gcc-4.8-20130310/libatomic/configure.ac	2013-01-14 12:16:23.000000000 -0600
-+++ src/gcc-4.8-20130310/libatomic/configure.ac	2013-03-17 05:29:30.655070400 -0500
-@@ -143,6 +143,7 @@
- 
- # Configure libtool
- AM_PROG_LIBTOOL
-+ACX_LT_HOST_FLAGS
- AC_SUBST(enable_shared)
- AC_SUBST(enable_static)
- AM_MAINTAINER_MODE
---- origsrc/gcc-4.8-20130310/libatomic/configure.tgt	2013-01-14 12:16:23.000000000 -0600
-+++ src/gcc-4.8-20130310/libatomic/configure.tgt	2013-03-17 04:50:09.727033000 -0500
-@@ -108,7 +108,7 @@
-   *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu \
-   | *-*-netbsd* | *-*-freebsd* | *-*-openbsd* \
-   | *-*-solaris2* | *-*-sysv4* | *-*-irix6* | *-*-osf* | *-*-hpux11* \
--  | *-*-darwin* | *-*-aix*)
-+  | *-*-darwin* | *-*-aix* | *-*-cygwin*)
- 	# POSIX system.  The OS is supported.
- 	config_path="${config_path} posix"
- 	;;

@@ -22,8 +22,8 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain
 
 NAME="gcc"
-VERSION=4.8.2
-RELEASE=2
+VERSION=4.8.3
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -58,10 +58,10 @@ PATCH_URI="
 	${ARCH_x86_64+4.8-cmodel-medium.patch}
 	4.5-skiptest.patch
 	${ARCH_x86_64+4.8-duplicate-symbols.patch}
-	4.8-libgcc-references.patch
 	4.8-gcc-ada-DTR.patch
 	4.8-Wimplicit-decls.patch
 	4.8-ada-cygwin64.patch
+	4.9-default-manifest.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
