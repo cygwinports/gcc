@@ -23,7 +23,7 @@ inherit toolchain
 
 NAME="gcc"
 VERSION=4.8.3
-RELEASE=1
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -62,6 +62,7 @@ PATCH_URI="
 	4.8-Wimplicit-decls.patch
 	4.8-ada-cygwin64.patch
 	4.9-default-manifest.patch
+	4.8-libgcc-deregister.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
