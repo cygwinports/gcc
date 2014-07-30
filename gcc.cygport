@@ -160,6 +160,34 @@ src_install() {
 	# create standard aliases
 	dosym gcc.exe /usr/bin/cc
 	dosym ../bin/cpp.exe /usr/lib/cpp
+	dosym gfortran.exe /usr/bin/f95
+
+	cat > ${D}/usr/bin/c89 <<_EOF
+#!/bin/sh
+fl="-std=c89"
+for opt; do
+  case "\$opt" in
+    -ansi|-std=c89|-std=iso9899:1990) fl="";;
+    -std=*) echo "`basename \$0` called with non ANSI/ISO C option \$opt" >&2
+	    exit 1;;
+  esac
+done
+exec /usr/bin/gcc \$fl \${1+"\$@"}
+_EOF
+
+	cat > ${D}/usr/bin/c99 <<_EOF
+#!/bin/sh
+fl="-std=c99"
+for opt; do
+  case "\$opt" in
+    -std=c99|-std=iso9899:1999) fl="";;
+    -std=*) echo "`basename \$0` called with non ISO C99 option \$opt" >&2
+	    exit 1;;
+  esac
+done
+exec /usr/bin/gcc \$fl \${1+"\$@"}
+_EOF
+	chmod 755 ${D}/usr/bin/c?9
 
 	# Move Ada DLLs
 	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/*.dll ${D}/usr/bin/
@@ -190,6 +218,8 @@ gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils w32api-headers w32api-runtime"
 gcc_core_CONTENTS="--exclude=jni*.h
     usr/bin/cc \
+    usr/bin/c89 \
+    usr/bin/c99 \
     usr/bin/cpp.exe \
     usr/bin/gcc.exe \
     usr/bin/gcc-ar.exe
@@ -321,6 +351,7 @@ gcc_java_CONTENTS="
 gcc_fortran_SUMMARY="${SUMMARY} (Fortran)"
 gcc_fortran_REQUIRES="${NAME}-core"
 gcc_fortran_CONTENTS="
+    usr/bin/f95 \
     usr/bin/gfortran.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gfortran.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/finclude/ \
