@@ -23,7 +23,7 @@ inherit toolchain
 
 NAME="gcc"
 VERSION=4.8.3
-RELEASE=2
+RELEASE=3
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -63,6 +63,7 @@ PATCH_URI="
 	4.8-ada-cygwin64.patch
 	4.9-default-manifest.patch
 	4.8-libgcc-deregister.patch
+	4.8-__cxa_atexit.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
@@ -87,7 +88,7 @@ CYGCONF_ARGS="
 	--enable-shared --enable-shared-libgcc --enable-static
 	--enable-version-specific-runtime-libs
 	$(cross_compiling || echo --enable-bootstrap)
-	--disable-__cxa_atexit
+	--enable-__cxa_atexit
 	--with-dwarf2
 	${ARCH_i686+--with-arch=i686} --with-tune=generic
 	${ARCH_i686+--disable-sjlj-exceptions}

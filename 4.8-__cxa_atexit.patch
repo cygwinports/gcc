@@ -1,0 +1,154 @@
+--- origsrc/gcc-4.8.3/gcc/config/i386/cygwin.h	2014-08-01 15:20:08.936969300 -0500
++++ src/gcc-4.8.3/gcc/config/i386/cygwin.h	2014-08-04 17:17:31.265803800 -0500
+@@ -40,7 +40,7 @@ along with GCC; see the file COPYING3.
+ #define STARTFILE_SPEC "\
+   %{!shared: %{!mdll: crt0%O%s \
+   %{pg:gcrt0%O%s}}}\
+-  crtbegin.o%s"
++  %{shared:crtbeginS.o%s;:crtbegin.o%s}"
+ 
+ #undef ENDFILE_SPEC
+ #define ENDFILE_SPEC \
+--- origsrc/gcc-4.8.3/gcc/config.gcc	2014-08-01 15:20:08.402401400 -0500
++++ src/gcc-4.8.3/gcc/config.gcc	2014-08-06 17:58:38.240552900 -0500
+@@ -1452,6 +1452,7 @@ i[34567]86-*-cygwin*)
+ 		thread_file='posix'
+ 	fi
+ 	use_gcc_stdint=wrap
++	default_use_cxa_atexit=yes
+ 	;;
+ x86_64-*-cygwin*)
+ 	need_64bit_isa=yes
+@@ -1467,6 +1468,7 @@ x86_64-*-cygwin*)
+ 		thread_file='posix'
+ 	fi
+ 	use_gcc_stdint=wrap
++	default_use_cxa_atexit=yes
+ 	;;
+ i[34567]86-*-mingw* | x86_64-*-mingw*)
+ 	tm_file="${tm_file} i386/unix.h i386/bsd.h i386/gas.h dbxcoff.h i386/cygming.h"
+--- origsrc/gcc-4.8.3/libgcc/config/i386/cygming-crtbegin.c	2014-08-01 15:20:08.998477100 -0500
++++ src/gcc-4.8.3/libgcc/config/i386/cygming-crtbegin.c	2014-08-06 23:54:59.133581500 -0500
+@@ -81,6 +81,23 @@ static void *__JCR_LIST__[]
+   = { };
+ #endif
+ 
++#ifdef __CYGWIN__
++/* Declare the __dso_handle variable.  It should have a unique value
++   in every shared-object; in a main program its value is zero.  The
++   object should in any case be protected.  This means the instance
++   in one DSO or the main program is not used in another object.  The
++   dynamic linker takes care of this.  */
++
++#ifdef CRTSTUFFS_O
++extern void *__ImageBase;
++void *__dso_handle = &__ImageBase;
++#else
++void *__dso_handle = 0;
++#endif
++
++#endif /* __CYGWIN__ */
++
++
+ /* Pull in references from libgcc.a(unwind-dw2-fde.o) in the
+    startfile. These are referenced by a ctor and dtor in crtend.o.  */
+ extern void __gcc_register_frame (void);
+@@ -131,6 +148,13 @@ __gcc_register_frame (void)
+ 	register_class_fn (__JCR_LIST__);
+     }
+ #endif
++
++#if DEFAULT_USE_CXA_ATEXIT
++  /* If we use the __cxa_atexit method to register C++ dtors
++     at object construction,  also use atexit to register eh frame
++     info cleanup.  */
++  atexit(__gcc_deregister_frame);
++#endif /* DEFAULT_USE_CXA_ATEXIT */
+ }
+ 
+ void
+--- origsrc/gcc-4.8.3/libgcc/config/i386/cygming-crtend.c	2013-02-04 13:06:20.000000000 -0600
++++ src/gcc-4.8.3/libgcc/config/i386/cygming-crtend.c	2014-08-06 01:27:35.568214600 -0500
+@@ -70,12 +70,6 @@ static void
+ register_frame_ctor (void)
+ {
+   __gcc_register_frame ();
+-#if DEFAULT_USE_CXA_ATEXIT
+-  /* If we use the __cxa_atexit method to register C++ dtors
+-     at object construction,  also use atexit to register eh frame
+-     info cleanup.  */
+-  atexit (__gcc_deregister_frame);
+-#endif
+ }
+ 
+ #if !DEFAULT_USE_CXA_ATEXIT
+--- origsrc/gcc-4.8.3/libgcc/config/i386/t-cygming	2011-11-02 10:23:48.000000000 -0500
++++ src/gcc-4.8.3/libgcc/config/i386/t-cygming	2014-08-04 17:15:30.836011200 -0500
+@@ -8,6 +8,9 @@ CUSTOM_CRTSTUFF = yes
+ crtbegin.o: $(srcdir)/config/i386/cygming-crtbegin.c
+ 	$(crt_compile) -fno-omit-frame-pointer  -c $<
+ 
++crtbeginS.o: $(srcdir)/config/i386/cygming-crtbegin.c
++	$(crt_compile) -fno-omit-frame-pointer  -c $< -DCRTSTUFFS_O
++
+ # We intentionally use a implementation-reserved init priority of 0,
+ # so allow the warning.
+ crtend.o: $(srcdir)/config/i386/cygming-crtend.c
+--- origsrc/gcc-4.8.3/libgcc/config.host	2014-08-01 15:20:05.717560400 -0500
++++ src/gcc-4.8.3/libgcc/config.host	2014-08-04 17:19:11.955589800 -0500
+@@ -559,7 +559,7 @@ i[34567]86-*-solaris2* | x86_64-*-solari
+ i[4567]86-wrs-vxworks|i[4567]86-wrs-vxworksae)
+ 	;;
+ i[34567]86-*-cygwin*)
+-	extra_parts="crtbegin.o crtend.o crtfastmath.o"
++	extra_parts="crtbegin.o crtbeginS.o crtend.o crtfastmath.o"
+ 	# This has to match the logic for DWARF2_UNWIND_INFO in gcc/config/i386/cygming.h
+ 	if test x$enable_sjlj_exceptions = xyes; then
+ 		tmake_eh_file="i386/t-sjlj-eh"
+--- origsrc/gcc-4.8.3/libstdc++-v3/libsupc++/atexit_thread.cc	2013-07-27 21:33:01.000000000 -0500
++++ src/gcc-4.8.3/libstdc++-v3/libsupc++/atexit_thread.cc	2014-08-07 11:02:26.614465800 -0500
+@@ -25,6 +25,10 @@
+ #include <cstdlib>
+ #include <new>
+ #include "bits/gthr.h"
++#if defined(_WIN32) || defined(__CYGWIN__)
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++#endif
+ 
+ #if HAVE___CXA_THREAD_ATEXIT_IMPL
+ 
+@@ -47,6 +51,9 @@ namespace {
+     void (*destructor)(void *);
+     void *object;
+     elt *next;
++#if defined(_WIN32) || defined(__CYGWIN__)
++    HMODULE dll;
++#endif
+   };
+ 
+   // Keep a per-thread list of cleanups in gthread_key storage.
+@@ -62,6 +69,10 @@ namespace {
+       {
+ 	elt *old_e = e;
+ 	e->destructor (e->object);
++#if defined(_WIN32) || defined(__CYGWIN__)
++	if (e->dll)
++	  FreeLibrary (e->dll);
++#endif
+ 	e = e->next;
+ 	delete (old_e);
+       }
+@@ -133,6 +144,12 @@ __cxxabiv1::__cxa_thread_atexit (void (*
+   new_elt->destructor = dtor;
+   new_elt->object = obj;
+   new_elt->next = first;
++#if defined(_WIN32) || defined(__CYGWIN__)
++  /* Increment DLL count.  This blocks dlclose from unloading the DLL
++     before the thread-local dtors have been called. */
++  GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
++		      (LPCWSTR) dtor, &new_elt->dll);
++#endif
+ 
+   if (__gthread_active_p ())
+     __gthread_setspecific (key, new_elt);
