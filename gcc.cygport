@@ -64,6 +64,7 @@ PATCH_URI="
 	4.9-default-manifest.patch
 	4.8-libgcc-deregister.patch
 	4.8-__cxa_atexit.patch
+	4.8-libstdc-atexit_thread.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
