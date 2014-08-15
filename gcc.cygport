@@ -191,11 +191,6 @@ exec /usr/bin/gcc \$fl \${1+"\$@"}
 _EOF
 	chmod 755 ${D}/usr/bin/c?9
 
-	# Move Ada DLLs
-	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/*.dll ${D}/usr/bin/
-	dosym ../../../../../bin/cyggnat-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/libgnat-${VERSION%[-\.]*}.dll.a
-	dosym ../../../../../bin/cyggnarl-${VERSION%[-\.]*}.dll /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/libgnarl-${VERSION%[-\.]*}.dll.a
-
 	if defined ARCH_i686; then
 
 	# Install the helper scripts for fixing up existing .la files
