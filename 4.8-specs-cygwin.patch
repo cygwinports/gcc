@@ -165,14 +165,14 @@
    %{shared|mdll: --enable-auto-image-base -e __cygwin_dll_entry@12} \
 -  --dll-search-prefix=cyg -tsaware"
 +  --dll-search-prefix=cyg \
-+  %{rdynamic: --export-all-symbols} \
++  %{rdynamic|export-dynamic: --export-all-symbols} \
 +  %{!shared: %{!mdll: --large-address-aware --tsaware}}"
  
  /* Binutils does not handle weak symbols from dlls correctly.  For now,
     do not use them unnecessarily in gthr-posix.h.  */
 --- gcc/config/i386/cygwin.opt	1969-12-31 18:00:00.000000000 -0600
 +++ gcc/config/i386/cygwin.opt	2013-03-11 03:36:36.556378400 -0500
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,30 @@
 +; Cygwin-specific options.
 +
 +; Copyright (C) 2005, 2007, 2009, 2010, 2011 Free Software Foundation, Inc.
@@ -197,6 +197,9 @@
 +Driver
 +
 +rdynamic
++Driver
++
++export-dynamic
 +Driver
 +
 +; Retain blank line above
@@ -272,7 +275,7 @@
 +  %{shared|mdll: " SUB_LINK_ENTRY " --enable-auto-image-base} \
 +  %(shared_libgcc_undefs) \
 +  --dll-search-prefix=cyg \
-+  %{rdynamic: --export-all-symbols} \
++  %{rdynamic|export-dynamic: --export-all-symbols} \
 +  %{!shared: %{!mdll: %{" SPEC_32 ":--large-address-aware} --tsaware}}"
 +
 +/* Cygwin64 will have a 64-bit long type. */
