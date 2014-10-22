@@ -212,7 +212,7 @@ then
 fi
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
-gcc_core_REQUIRES="binutils w32api-headers w32api-runtime"
+gcc_core_REQUIRES="binutils cygwin-devel w32api-headers w32api-runtime"
 gcc_core_CONTENTS="--exclude=jni*.h
     usr/bin/cc \
     usr/bin/c89 \
