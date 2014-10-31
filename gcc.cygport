@@ -23,7 +23,7 @@ inherit toolchain
 
 NAME="gcc"
 VERSION=4.8.3
-RELEASE=3
+RELEASE=4
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
