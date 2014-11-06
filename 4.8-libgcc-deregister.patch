@@ -2,13 +2,13 @@ Index: libgcc/config/i386/cygming-crtbegin.c
 ===================================================================
 --- libgcc/config/i386/cygming-crtbegin.c	(revision 212546)
 +++ libgcc/config/i386/cygming-crtbegin.c	(working copy)
-@@ -99,12 +99,13 @@ static EH_FRAME_SECTION_CONST char __EH_
+@@ -99,12 +99,11 @@ static EH_FRAME_SECTION_CONST char __EH_
    = { };
  
  static struct object obj;
  
- /* Handle of libgcc's DLL reference.  */
- HANDLE hmod_libgcc;
+-/* Handle of libgcc's DLL reference.  */
+-HANDLE hmod_libgcc;
 +static void *  (*deregister_frame_fn) (const void *) = NULL;
  #endif
  
