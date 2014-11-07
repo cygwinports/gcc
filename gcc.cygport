@@ -205,7 +205,7 @@ _EOF
 KEEP_LA_FILES="none"
 
 PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat${VERSION%[-\.]*} ${ARCH_i686+libobjc4} libstdc++6 libquadmath0"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat${VERSION%[-\.]*} libobjc4 libstdc++6 libquadmath0"
 if defined ARCH_i686
 then
 	PKG_NAMES+=" ${NAME}-java libgcj-common libgcj14 libstdc++6-devel"
