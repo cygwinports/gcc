@@ -1,10 +1,22 @@
-Index: libstdc++-v3/config/os/mingw32-w64/os_defines.h
-===================================================================
---- libstdc++-v3/config/os/mingw32-w64/os_defines.h	(revision 213759)
-+++ libstdc++-v3/config/os/mingw32-w64/os_defines.h	(working copy)
-@@ -78,4 +78,9 @@
- #define _GLIBCXX_LLP64 1
- #endif
+From 4f45f5abe77525389e0a4d9885c5bf63e2f54bc8 Mon Sep 17 00:00:00 2001
+From: Jonathan Yong <10walls@gmail.com>
+Date: Fri, 31 Oct 2014 06:46:02 +0800
+Subject: [PATCH 22/24] prevent modules from being unloaded before their dtors
+ are called
+
+---
+ libstdc++-v3/config/os/mingw32-w64/os_defines.h |  5 +++++
+ libstdc++-v3/config/os/newlib/os_defines.h      |  6 ++++++
+ libstdc++-v3/libsupc++/atexit_thread.cc         | 20 ++++++++++++++++++++
+ 3 files changed, 31 insertions(+)
+
+diff --git a/libstdc++-v3/config/os/mingw32-w64/os_defines.h b/libstdc++-v3/config/os/mingw32-w64/os_defines.h
+index fd5ad9e..41d59be 100644
+--- a/libstdc++-v3/config/os/mingw32-w64/os_defines.h
++++ b/libstdc++-v3/config/os/mingw32-w64/os_defines.h
+@@ -81,4 +81,9 @@
+ // See libstdc++/59807
+ #define _GTHREAD_USE_MUTEX_INIT_FUNC 1
  
 +// Enable use of GetModuleHandleEx (requires Windows XP/2003) in
 +// __cxa_thread_atexit to prevent modules from being unloaded before
@@ -12,10 +24,10 @@ Index: libstdc++-v3/config/os/mingw32-w64/os_defines.h
 +#define _GLIBCXX_THREAD_ATEXIT_WIN32 1
 +
  #endif
-Index: libstdc++-v3/config/os/newlib/os_defines.h
-===================================================================
---- libstdc++-v3/config/os/newlib/os_defines.h	(revision 213759)
-+++ libstdc++-v3/config/os/newlib/os_defines.h	(working copy)
+diff --git a/libstdc++-v3/config/os/newlib/os_defines.h b/libstdc++-v3/config/os/newlib/os_defines.h
+index 92748da..2e01d3b 100644
+--- a/libstdc++-v3/config/os/newlib/os_defines.h
++++ b/libstdc++-v3/config/os/newlib/os_defines.h
 @@ -47,6 +47,12 @@
  
  // See libstdc++/20806.
@@ -29,10 +41,10 @@ Index: libstdc++-v3/config/os/newlib/os_defines.h
  #endif
  
  #endif
-Index: libstdc++-v3/libsupc++/atexit_thread.cc
-===================================================================
---- libstdc++-v3/libsupc++/atexit_thread.cc	(revision 213759)
-+++ libstdc++-v3/libsupc++/atexit_thread.cc	(working copy)
+diff --git a/libstdc++-v3/libsupc++/atexit_thread.cc b/libstdc++-v3/libsupc++/atexit_thread.cc
+index dff08e9..d7d84d2 100644
+--- a/libstdc++-v3/libsupc++/atexit_thread.cc
++++ b/libstdc++-v3/libsupc++/atexit_thread.cc
 @@ -25,6 +25,10 @@
  #include <cstdlib>
  #include <new>
@@ -42,9 +54,9 @@ Index: libstdc++-v3/libsupc++/atexit_thread.cc
 +#include <windows.h>
 +#endif
  
- #if HAVE___CXA_THREAD_ATEXIT_IMPL
+ #if _GLIBCXX_HAVE___CXA_THREAD_ATEXIT_IMPL
  
-@@ -47,6 +51,9 @@
+@@ -47,6 +51,9 @@ namespace {
      void (*destructor)(void *);
      void *object;
      elt *next;
@@ -54,7 +66,7 @@ Index: libstdc++-v3/libsupc++/atexit_thread.cc
    };
  
    // Keep a per-thread list of cleanups in gthread_key storage.
-@@ -62,6 +69,11 @@
+@@ -62,6 +69,11 @@ namespace {
        {
  	elt *old_e = e;
  	e->destructor (e->object);
@@ -66,7 +78,7 @@ Index: libstdc++-v3/libsupc++/atexit_thread.cc
  	e = e->next;
  	delete (old_e);
        }
-@@ -133,6 +145,14 @@
+@@ -133,6 +145,14 @@ __cxxabiv1::__cxa_thread_atexit (void (*dtor)(void *), void *obj, void */*dso_ha
    new_elt->destructor = dtor;
    new_elt->object = obj;
    new_elt->next = first;
@@ -81,3 +93,6 @@ Index: libstdc++-v3/libsupc++/atexit_thread.cc
  
    if (__gthread_active_p ())
      __gthread_setspecific (key, new_elt);
+-- 
+2.1.1
+

@@ -1,9 +1,17 @@
-Index: libgcc/config/i386/cygming-crtbegin.c
-===================================================================
---- libgcc/config/i386/cygming-crtbegin.c	(revision 212546)
-+++ libgcc/config/i386/cygming-crtbegin.c	(working copy)
-@@ -99,12 +99,11 @@ static EH_FRAME_SECTION_CONST char __EH_
-   = { };
+From 3d30fe549f54d5399a41ead2fd2c8c5d5ed56b85 Mon Sep 17 00:00:00 2001
+From: Jonathan Yong <10walls@gmail.com>
+Date: Sat, 8 Nov 2014 14:29:45 +0800
+Subject: [PATCH 23/24] Attempt to fix dw2 unwinder for Cygwin
+
+---
+ libgcc/config/i386/cygming-crtbegin.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/libgcc/config/i386/cygming-crtbegin.c b/libgcc/config/i386/cygming-crtbegin.c
+index aece23c..3651afa 100644
+--- a/libgcc/config/i386/cygming-crtbegin.c
++++ b/libgcc/config/i386/cygming-crtbegin.c
+@@ -100,8 +100,7 @@ static EH_FRAME_SECTION_CONST char __EH_FRAME_BEGIN__[]
  
  static struct object obj;
  
@@ -13,10 +21,7 @@ Index: libgcc/config/i386/cygming-crtbegin.c
  #endif
  
  #if TARGET_USE_JCR_SECTION
- static void *__JCR_LIST__[]
-   __attribute__ ((used, section(JCR_SECTION_NAME), aligned(4)))
-   = { };
-@@ -130,13 +131,16 @@ __gcc_register_frame (void)
+@@ -146,13 +145,16 @@ __gcc_register_frame (void)
  
    if (h)
      {
@@ -37,10 +42,7 @@ Index: libgcc/config/i386/cygming-crtbegin.c
    if (register_frame_fn)
       register_frame_fn (__EH_FRAME_BEGIN__, &obj);
  #endif
-@@ -158,19 +164,10 @@ __gcc_register_frame (void)
- }
- 
- void
+@@ -189,16 +191,7 @@ void
  __gcc_deregister_frame (void)
  {
  #if DWARF2_UNWIND_INFO
@@ -57,3 +59,6 @@ Index: libgcc/config/i386/cygming-crtbegin.c
 -    FreeLibrary (hmod_libgcc);
  #endif
  }
+-- 
+2.1.1
+

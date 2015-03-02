@@ -1,6 +1,18 @@
---- origsrc/gcc-4.8.2/libiberty/aclocal.m4	2013-11-17 03:48:36.190725600 -0600
-+++ src/gcc-4.8.2/libiberty/aclocal.m4	2013-11-16 23:57:59.000000000 -0600
-@@ -15,6 +15,8 @@ AC_CACHE_CHECK([for working strncmp], ac
+From 9d2689cee7e62d9f996d4cfdbb1dcb728455702a Mon Sep 17 00:00:00 2001
+From: Jonathan Yong <10walls@gmail.com>
+Date: Sat, 28 Jun 2014 10:08:25 +0800
+Subject: [PATCH 19/24] fix some implicit declaration warnings
+
+---
+ libiberty/aclocal.m4 | 6 +++++-
+ libiberty/configure  | 3 +++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/libiberty/aclocal.m4 b/libiberty/aclocal.m4
+index bf8a907..6b5e66c 100644
+--- a/libiberty/aclocal.m4
++++ b/libiberty/aclocal.m4
+@@ -15,6 +15,8 @@ AC_CACHE_CHECK([for working strncmp], ac_cv_func_strncmp_works,
  /* Test by Jim Wilson and Kaveh Ghazi.
     Check whether strncmp reads past the end of its string parameters. */
  #include <sys/types.h>
@@ -20,9 +32,11 @@
  {
    static char *addr = 0;
    auto char dummy;
---- origsrc/gcc-4.8.2/libiberty/configure	2013-11-17 03:48:36.197726000 -0600
-+++ src/gcc-4.8.2/libiberty/configure	2013-11-16 23:57:59.000000000 -0600
-@@ -6069,6 +6069,7 @@ else
+diff --git a/libiberty/configure b/libiberty/configure
+index 7bde9b3..1b9f1ec 100755
+--- a/libiberty/configure
++++ b/libiberty/configure
+@@ -6077,6 +6077,7 @@ else
  else
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
@@ -30,7 +44,7 @@
  find_stack_direction ()
  {
    static char *addr = 0;
-@@ -6838,6 +6839,8 @@ else
+@@ -6846,6 +6847,8 @@ else
  /* Test by Jim Wilson and Kaveh Ghazi.
     Check whether strncmp reads past the end of its string parameters. */
  #include <sys/types.h>
@@ -39,3 +53,6 @@
  
  #ifdef HAVE_FCNTL_H
  #include <fcntl.h>
+-- 
+2.1.1
+
