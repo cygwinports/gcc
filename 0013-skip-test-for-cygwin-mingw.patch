@@ -1,7 +1,7 @@
-From 50ab7461ea28b3958a805965374d43f5c945d2c5 Mon Sep 17 00:00:00 2001
+From fb545617895ad517f57367b5b0366b066c28dc3b Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 09:54:57 +0800
-Subject: [PATCH 16/24] skip test for cygwin/mingw
+Subject: [PATCH 13/21] skip test for cygwin/mingw
 
 ---
  gcc/testsuite/gcc.target/i386/pr25993.c | 2 +-
@@ -19,5 +19,5 @@ index b079e25..c30eaf5 100644
  
  #ifndef __ASSEMBLER__
 -- 
-2.1.1
+2.4.5
 

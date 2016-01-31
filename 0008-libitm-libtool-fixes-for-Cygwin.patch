@@ -1,7 +1,7 @@
-From d20aa5cbede139c08faa87f1942dfcd5348b62df Mon Sep 17 00:00:00 2001
+From 0e3b5257a3703bd2867c329a8fd60ec4994655ab Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 09:22:03 +0800
-Subject: [PATCH 11/24] libitm libtool fixes for Cygwin
+Subject: [PATCH 08/21] libitm libtool fixes for Cygwin
 
 ---
  libitm/Makefile.am  |  2 +-
@@ -25,10 +25,10 @@ index 1dce82d..0ea39f2 100644
  libitm_la_SOURCES = \
  	aatree.cc alloc.cc alloc_c.cc alloc_cpp.cc barrier.cc beginend.cc \
 diff --git a/libitm/Makefile.in b/libitm/Makefile.in
-index 6c4d253..5898bd8 100644
+index 138eeb1..a25c6d2 100644
 --- a/libitm/Makefile.in
 +++ b/libitm/Makefile.in
-@@ -279,6 +279,7 @@ libtool_VERSION = @libtool_VERSION@
+@@ -307,6 +307,7 @@ libtool_VERSION = @libtool_VERSION@
  link_itm = @link_itm@
  localedir = @localedir@
  localstatedir = @localstatedir@
@@ -36,7 +36,7 @@ index 6c4d253..5898bd8 100644
  mandir = @mandir@
  mkdir_p = @mkdir_p@
  multi_basedir = @multi_basedir@
-@@ -329,7 +330,7 @@ libitm_version_info = -version-info $(libtool_VERSION)
+@@ -357,7 +358,7 @@ libitm_version_info = -version-info $(libtool_VERSION)
  # want or need libstdc++.
  libitm_la_DEPENDENCIES = $(libitm_version_dep)
  libitm_la_LINK = $(LINK) $(libitm_la_LDFLAGS)
@@ -46,10 +46,10 @@ index 6c4d253..5898bd8 100644
  	barrier.cc beginend.cc clone.cc eh_cpp.cc local.cc query.cc \
  	retry.cc rwlock.cc useraction.cc util.cc sjlj.S tls.cc \
 diff --git a/libitm/aclocal.m4 b/libitm/aclocal.m4
-index 625404e..4be0d43 100644
+index aeab414..15be307 100644
 --- a/libitm/aclocal.m4
 +++ b/libitm/aclocal.m4
-@@ -996,6 +996,7 @@ m4_include([../config/depstand.m4])
+@@ -1016,6 +1016,7 @@ m4_include([../config/depstand.m4])
  m4_include([../config/enable.m4])
  m4_include([../config/futex.m4])
  m4_include([../config/lead-dot.m4])
@@ -58,7 +58,7 @@ index 625404e..4be0d43 100644
  m4_include([../config/multi.m4])
  m4_include([../config/override.m4])
 diff --git a/libitm/configure b/libitm/configure
-index ce6d50a..fe5c8ae 100644
+index 55332bb..2696e86 100644
 --- a/libitm/configure
 +++ b/libitm/configure
 @@ -630,6 +630,7 @@ MAINTAINER_MODE_FALSE
@@ -69,7 +69,7 @@ index ce6d50a..fe5c8ae 100644
  CXXCPP
  CPP
  OTOOL64
-@@ -15147,6 +15148,28 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+@@ -15152,6 +15153,28 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
  
  
  
@@ -99,7 +99,7 @@ index ce6d50a..fe5c8ae 100644
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
  $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
 diff --git a/libitm/configure.ac b/libitm/configure.ac
-index 70feff2..17a13ba 100644
+index 2d99b11..6b8ad09 100644
 --- a/libitm/configure.ac
 +++ b/libitm/configure.ac
 @@ -147,6 +147,7 @@ AM_CONDITIONAL(BUILD_INFO, test $gcc_cv_prog_makeinfo_modern = "yes")
@@ -111,5 +111,5 @@ index 70feff2..17a13ba 100644
  AC_SUBST(enable_static)
  
 -- 
-2.1.1
+2.4.5
 

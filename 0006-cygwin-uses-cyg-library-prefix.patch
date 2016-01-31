@@ -1,7 +1,7 @@
-From 3a9e0759c78e3ce788c446b1fc68efa9e84c900a Mon Sep 17 00:00:00 2001
+From aa3bb322bfa366fee3cfd83646bd0c049957ff05 Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 08:48:56 +0800
-Subject: [PATCH 06/24] cygwin uses cyg library prefix
+Subject: [PATCH 06/21] cygwin uses cyg library prefix
 
 ---
  libjava/include/posix.h                | 6 ++++++
@@ -47,5 +47,5 @@ index 0a30a21..810e045 100644
      return;
  
 -- 
-2.1.1
+2.4.5
 

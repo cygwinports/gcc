@@ -1,7 +1,7 @@
-From 3dc7b3621f887de9ed4993af86f512f028c71975 Mon Sep 17 00:00:00 2001
+From 562f01f9f740937c28d59ce37770a07716039d52 Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 08:45:53 +0800
-Subject: [PATCH 05/24] use -avoid-version if not tracking SO version
+Subject: [PATCH 05/21] use -avoid-version if not tracking SO version
 
 ---
  libjava/classpath/configure    | 2 +-
@@ -9,10 +9,10 @@ Subject: [PATCH 05/24] use -avoid-version if not tracking SO version
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/libjava/classpath/configure b/libjava/classpath/configure
-index bcb5bff..ac49367 100755
+index 6d46403..801f6ec 100755
 --- a/libjava/classpath/configure
 +++ b/libjava/classpath/configure
-@@ -3180,7 +3180,7 @@ case "$host_os" in
+@@ -3181,7 +3181,7 @@ case "$host_os" in
  	cp_module=""
  	;;
  	*)
@@ -22,7 +22,7 @@ index bcb5bff..ac49367 100755
  esac
  
 diff --git a/libjava/classpath/configure.ac b/libjava/classpath/configure.ac
-index d120b5b..f59e599 100644
+index 245e1df..5c6f229 100644
 --- a/libjava/classpath/configure.ac
 +++ b/libjava/classpath/configure.ac
 @@ -64,7 +64,7 @@ case "$host_os" in
@@ -35,5 +35,5 @@ index d120b5b..f59e599 100644
  esac
  
 -- 
-2.1.1
+2.4.5
 

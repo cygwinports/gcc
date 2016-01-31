@@ -1,7 +1,7 @@
-From 4c3499c1009f7051d76ba8b603fdeaa510e5c650 Mon Sep 17 00:00:00 2001
+From f590da14fcd201f8f2a1538523a6cfc279861842 Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 08:37:16 +0800
-Subject: [PATCH 04/24] Cygwin ioctl may emit EINVAL
+Subject: [PATCH 04/21] Cygwin ioctl may emit EINVAL
 
 On Cygwin (on X86) ioctl on FIONREAD returns EINVAL on the errno variable instead of ENOTTY
 http://gcc.gnu.org/bugzilla/show_bug.cgi?id=35536
@@ -23,5 +23,5 @@ index e05904c..0a2569c 100644
        // If the ioctl doesn't work, we don't care.
        r = 0;
 -- 
-2.1.1
+2.4.5
 

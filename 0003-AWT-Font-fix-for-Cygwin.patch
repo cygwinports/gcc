@@ -1,7 +1,7 @@
-From f4176d1e246a755de7a181169d94cd9676ebb86a Mon Sep 17 00:00:00 2001
+From d586c363d6a880f816e77fe4970da29a417f7d45 Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Thu, 29 May 2014 18:06:00 +0800
-Subject: [PATCH 03/24] AWT Font fix for Cygwin
+Subject: [PATCH 03/21] AWT Font fix for Cygwin
 
 ---
  .../gnu/classpath/examples/awt/HintingDemo.java    |  2 +-
@@ -95,5 +95,5 @@ index 4fc0b10..1370469 100644
  # List of aliases.
  Dialog/a=FreeSans
 -- 
-2.1.1
+2.4.5
 

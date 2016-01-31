@@ -1,7 +1,7 @@
-From 9d2689cee7e62d9f996d4cfdbb1dcb728455702a Mon Sep 17 00:00:00 2001
+From 9acb3806f55fe198543405988601fd90945f00ac Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 10:08:25 +0800
-Subject: [PATCH 19/24] fix some implicit declaration warnings
+Subject: [PATCH 16/21] fix some implicit declaration warnings
 
 ---
  libiberty/aclocal.m4 | 6 +++++-
@@ -33,10 +33,10 @@ index bf8a907..6b5e66c 100644
    static char *addr = 0;
    auto char dummy;
 diff --git a/libiberty/configure b/libiberty/configure
-index 7bde9b3..1b9f1ec 100755
+index da2df4e..f8bb482 100755
 --- a/libiberty/configure
 +++ b/libiberty/configure
-@@ -6077,6 +6077,7 @@ else
+@@ -6390,6 +6390,7 @@ else
  else
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
@@ -44,7 +44,7 @@ index 7bde9b3..1b9f1ec 100755
  find_stack_direction ()
  {
    static char *addr = 0;
-@@ -6846,6 +6847,8 @@ else
+@@ -7200,6 +7201,8 @@ else
  /* Test by Jim Wilson and Kaveh Ghazi.
     Check whether strncmp reads past the end of its string parameters. */
  #include <sys/types.h>
@@ -54,5 +54,5 @@ index 7bde9b3..1b9f1ec 100755
  #ifdef HAVE_FCNTL_H
  #include <fcntl.h>
 -- 
-2.1.1
+2.4.5
 

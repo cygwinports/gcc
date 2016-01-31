@@ -19,11 +19,11 @@
 #
 ################################################################################
 TOOLCHAIN_TARGET="native"
-inherit toolchain python
+inherit toolchain
 
 NAME="gcc"
-VERSION=4.9.2
-RELEASE=3
+VERSION=5.3.0
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -36,6 +36,7 @@ case ${VERSION} in
 *)	SRC_URI="mirror://gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.bz2" ;;
 esac
 SRC_DIR="gcc-${VERSION}"
+MAKEOPTS=-j1
 PATCH_URI="
 0001-share-mingw-fset-stack-executable-with-cygwin.patch
 0002-boehm-gc-for-cygwin.patch
@@ -43,27 +44,22 @@ PATCH_URI="
 0004-Cygwin-ioctl-may-emit-EINVAL.patch
 0005-use-avoid-version-if-not-tracking-SO-version.patch
 0006-cygwin-uses-cyg-library-prefix.patch
-0007-bump-libgcj-version.patch
-0008-libatomic-libtool-fixes-for-Cygwin.patch
-0009-support-64bit-cygwin-too.patch
-0010-Avoid-installing-libffi.patch
-0011-libitm-libtool-fixes-for-Cygwin.patch
-0012-Cygwin-uses-sysv-ABI-on-x86_64.patch
-0013-Do-not-version-lto-plugin-on-cygwin-mingw.patch
-0014-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
-0014a-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
-0015-handle-dllimport-properly-in-medium-model.patch
-0016-skip-test-for-cygwin-mingw.patch
-0017-64bit-Cygwin-uses-SEH.patch
-0018-define-RTS_CONTROL_ENABLE-and-DTR_CONTROL_ENABLE-for.patch
-0019-fix-some-implicit-declaration-warnings.patch
-0020-fix-gnat-DLL-prefix-for-Cygwin.patch
-0021-__cxa-atexit-for-Cygwin.patch
-0022-prevent-modules-from-being-unloaded-before-their-dto.patch
-0023-Attempt-to-fix-dw2-unwinder-for-Cygwin.patch
-0024-Restore-compile-mode-pthread.patch
-0025-fix-cygwin-stdint.patch
-4.0-latest-gcc-runtimes.patch
+0007-Avoid-installing-libffi.patch
+0008-libitm-libtool-fixes-for-Cygwin.patch
+0009-Cygwin-uses-sysv-ABI-on-x86_64.patch
+0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch
+0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
+0011a-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
+0012-handle-dllimport-properly-in-medium-model.patch
+0013-skip-test-for-cygwin-mingw.patch
+0014-64bit-Cygwin-uses-SEH.patch
+0015-define-RTS_CONTROL_ENABLE-and-DTR_CONTROL_ENABLE-for.patch
+0016-fix-some-implicit-declaration-warnings.patch
+0017-__cxa-atexit-for-Cygwin.patch
+0018-prevent-modules-from-being-unloaded-before-their-dto.patch
+0019-Cygwin-doesn-t-do-text-mode-translations-for-file-ha.patch
+0020-cygwin-uses-cyg-lib-prefix.patch
+0021-search-usr-lib-w32api-explicitly.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
@@ -113,6 +109,7 @@ CYGCONF_ARGS="
 	--without-libintl-prefix
 	--with-system-zlib
 	--enable-linker-build-id
+	--with-default-libstdcxx-abi=gcc4-compatible
 "
 
 src_compile() {
@@ -154,15 +151,6 @@ src_install() {
 		mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib/libgcc_s.dll.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/
 #		mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib32/libgcc_s.dll.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/32/
 	fi
-
-	# Move GDB auto-load to correct name and location
-	dodir /usr/share/gdb/auto-load/usr/bin
-	sed -i -e "/^libdir/ s|/lib/gcc/.*|/bin'|" \
-		${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libstdc++.dll.a-gdb.py
-	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libstdc++.dll.a-gdb.py \
-		${D}/usr/share/gdb/auto-load/usr/bin/cygstdc++-6.dll-gdb.py
-
-	python_compile /usr/share/gcc-${VERSION}/python
 
         # Move ADA DLLs
         mv -v ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/cyg*.dll ${D}/usr/bin/
@@ -206,7 +194,7 @@ _EOF
 	if defined ARCH_i686; then
 
 	# Install the helper scripts for fixing up existing .la files
-	dosbin ${C}/fix-libtool-scripts-for-latest-gcc-runtimes.sh
+	# dosbin ${C}/fix-libtool-scripts-for-latest-gcc-runtimes.sh
 
 	# Create defaults of libgcj-common config files.
 	make_etc_defaults /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/logging.properties /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/security/classpath.security
@@ -217,10 +205,10 @@ _EOF
 KEEP_LA_FILES="none"
 
 PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat${VERSION%[-\.]*} libobjc4 libstdc++6 libquadmath0"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat5 libobjc4 libstdc++6 libquadmath0 libvtv0"
 if defined ARCH_i686
 then
-	PKG_NAMES+=" ${NAME}-java libgcj-common libgcj15"
+	PKG_NAMES+=" ${NAME}-java libgcj-common libgcj16"
 fi
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
@@ -235,6 +223,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/bin/gcc-nm.exe \
     usr/bin/gcc-ranlib.exe \
     usr/bin/gcov.exe \
+    usr/bin/gcov-tool.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-${VERSION/-*/.*}.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-ar.exe \
@@ -253,10 +242,12 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcc* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcov.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp.* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp-plugin-host_nonshm.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libquadmath.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libssp* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/lto*.exe \
-    ${ARCH_i686+usr/sbin/fix-libtool-scripts-for-latest-gcc-runtimes.sh} \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libvtv.* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libvtv_stubs.* \
     usr/share/doc/${NAME}/ \
     usr/share/info/cpp.info* \
     usr/share/info/cppinternals.info* \
@@ -285,6 +276,7 @@ gcc_g___CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1plus.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libstdc++* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libsupc++* \
+    usr/share/gcc-${VERSION/-*/.*}/python/libstdcxx/
     usr/share/man/man1/g++.1* \
 "
 gcc_java_SUMMARY="${SUMMARY} (Java)"
@@ -326,8 +318,8 @@ gcc_java_CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/jvgenmain.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcj* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgij* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/gcj-${VERSION/-*/.*}-$((PV[2] + 6))/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/pkgconfig/libgcj-${VERSION%[-\.]*}.pc \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/gcj-${VERSION/-*/.*}-*/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/pkgconfig/libgcj-*.pc \
     usr/share/info/cp-tools.info* \
     usr/share/info/gcj.info* \
     usr/share/java/libgcj*-${VERSION/-*/.*}.jar \
@@ -382,7 +374,7 @@ gcc_objc___CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1objplus.exe
 "
 gcc_ada_SUMMARY="${SUMMARY} (Ada)"
-gcc_ada_REQUIRES="${NAME}-core libgnat4.9"
+gcc_ada_REQUIRES="${NAME}-core"
 gcc_ada_CONTENTS="
     usr/bin/gnat.exe \
     usr/bin/gnatbind.exe \
@@ -412,13 +404,13 @@ libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
 libgfortran3_CATEGORY="Libs"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
 libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
-libgnat4_9_CATEGORY="Libs"
-libgnat4_9_SUMMARY="GCC Ada runtime library"
-libgnat4_9_CONTENTS="usr/bin/cyggnarl-4.9.dll usr/bin/cyggnat-4.9.dll"
-libgcj15_CATEGORY="Libs"
-libgcj15_SUMMARY="GCC Java runtime library"
-libgcj15_REQUIRES="libgcj-common"
-libgcj15_CONTENTS="usr/bin/cyggcj*-15.dll usr/bin/cyggij-15.dll"
+libgnat5_CATEGORY="Libs"
+libgnat5_SUMMARY="GCC Ada runtime library"
+libgnat5_CONTENTS="usr/bin/cyggnarl-5.dll usr/bin/cyggnat-5.dll"
+libgcj16_CATEGORY="Libs"
+libgcj16_SUMMARY="GCC Java runtime library"
+libgcj16_REQUIRES="libgcj-common"
+libgcj16_CONTENTS="usr/bin/cyggcj*-16.dll usr/bin/cyggij-16.dll"
 libgcj_common_CATEGORY="Libs"
 libgcj_common_SUMMARY="GCC Java runtime data"
 libgcj_common_CONTENTS="
@@ -429,7 +421,7 @@ libgcj_common_CONTENTS="
 "
 libgomp1_CATEGORY="Libs"
 libgomp1_SUMMARY="GCC OpenMP runtime library"
-libgomp1_CONTENTS="usr/bin/cyggomp-1.dll"
+libgomp1_CONTENTS="usr/bin/cyggomp-1.dll usr/bin/cyggomp-plugin-host_nonshm-1.dll"
 libobjc4_CATEGORY="Libs"
 libobjc4_SUMMARY="GCC Objective-C runtime library"
 libobjc4_CONTENTS="usr/bin/cygobjc-4.dll"
@@ -444,4 +436,7 @@ libstdc__devel_SUMMARY="Obsolete package"
 libquadmath0_CATEGORY="Libs"
 libquadmath0_SUMMARY="GCC Quad-Precision Math runtime library"
 libquadmath0_CONTENTS="usr/bin/cygquadmath-0.dll"
-gcc_debuginfo_CONTENTS+=" usr/share/gcc-${VERSION/-*/.*}/python/libstdcxx/"
+libvtv0_CATEGORY="Libs"
+libvtv0_SUMMARY="GCC vtable verification library"
+libvtv0_CONTENTS="usr/bin/cygvtv-0.dll usr/bin/cygvtv_stubs-0.dll"
+PKG_IGNORE="usr/lib/libiberty.*"

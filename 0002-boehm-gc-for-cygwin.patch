@@ -1,17 +1,17 @@
-From 28e07034d97f5f8eb38f78d8e45e2d47de5c0040 Mon Sep 17 00:00:00 2001
+From 350df6c8caa021f3237486ea6b5145ee559f4d00 Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Wed, 28 May 2014 22:11:01 +0800
-Subject: [PATCH 02/24] boehm-gc for cygwin
+Subject: [PATCH 02/21] boehm-gc for cygwin
 
 ---
  boehm-gc/win32_threads.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 48 insertions(+)
 
 diff --git a/boehm-gc/win32_threads.c b/boehm-gc/win32_threads.c
-index ffb34e0..186bc39 100644
+index 2de1c69..07ecde0 100644
 --- a/boehm-gc/win32_threads.c
 +++ b/boehm-gc/win32_threads.c
-@@ -707,6 +707,54 @@ void * GC_start_routine(void * arg)
+@@ -711,6 +711,54 @@ void * GC_start_routine(void * arg)
      return(result);
  }
  
@@ -67,5 +67,5 @@ index ffb34e0..186bc39 100644
  {
      GC_thread me = (GC_thread)arg;
 -- 
-2.1.1
+2.4.5
 

@@ -1,17 +1,17 @@
-From 508940bebe9d116a1452c1c0b515201929d0738f Mon Sep 17 00:00:00 2001
+From 8d351787bfcd1db7a5661dd9fccd0a1fa0fa04fc Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 09:52:21 +0800
-Subject: [PATCH 15/24] handle dllimport properly in medium model
+Subject: [PATCH 12/21] handle dllimport properly in medium model
 
 ---
  gcc/config/i386/predicates.md | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/gcc/config/i386/predicates.md b/gcc/config/i386/predicates.md
-index 2ef1384..3fc6104 100644
+index bc76a5b..e886af2 100644
 --- a/gcc/config/i386/predicates.md
 +++ b/gcc/config/i386/predicates.md
-@@ -164,6 +164,7 @@
+@@ -168,6 +168,7 @@
  	switch (XINT (XEXP (op, 0), 1))
  	  {
  	  case UNSPEC_GOTPCREL:
@@ -19,7 +19,7 @@ index 2ef1384..3fc6104 100644
  	  case UNSPEC_DTPOFF:
  	  case UNSPEC_GOTNTPOFF:
  	  case UNSPEC_NTPOFF:
-@@ -268,6 +269,10 @@
+@@ -263,6 +264,10 @@
        /* TLS symbols are not constant.  */
        if (SYMBOL_REF_TLS_MODEL (op))
  	return false;
@@ -31,5 +31,5 @@ index 2ef1384..3fc6104 100644
  	      || (ix86_cmodel == CM_MEDIUM
  		  && !SYMBOL_REF_FAR_ADDR_P (op)));
 -- 
-2.1.1
+2.4.5
 

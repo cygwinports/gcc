@@ -1,8 +1,10 @@
-From 45d9322ca504239a11f49b3a9d58916cc3fb1d6d Mon Sep 17 00:00:00 2001
+From e1a6bd5a0f166c0677e0272bec0e7e3f26003fbd Mon Sep 17 00:00:00 2001
 From: Jonathan Yong <10walls@gmail.com>
 Date: Sat, 28 Jun 2014 09:31:06 +0800
-Subject: [PATCH 12/24] Cygwin uses sysv ABI on x86_64
+Subject: [PATCH 09/21] Cygwin uses sysv ABI on x86_64
 
+Conflicts:
+	libitm/configure.tgt
 ---
  gcc/builtin-attrs.def | 3 +++
  gcc/gtm-builtins.def  | 2 +-
@@ -12,7 +14,7 @@ Subject: [PATCH 12/24] Cygwin uses sysv ABI on x86_64
  5 files changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/gcc/builtin-attrs.def b/gcc/builtin-attrs.def
-index 593df2d..a707d0a 100644
+index 1338644..59bdc72 100644
 --- a/gcc/builtin-attrs.def
 +++ b/gcc/builtin-attrs.def
 @@ -108,6 +108,7 @@ DEF_ATTR_IDENT (ATTR_TYPEGENERIC, "type generic")
@@ -23,7 +25,7 @@ index 593df2d..a707d0a 100644
  
  DEF_ATTR_TREE_LIST (ATTR_NOVOPS_LIST, ATTR_NOVOPS, ATTR_NULL, ATTR_NULL)
  
-@@ -259,6 +260,8 @@ DEF_ATTR_TREE_LIST (ATTR_TM_CONST_NOTHROW_LIST,
+@@ -264,6 +265,8 @@ DEF_ATTR_TREE_LIST (ATTR_TM_CONST_NOTHROW_LIST,
  		    ATTR_TM_REGPARM, ATTR_NULL, ATTR_CONST_NOTHROW_LIST)
  DEF_ATTR_TREE_LIST (ATTR_TM_NOTHROW_RT_LIST,
  		    ATTR_RETURNS_TWICE, ATTR_NULL, ATTR_TM_NOTHROW_LIST)
@@ -44,20 +46,20 @@ index e2bc081..08cf597 100644
  DEF_TM_BUILTIN (BUILT_IN_TM_COMMIT, "_ITM_commitTransaction",
  		BT_FN_VOID, ATTR_TM_NOTHROW_LIST)
 diff --git a/libitm/configure.tgt b/libitm/configure.tgt
-index bd95509..8bb9bdc 100644
+index 99da73a..c879632 100644
 --- a/libitm/configure.tgt
 +++ b/libitm/configure.tgt
 @@ -141,7 +141,7 @@ case "${target}" in
    *-*-gnu* | *-*-k*bsd*-gnu \
    | *-*-netbsd* | *-*-freebsd* | *-*-openbsd* \
    | *-*-solaris2* | *-*-sysv4* | *-*-hpux11* \
--  | *-*-darwin* | *-*-aix*)
-+  | *-*-darwin* | *-*-aix* | *-*-cygwin*)
+-  | *-*-darwin* | *-*-aix* | *-*-dragonfly*)
++  | *-*-darwin* | *-*-aix* | *-*-dragonfly* | *-*-cygwin*)
  	# POSIX system.  The OS is supported.
  	;;
  
 diff --git a/libitm/libitm.h b/libitm/libitm.h
-index b15b68c..0ee9db5 100644
+index 651896b..6f7a84b 100644
 --- a/libitm/libitm.h
 +++ b/libitm/libitm.h
 @@ -45,6 +45,7 @@ extern "C" {
@@ -78,7 +80,7 @@ index b15b68c..0ee9db5 100644
  extern void _ITM_abortTransaction(_ITM_abortReason) ITM_REGPARM ITM_NORETURN;
  
 diff --git a/libitm/libitm_i.h b/libitm/libitm_i.h
-index 7c24493..81f30e9 100644
+index 0eda01b..87f793d 100644
 --- a/libitm/libitm_i.h
 +++ b/libitm/libitm_i.h
 @@ -39,8 +39,10 @@
@@ -111,5 +113,5 @@ index 7c24493..81f30e9 100644
  extern "C" void GTM_LB (const void *, size_t) ITM_REGPARM;
  
 -- 
-2.1.1
+2.4.5
 
