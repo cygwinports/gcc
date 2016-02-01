@@ -19,11 +19,11 @@
 #
 ################################################################################
 TOOLCHAIN_TARGET="native"
-inherit toolchain
+inherit toolchain python
 
 NAME="gcc"
 VERSION=5.3.0
-RELEASE=1
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -36,7 +36,6 @@ case ${VERSION} in
 *)	SRC_URI="mirror://gnu/gcc/gcc-${VERSION}/gcc-${VERSION}.tar.bz2" ;;
 esac
 SRC_DIR="gcc-${VERSION}"
-MAKEOPTS=-j1
 PATCH_URI="
 0001-share-mingw-fset-stack-executable-with-cygwin.patch
 0002-boehm-gc-for-cygwin.patch
@@ -49,7 +48,6 @@ PATCH_URI="
 0009-Cygwin-uses-sysv-ABI-on-x86_64.patch
 0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch
 0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
-0011a-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
 0012-handle-dllimport-properly-in-medium-model.patch
 0013-skip-test-for-cygwin-mingw.patch
 0014-64bit-Cygwin-uses-SEH.patch
@@ -60,10 +58,11 @@ PATCH_URI="
 0019-Cygwin-doesn-t-do-text-mode-translations-for-file-ha.patch
 0020-cygwin-uses-cyg-lib-prefix.patch
 0021-search-usr-lib-w32api-explicitly.patch
+0022-libgomp-soname-cygwin-mingw.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
-# DISTCLEANFILES="gcc/ada/*-cygwin* gcc/config/i386/cygwin.opt gcc/config/i386/*cygwin-w64*"
+DISTCLEANFILES="gcc/ada/system-cygwin-x86_64.ads libgomp/config/cygwin/plugin-suffix.h"
 
 # These must not be set in the environment, but main cygport
 # script tries to be too helpful here and confuses auto-detection
@@ -92,6 +91,7 @@ CYGCONF_ARGS="
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
+	--disable-libcilkrts
 	--enable-libgomp
 	--disable-libitm
 	--enable-libquadmath
@@ -151,6 +151,14 @@ src_install() {
 		mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib/libgcc_s.dll.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/
 #		mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/lib32/libgcc_s.dll.a ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/32/
 	fi
+
+	# Move GDB auto-load to correct name and location
+	dodir /usr/share/gdb/auto-load/usr/bin
+	sed -i -e "/^libdir/ s|/lib/gcc/.*|/bin'|" \
+		${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libstdc++.dll.a-gdb.py
+	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/libstdc++.dll.a-gdb.py \
+		${D}/usr/share/gdb/auto-load/usr/bin/cygstdc++-6.dll-gdb.py
+	python_optimize /usr/share/gcc-${VERSION}/python
 
         # Move ADA DLLs
         mv -v ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/adalib/cyg*.dll ${D}/usr/bin/
@@ -276,7 +284,6 @@ gcc_g___CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1plus.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libstdc++* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libsupc++* \
-    usr/share/gcc-${VERSION/-*/.*}/python/libstdcxx/
     usr/share/man/man1/g++.1* \
 "
 gcc_java_SUMMARY="${SUMMARY} (Java)"
@@ -439,4 +446,5 @@ libquadmath0_CONTENTS="usr/bin/cygquadmath-0.dll"
 libvtv0_CATEGORY="Libs"
 libvtv0_SUMMARY="GCC vtable verification library"
 libvtv0_CONTENTS="usr/bin/cygvtv-0.dll usr/bin/cygvtv_stubs-0.dll"
+gcc_debuginfo_CONTENTS+=" usr/share/gcc-${VERSION/-*/.*}/python/libstdcxx/"
 PKG_IGNORE="usr/lib/libiberty.*"
