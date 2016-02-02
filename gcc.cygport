@@ -44,7 +44,6 @@ PATCH_URI="
 0005-use-avoid-version-if-not-tracking-SO-version.patch
 0006-cygwin-uses-cyg-library-prefix.patch
 0007-Avoid-installing-libffi.patch
-0008-libitm-libtool-fixes-for-Cygwin.patch
 0009-Cygwin-uses-sysv-ABI-on-x86_64.patch
 0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch
 0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
@@ -60,6 +59,8 @@ PATCH_URI="
 0021-search-usr-lib-w32api-explicitly.patch
 0022-libgomp-soname-cygwin-mingw.patch
 0023-glibcxx-use-c99.patch
+0024-libitm-weak-symbols.patch
+0025-enable-libcilkrts.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
@@ -76,7 +77,6 @@ src_unpack_hook() {
 }
 
 # gccgo: requires <ucontext.h>
-# libitm: test programs segfault
 # java-awt: requires GTK+, large deps for little use
 # libexecdir: http://cygwin.com/ml/cygwin/2013-11/msg00018.html et al
 CYGCONF_ARGS="
@@ -92,9 +92,9 @@ CYGCONF_ARGS="
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
-	--disable-libcilkrts
+	--enable-libcilkrts
 	--enable-libgomp
-	--disable-libitm
+	--enable-libitm
 	--enable-libquadmath
 	--enable-libquadmath-support
 	--enable-libssp
@@ -127,6 +127,7 @@ src_test() {
 	gccpath="${B}/gcc/ada/rts:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgcc/shlib:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libatomic/.libs:"
+	gccpath+="${B}/${TOOLCHAIN_TARGET}/libcilkrts/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgfortran/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libjava/.libs:"
@@ -209,12 +210,17 @@ _EOF
 	make_etc_defaults /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/logging.properties /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/security/classpath.security
 
 	fi # ARCH_i686
+
+	# clean-up include-fixed
+	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include-fixed/*limits.h \
+	   ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/
+	rm -fr ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include-fixed/
 }
 
 KEEP_LA_FILES="none"
 
-PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat5 libobjc4 libstdc++6 libquadmath0 libvtv0"
+PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-cilkplus ${NAME}-objc ${NAME}-objc++"
+PKG_NAMES+=" libatomic1 libcilkrts5 libgcc1 libgomp1 libssp0 libgfortran3 libgnat5 libobjc4 libstdc++6 libquadmath0 libvtv0"
 if defined ARCH_i686
 then
 	PKG_NAMES+=" ${NAME}-java libgcj-common libgcj16"
@@ -241,7 +247,6 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/lib/cpp \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/*.h \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/ssp/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include-fixed \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/install-tools \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/collect2.exe \
@@ -252,6 +257,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcov.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp-plugin-host_nonshm.* \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libitm.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libquadmath.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libssp* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/lto*.exe \
@@ -264,6 +270,7 @@ gcc_core_CONTENTS="--exclude=jni*.h
     usr/share/info/gccinstall.info* \
     usr/share/info/gccint.info* \
     usr/share/info/libgomp.info* \
+    usr/share/info/libitm.info* \
     usr/share/info/libquadmath.info*
     usr/share/locale/* \
     usr/share/man/man1/cpp.1* \
@@ -369,6 +376,12 @@ gcc_fortran_CONTENTS="
     usr/share/info/gfortran.info* \
     usr/share/man/man1/gfortran.1* \
 "
+gcc_cilkplus_SUMMARY="${SUMMARY} (Cilk Plus)"
+gcc_cilkplus_REQUIRES="${NAME}-core"
+gcc_cilkplus_CONTENTS="
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/cilk/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libcilkrts.* \
+"
 gcc_objc_SUMMARY="${SUMMARY} (Objective-C)"
 gcc_objc_REQUIRES="${NAME}-core"
 gcc_objc_CONTENTS="
@@ -406,6 +419,9 @@ gcc_ada_CONTENTS="
 libatomic1_CATEGORY="Libs"
 libatomic1_SUMMARY="GCC C11/C++11 locked atomics runtime library"
 libatomic1_CONTENTS="usr/bin/cygatomic-1.dll"
+libcilkrts5_CATEGORY="Libs"
+libcilkrts5_SUMMARY="GCC Cilk Plus runtime library"
+libcilkrts5_CONTENTS="usr/bin/cygcilkrts-5.dll"
 libgcc1_CATEGORY="Libs"
 libgcc1_SUMMARY="GCC C runtime library"
 libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
@@ -448,4 +464,3 @@ libvtv0_CATEGORY="Libs"
 libvtv0_SUMMARY="GCC vtable verification library"
 libvtv0_CONTENTS="usr/bin/cygvtv-0.dll usr/bin/cygvtv_stubs-0.dll"
 gcc_debuginfo_CONTENTS+=" usr/share/gcc-${VERSION/-*/.*}/python/libstdcxx/"
-PKG_IGNORE="usr/lib/libiberty.*"
