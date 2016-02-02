@@ -59,6 +59,7 @@ PATCH_URI="
 0020-cygwin-uses-cyg-lib-prefix.patch
 0021-search-usr-lib-w32api-explicitly.patch
 0022-libgomp-soname-cygwin-mingw.patch
+0023-glibcxx-use-c99.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing

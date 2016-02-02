@@ -1,0 +1,29 @@
+--- origsrc/gcc-5.3.0/libstdc++-v3/acinclude.m4	2015-11-24 07:25:07.000000000 -0600
++++ src/gcc-5.3.0/libstdc++-v3/acinclude.m4	2016-02-01 18:29:11.327068100 -0600
+@@ -1128,7 +1128,6 @@
+ 
+   # Option parsed, now set things appropriately.
+   if test x"$glibcxx_cv_c99_math" = x"no" ||
+-     test x"$glibcxx_cv_c99_complex" = x"no" ||
+      test x"$glibcxx_cv_c99_stdio" = x"no" ||
+      test x"$glibcxx_cv_c99_stdlib" = x"no" ||
+      test x"$glibcxx_cv_c99_wchar" = x"no"; then
+@@ -1136,7 +1135,7 @@
+   else
+     AC_DEFINE(_GLIBCXX_USE_C99, 1,
+     [Define if C99 functions or macros from <wchar.h>, <math.h>,
+-    <complex.h>, <stdio.h>, and <stdlib.h> can be used or exposed.])
++    <stdio.h>, and <stdlib.h> can be used or exposed.])
+   fi
+ 
+   gcc_no_link="$ac_save_gcc_no_link"
+--- origsrc/gcc-5.3.0/libstdc++-v3/configure	2015-11-26 07:51:04.000000000 -0600
++++ src/gcc-5.3.0/libstdc++-v3/configure	2016-02-01 18:29:39.777107300 -0600
+@@ -17270,7 +17270,6 @@
+ 
+   # Option parsed, now set things appropriately.
+   if test x"$glibcxx_cv_c99_math" = x"no" ||
+-     test x"$glibcxx_cv_c99_complex" = x"no" ||
+      test x"$glibcxx_cv_c99_stdio" = x"no" ||
+      test x"$glibcxx_cv_c99_stdlib" = x"no" ||
+      test x"$glibcxx_cv_c99_wchar" = x"no"; then
