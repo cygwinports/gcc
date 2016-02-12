@@ -61,10 +61,11 @@ PATCH_URI="
 0023-glibcxx-use-c99.patch
 0024-libitm-weak-symbols.patch
 0025-enable-libcilkrts.patch
+0026-g++-gnu-source.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
-DISTCLEANFILES="gcc/ada/system-cygwin-x86_64.ads libgomp/config/cygwin/plugin-suffix.h"
+DISTCLEANFILES="config/mt-cygwin gcc/ada/system-cygwin-x86_64.ads libgomp/config/cygwin/plugin-suffix.h"
 
 # These must not be set in the environment, but main cygport
 # script tries to be too helpful here and confuses auto-detection
@@ -115,6 +116,10 @@ CYGCONF_ARGS="
 
 src_compile() {
 	cd ${B}
+	# configure tries to test SUSv4-compliant behaviour of
+	# realpath(..., NULL) via _XOPEN_VERSION
+	export glibcxx_cv_realpath=yes
+
 	cygconf # CYGCONF_ARGS defined above
 	cygmake BOOT_CFLAGS="${CXXFLAGS}"
 }
