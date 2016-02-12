@@ -1,5 +1,14 @@
 --- origsrc/gcc-5.3.0/libstdc++-v3/acinclude.m4	2015-11-24 07:25:07.000000000 -0600
-+++ src/gcc-5.3.0/libstdc++-v3/acinclude.m4	2016-02-01 18:29:11.327068100 -0600
++++ src/gcc-5.3.0/libstdc++-v3/acinclude.m4	2016-02-04 17:42:34.609707600 -0600
+@@ -925,7 +925,7 @@ AC_DEFUN([GLIBCXX_ENABLE_C99], [
+   # Long term, -std=c++0x could be even better, could manage to explicitly
+   # request C99 facilities to the underlying C headers.
+   ac_save_CXXFLAGS="$CXXFLAGS"
+-  CXXFLAGS="$CXXFLAGS -std=c++98"
++  CXXFLAGS="$CXXFLAGS -std=c++11"
+   ac_save_LIBS="$LIBS"
+   ac_save_gcc_no_link="$gcc_no_link"
+ 
 @@ -1128,7 +1128,6 @@
  
    # Option parsed, now set things appropriately.
@@ -17,8 +26,37 @@
    fi
  
    gcc_no_link="$ac_save_gcc_no_link"
+@@ -1448,7 +1447,7 @@ AC_DEFUN([GLIBCXX_CHECK_C99_TR1], [
+   # Use -std=c++98 because the default (-std=gnu++98) leaves __STRICT_ANSI__
+   # undefined and fake C99 facilities may be spuriously enabled.
+   ac_save_CXXFLAGS="$CXXFLAGS"
+-  CXXFLAGS="$CXXFLAGS -std=c++98"
++  CXXFLAGS="$CXXFLAGS -std=c++11"
+ 
+   # Check for the existence of <complex.h> complex math functions used
+   # by tr1/complex.
+--- origsrc/gcc-5.3.0/libstdc++-v3/linkage.m4	2013-02-11 11:50:13.000000000 -0600
++++ src/gcc-5.3.0/libstdc++-v3/linkage.m4	2016-02-12 00:28:50.419067100 -0600
+@@ -333,7 +333,7 @@
+ AC_DEFUN([GLIBCXX_CHECK_STDLIB_SUPPORT], [
+   ac_test_CXXFLAGS="${CXXFLAGS+set}"
+   ac_save_CXXFLAGS="$CXXFLAGS"
+-  CXXFLAGS='-fno-builtin -D_GNU_SOURCE'
++  CXXFLAGS='-std=gnu++11 -fno-builtin -D_GNU_SOURCE'
+ 
+   GLIBCXX_CHECK_STDLIB_DECL_AND_LINKAGE_1(at_quick_exit)
+   GLIBCXX_CHECK_STDLIB_DECL_AND_LINKAGE_1(quick_exit)
 --- origsrc/gcc-5.3.0/libstdc++-v3/configure	2015-11-26 07:51:04.000000000 -0600
-+++ src/gcc-5.3.0/libstdc++-v3/configure	2016-02-01 18:29:39.777107300 -0600
++++ src/gcc-5.3.0/libstdc++-v3/configure	2016-02-04 17:43:03.473372800 -0600
+@@ -16646,7 +16646,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+   # Long term, -std=c++0x could be even better, could manage to explicitly
+   # request C99 facilities to the underlying C headers.
+   ac_save_CXXFLAGS="$CXXFLAGS"
+-  CXXFLAGS="$CXXFLAGS -std=c++98"
++  CXXFLAGS="$CXXFLAGS -std=c++11"
+   ac_save_LIBS="$LIBS"
+   ac_save_gcc_no_link="$gcc_no_link"
+ 
 @@ -17270,7 +17270,6 @@
  
    # Option parsed, now set things appropriately.
@@ -27,3 +65,21 @@
       test x"$glibcxx_cv_c99_stdio" = x"no" ||
       test x"$glibcxx_cv_c99_stdlib" = x"no" ||
       test x"$glibcxx_cv_c99_wchar" = x"no"; then
+@@ -18887,7 +18886,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+   # Use -std=c++98 because the default (-std=gnu++98) leaves __STRICT_ANSI__
+   # undefined and fake C99 facilities may be spuriously enabled.
+   ac_save_CXXFLAGS="$CXXFLAGS"
+-  CXXFLAGS="$CXXFLAGS -std=c++98"
++  CXXFLAGS="$CXXFLAGS -std=c++11"
+ 
+   # Check for the existence of <complex.h> complex math functions used
+   # by tr1/complex.
+@@ -26704,7 +26704,7 @@
+ 
+   ac_test_CXXFLAGS="${CXXFLAGS+set}"
+   ac_save_CXXFLAGS="$CXXFLAGS"
+-  CXXFLAGS='-fno-builtin -D_GNU_SOURCE'
++  CXXFLAGS='-std=gnu++11 -fno-builtin -D_GNU_SOURCE'
+ 
+ 
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for at_quick_exit declaration" >&5
