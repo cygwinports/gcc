@@ -23,7 +23,7 @@ inherit toolchain python
 
 NAME="gcc"
 VERSION=5.3.0
-RELEASE=2
+RELEASE=3
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -62,6 +62,7 @@ PATCH_URI="
 0024-libitm-weak-symbols.patch
 0025-enable-libcilkrts.patch
 0026-g++-gnu-source.patch
+0027-link-w32api.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing

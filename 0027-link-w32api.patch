@@ -1,0 +1,12 @@
+https://cygwin.com/ml/cygwin/2016-02/msg00393.html
+
+--- a/gcc/config/i386/cygwin.h	2016-02-11 17:21:55.058829500 -0600
++++ b/gcc/config/i386/cygwin.h	2016-02-25 11:48:51.241207300 -0600
+@@ -39,7 +39,6 @@ along with GCC; see the file COPYING3.
+ 
+ #undef STARTFILE_SPEC
+ #define STARTFILE_SPEC "\
+-  -L%R/usr/lib/w32api \
+   %{!shared: %{!mdll: crt0%O%s \
+   %{pg:gcrt0%O%s}}}\
+   %{shared:crtbeginS.o%s;:crtbegin.o%s} \
