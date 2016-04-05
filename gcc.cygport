@@ -23,7 +23,7 @@ inherit toolchain python
 
 NAME="gcc"
 VERSION=5.3.0
-RELEASE=3
+RELEASE=4
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -56,13 +56,11 @@ PATCH_URI="
 0018-prevent-modules-from-being-unloaded-before-their-dto.patch
 0019-Cygwin-doesn-t-do-text-mode-translations-for-file-ha.patch
 0020-cygwin-uses-cyg-lib-prefix.patch
-0021-search-usr-lib-w32api-explicitly.patch
 0022-libgomp-soname-cygwin-mingw.patch
-0023-glibcxx-use-c99.patch
 0024-libitm-weak-symbols.patch
 0025-enable-libcilkrts.patch
-0026-g++-gnu-source.patch
 0027-link-w32api.patch
+0028-g++-time.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
