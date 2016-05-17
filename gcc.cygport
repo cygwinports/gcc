@@ -59,7 +59,6 @@ PATCH_URI="
 0022-libgomp-soname-cygwin-mingw.patch
 0024-libitm-weak-symbols.patch
 0025-enable-libcilkrts.patch
-0027-link-w32api.patch
 0028-g++-time.patch
 "
 
