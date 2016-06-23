@@ -23,7 +23,7 @@ inherit toolchain python
 
 NAME="gcc"
 VERSION=5.3.0
-RELEASE=4
+RELEASE=5
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
