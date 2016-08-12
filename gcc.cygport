@@ -23,12 +23,12 @@ inherit toolchain python
 
 NAME="gcc"
 VERSION=5.4.0
-RELEASE=1
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
-Objective-C, Fortran, Java, Ada, and Go, as well as libraries for these
-languages (libstdc++, libgcj,...)."
+Objective-C, Fortran, and Ada, as well as libraries for these
+languages (libstdc++, libgfortran, etc)."
 HOMEPAGE="http://gcc.gnu.org/"
 case ${VERSION} in
 *.*-20[1-9][0-9][0-1][0-9][0-3][0-9])
@@ -38,12 +38,6 @@ esac
 SRC_DIR="gcc-${VERSION}"
 PATCH_URI="
 0001-share-mingw-fset-stack-executable-with-cygwin.patch
-0002-boehm-gc-for-cygwin.patch
-0003-AWT-Font-fix-for-Cygwin.patch
-0004-Cygwin-ioctl-may-emit-EINVAL.patch
-0005-use-avoid-version-if-not-tracking-SO-version.patch
-0006-cygwin-uses-cyg-library-prefix.patch
-0007-Avoid-installing-libffi.patch
 0009-Cygwin-uses-sysv-ABI-on-x86_64.patch
 0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch
 0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
@@ -69,7 +63,7 @@ DISTCLEANFILES="config/mt-cygwin gcc/ada/system-cygwin-x86_64.ads libgomp/config
 # These must not be set in the environment, but main cygport
 # script tries to be too helpful here and confuses auto-detection
 # process during gcc build stages.
-unset CC CXX F77 FC GCJ GOC OBJC OBJCXX
+unset CC CXX F77 FC GOC OBJC OBJCXX
 
 CYGPORT_USE_UNSTABLE_API=1
 src_unpack_hook() {
@@ -77,7 +71,6 @@ src_unpack_hook() {
 }
 
 # gccgo: requires <ucontext.h>
-# java-awt: requires GTK+, large deps for little use
 # libexecdir: http://cygwin.com/ml/cygwin/2013-11/msg00018.html et al
 CYGCONF_ARGS="
 	--libexecdir=/usr/lib
@@ -88,7 +81,7 @@ CYGCONF_ARGS="
 	--with-dwarf2
 	${ARCH_i686+--with-arch=i686} --with-tune=generic
 	${ARCH_i686+--disable-sjlj-exceptions}
-	--enable-languages=ada,c,c++,fortran,${ARCH_i686+java,}lto,objc,obj-c++
+	--enable-languages=ada,c,c++,fortran,lto,objc,obj-c++
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
@@ -99,13 +92,8 @@ CYGCONF_ARGS="
 	--enable-libquadmath-support
 	--enable-libssp
 	--enable-libada
-	${ARCH_i686+--enable-libjava}
-	--enable-libgcj-sublibs
-	--disable-java-awt
 	--disable-symvers
-	--with-ecj-jar=/usr/share/java/ecj.jar
 	--with-gnu-ld --with-gnu-as
-	--with-cloog-include=$(${TOOLCHAIN_TARGET}-gcc -print-sysroot)/usr/include/cloog-isl
 	--without-libiconv-prefix
 	--without-libintl-prefix
 	--with-system-zlib
@@ -134,7 +122,6 @@ src_test() {
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libcilkrts/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgfortran/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
-	gccpath+="${B}/${TOOLCHAIN_TARGET}/libjava/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libobjc/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libquadmath/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libssp/.libs:"
@@ -205,16 +192,6 @@ exec /usr/bin/gcc \$fl \${1+"\$@"}
 _EOF
 	chmod 755 ${D}/usr/bin/c?9
 
-	if defined ARCH_i686; then
-
-	# Install the helper scripts for fixing up existing .la files
-	# dosbin ${C}/fix-libtool-scripts-for-latest-gcc-runtimes.sh
-
-	# Create defaults of libgcj-common config files.
-	make_etc_defaults /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/logging.properties /usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/security/classpath.security
-
-	fi # ARCH_i686
-
 	# clean-up include-fixed
 	mv ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include-fixed/*limits.h \
 	   ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include/
@@ -225,14 +202,10 @@ KEEP_LA_FILES="none"
 
 PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-cilkplus ${NAME}-objc ${NAME}-objc++"
 PKG_NAMES+=" libatomic1 libcilkrts5 libgcc1 libgomp1 libssp0 libgfortran3 libgnat5 libobjc4 libstdc++6 libquadmath0 libvtv0"
-if defined ARCH_i686
-then
-	PKG_NAMES+=" ${NAME}-java libgcj-common libgcj16"
-fi
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils cygwin-devel w32api-headers w32api-runtime windows-default-manifest"
-gcc_core_CONTENTS="--exclude=jni*.h
+gcc_core_CONTENTS="
     usr/bin/cc \
     usr/bin/c89 \
     usr/bin/c99 \
@@ -287,7 +260,6 @@ gcc_core_CONTENTS="--exclude=jni*.h
 gcc_g___SUMMARY="${SUMMARY} (C++)"
 gcc_g___REQUIRES="${NAME}-core"
 gcc_g___CONTENTS="
-    --exclude=gcj --exclude=gnu --exclude=java --exclude=javax --exclude=org --exclude=sun
     usr/bin/c++.exe \
     usr/bin/g++.exe \
     usr/bin/${TOOLCHAIN_TARGET}-c++.exe \
@@ -297,75 +269,6 @@ gcc_g___CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libstdc++* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libsupc++* \
     usr/share/man/man1/g++.1* \
-"
-gcc_java_SUMMARY="${SUMMARY} (Java)"
-gcc_java_REQUIRES="${NAME}-core java-ecj"
-gcc_java_CONTENTS="
-    usr/bin/aot-compile \
-    usr/bin/cygjvm.dll \
-    usr/bin/gappletviewer.exe \
-    usr/bin/gc-analyze.exe \
-    usr/bin/gcj.exe \
-    usr/bin/gcj-dbtool.exe \
-    usr/bin/gcjh.exe \
-    usr/bin/gij.exe \
-    usr/bin/gjar.exe \
-    usr/bin/gjarsigner.exe \
-    usr/bin/gjavah.exe \
-    usr/bin/gjdoc.exe \
-    usr/bin/gkeytool.exe \
-    usr/bin/gnative2ascii.exe \
-    usr/bin/gorbd.exe \
-    usr/bin/grmic.exe \
-    usr/bin/grmid.exe \
-    usr/bin/grmiregistry.exe \
-    usr/bin/gserialver.exe \
-    usr/bin/gtnameserv.exe \
-    usr/bin/jcf-dump.exe \
-    usr/bin/jv-convert.exe \
-    usr/bin/rebuild-gcj-db \
-    usr/bin/${TOOLCHAIN_TARGET}-gcj.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/gcj/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/gnu/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/java*/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/org/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/c++/sun/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/gcj/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/jni*.h \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/ecj1.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/jc1.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/jvgenmain.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcj* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgij* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/gcj-${VERSION/-*/.*}-*/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/pkgconfig/libgcj-*.pc \
-    usr/share/info/cp-tools.info* \
-    usr/share/info/gcj.info* \
-    usr/share/java/libgcj*-${VERSION/-*/.*}.jar \
-    usr/share/man/man1/aot-compile.1* \
-    usr/share/man/man1/gappletviewer.1* \
-    usr/share/man/man1/gc-analyze.1* \
-    usr/share/man/man1/gcj.1* \
-    usr/share/man/man1/gcj-dbtool.1* \
-    usr/share/man/man1/gcjh.1* \
-    usr/share/man/man1/gij.1* \
-    usr/share/man/man1/gjar.1* \
-    usr/share/man/man1/gjarsigner.1* \
-    usr/share/man/man1/gjavah.1* \
-    usr/share/man/man1/gjdoc.1* \
-    usr/share/man/man1/gkeytool.1* \
-    usr/share/man/man1/gnative2ascii.1* \
-    usr/share/man/man1/gorbd.1* \
-    usr/share/man/man1/grmic.1* \
-    usr/share/man/man1/grmid.1* \
-    usr/share/man/man1/grmiregistry.1* \
-    usr/share/man/man1/gserialver.1* \
-    usr/share/man/man1/gtnameserv.1* \
-    usr/share/man/man1/jcf-dump.1* \
-    usr/share/man/man1/jv-convert.1* \
-    usr/share/man/man1/rebuild-gcj-db.1* \
-    usr/share/gcc-${VERSION/-*/.*}/python/libjava/aotcompile.py \
-    usr/share/gcc-${VERSION/-*/.*}/python/libjava/classfile.py \
 "
 gcc_fortran_SUMMARY="${SUMMARY} (Fortran)"
 gcc_fortran_REQUIRES="${NAME}-core"
@@ -435,18 +338,6 @@ libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
 libgnat5_CATEGORY="Libs"
 libgnat5_SUMMARY="GCC Ada runtime library"
 libgnat5_CONTENTS="usr/bin/cyggnarl-5.dll usr/bin/cyggnat-5.dll"
-libgcj16_CATEGORY="Libs"
-libgcj16_SUMMARY="GCC Java runtime library"
-libgcj16_REQUIRES="libgcj-common"
-libgcj16_CONTENTS="usr/bin/cyggcj*-16.dll usr/bin/cyggij-16.dll"
-libgcj_common_CATEGORY="Libs"
-libgcj_common_SUMMARY="GCC Java runtime data"
-libgcj_common_CONTENTS="
-    etc/defaults/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/logging.properties \
-    etc/defaults/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/security/classpath.security \
-    etc/postinstall/gcc.sh
-    etc/preremove/gcc.sh
-"
 libgomp1_CATEGORY="Libs"
 libgomp1_SUMMARY="GCC OpenMP runtime library"
 libgomp1_CONTENTS="usr/bin/cyggomp-1.dll usr/bin/cyggomp-plugin-host_nonshm-1.dll"
