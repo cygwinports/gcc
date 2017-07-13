@@ -22,7 +22,7 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain python
 
 NAME="gcc"
-VERSION=5.4.0
+VERSION=6.3.0
 RELEASE=2
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
@@ -198,10 +198,8 @@ _EOF
 	rm -fr ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include-fixed/
 }
 
-KEEP_LA_FILES="none"
-
 PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-cilkplus ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libcilkrts5 libgcc1 libgomp1 libssp0 libgfortran3 libgnat5 libobjc4 libstdc++6 libquadmath0 libvtv0"
+PKG_NAMES+=" libatomic1 libcilkrts5 libgcc1 libgomp1 libssp0 libgfortran3 libgnat6 libobjc4 libstdc++6 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils cygwin-devel w32api-headers w32api-runtime windows-default-manifest"
@@ -233,13 +231,10 @@ gcc_core_CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcc* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgcov.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp.* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp-plugin-host_nonshm.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libitm.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libquadmath.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libssp* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/lto*.exe \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libvtv.* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libvtv_stubs.* \
     usr/share/doc/${NAME}/ \
     usr/share/info/cpp.info* \
     usr/share/info/cppinternals.info* \
@@ -258,6 +253,7 @@ gcc_core_CONTENTS="
     usr/share/man/man7/gpl.7*
 "
 gcc_g___SUMMARY="${SUMMARY} (C++)"
+gcc_g___OBSOLETES="${NAME}-java"
 gcc_g___REQUIRES="${NAME}-core"
 gcc_g___CONTENTS="
     usr/bin/c++.exe \
@@ -335,12 +331,12 @@ libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
 libgfortran3_CATEGORY="Libs"
 libgfortran3_SUMMARY="GCC Fortran runtime library"
 libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
-libgnat5_CATEGORY="Libs"
-libgnat5_SUMMARY="GCC Ada runtime library"
-libgnat5_CONTENTS="usr/bin/cyggnarl-5.dll usr/bin/cyggnat-5.dll"
+libgnat6_CATEGORY="Libs"
+libgnat6_SUMMARY="GCC Ada runtime library"
+libgnat6_CONTENTS="usr/bin/cyggnarl-6.dll usr/bin/cyggnat-6.dll"
 libgomp1_CATEGORY="Libs"
 libgomp1_SUMMARY="GCC OpenMP runtime library"
-libgomp1_CONTENTS="usr/bin/cyggomp-1.dll usr/bin/cyggomp-plugin-host_nonshm-1.dll"
+libgomp1_CONTENTS="usr/bin/cyggomp-1.dll"
 libobjc4_CATEGORY="Libs"
 libobjc4_SUMMARY="GCC Objective-C runtime library"
 libobjc4_CONTENTS="usr/bin/cygobjc-4.dll"
