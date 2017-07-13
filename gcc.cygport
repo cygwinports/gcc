@@ -52,7 +52,6 @@ PATCH_URI="
 0020-cygwin-uses-cyg-lib-prefix.patch
 0022-libgomp-soname-cygwin-mingw.patch
 0024-libitm-weak-symbols.patch
-0025-enable-libcilkrts.patch
 0027-libtool-w32api.patch
 0028-g++-time.patch
 "
@@ -85,7 +84,6 @@ CYGCONF_ARGS="
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
-	--enable-libcilkrts
 	--enable-libgomp
 	--enable-libitm
 	--enable-libquadmath
@@ -119,7 +117,6 @@ src_test() {
 	gccpath="${B}/gcc/ada/rts:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgcc/shlib:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libatomic/.libs:"
-	gccpath+="${B}/${TOOLCHAIN_TARGET}/libcilkrts/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgfortran/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libobjc/.libs:"
@@ -198,10 +195,11 @@ _EOF
 	rm -fr ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include-fixed/
 }
 
-PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-cilkplus ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libcilkrts5 libgcc1 libgomp1 libssp0 libgfortran3 libgnat6 libobjc4 libstdc++6 libquadmath0"
+PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat6 libobjc4 libstdc++6 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
+gcc_core_OBSOLETES="${NAME}-cilkplus"
 gcc_core_REQUIRES="binutils cygwin-devel w32api-headers w32api-runtime windows-default-manifest"
 gcc_core_CONTENTS="
     usr/bin/cc \
@@ -279,12 +277,6 @@ gcc_fortran_CONTENTS="
     usr/share/info/gfortran.info* \
     usr/share/man/man1/gfortran.1* \
 "
-gcc_cilkplus_SUMMARY="${SUMMARY} (Cilk Plus)"
-gcc_cilkplus_REQUIRES="${NAME}-core"
-gcc_cilkplus_CONTENTS="
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/cilk/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libcilkrts.* \
-"
 gcc_objc_SUMMARY="${SUMMARY} (Objective-C)"
 gcc_objc_REQUIRES="${NAME}-core"
 gcc_objc_CONTENTS="
@@ -322,9 +314,6 @@ gcc_ada_CONTENTS="
 libatomic1_CATEGORY="Libs"
 libatomic1_SUMMARY="GCC C11/C++11 locked atomics runtime library"
 libatomic1_CONTENTS="usr/bin/cygatomic-1.dll"
-libcilkrts5_CATEGORY="Libs"
-libcilkrts5_SUMMARY="GCC Cilk Plus runtime library"
-libcilkrts5_CONTENTS="usr/bin/cygcilkrts-5.dll"
 libgcc1_CATEGORY="Libs"
 libgcc1_SUMMARY="GCC C runtime library"
 libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
