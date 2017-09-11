@@ -211,6 +211,7 @@ gcc_core_CONTENTS="
     usr/bin/gcc-nm.exe \
     usr/bin/gcc-ranlib.exe \
     usr/bin/gcov.exe \
+    usr/bin/gcov-dump.exe \
     usr/bin/gcov-tool.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-${VERSION/-*/.*}.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc.exe \
@@ -246,6 +247,8 @@ gcc_core_CONTENTS="
     usr/share/man/man1/cpp.1* \
     usr/share/man/man1/gcc.1* \
     usr/share/man/man1/gcov.1* \
+    usr/share/man/man1/gcov-dump.1* \
+    usr/share/man/man1/gcov-tool.1* \
     usr/share/man/man7/fsf-funding.7* \
     usr/share/man/man7/gfdl.7* \
     usr/share/man/man7/gpl.7*
