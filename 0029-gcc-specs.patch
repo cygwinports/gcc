@@ -1,0 +1,12 @@
+Mistakenly added in r227962 (6.1), reverted in r237276 (7.1).
+
+--- origsrc/gcc-6.4.0/gcc/config/i386/cygwin.h	2017-11-03 00:47:46.634665300 -0500
++++ src/gcc-6.4.0/gcc/config/i386/cygwin.h	2017-11-06 22:32:13.599397100 -0600
+@@ -39,7 +39,6 @@
+ 
+ #undef STARTFILE_SPEC
+ #define STARTFILE_SPEC "\
+-  -L%R/usr/lib/w32api \
+   %{!shared: %{!mdll: crt0%O%s \
+   %{pg:gcrt0%O%s}}}\
+   %{shared:crtbeginS.o%s;:crtbegin.o%s} \
