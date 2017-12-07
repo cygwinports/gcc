@@ -74,8 +74,8 @@ index 0eda01b..87f793d 100644
 -	__asm__(UPFX "GTM_begin_transaction") ITM_REGPARM;
 +	__asm__(UPFX "GTM_begin_transaction") ITM_REGPARM ITM_SYSV;
    // In eh_cpp.cc
+   void init_cpp_exceptions ();
    void revert_cpp_exceptions (gtm_transaction_cp *cp = 0);
- 
 @@ -322,7 +322,7 @@ namespace GTM HIDDEN {
  extern uint64_t gtm_spin_count_var;
  

@@ -16,7 +16,7 @@ diff --git a/gcc/config.host b/gcc/config.host
 index 8b7e16d..361de8e 100644
 --- a/gcc/config.host
 +++ b/gcc/config.host
-@@ -232,14 +232,14 @@ case ${host} in
+@@ -232,22 +232,22 @@ case ${host} in
      out_host_hook_obj=host-cygwin.o
      host_xmake_file="${host_xmake_file} i386/x-cygwin"
      host_exeext=.exe
@@ -33,15 +33,15 @@ index 8b7e16d..361de8e 100644
      ;;
    x86_64-*-mingw*)
      use_long_long_for_widest_fast_int=yes
-@@ -247,7 +247,7 @@ case ${host} in
+     host_xm_file=i386/xm-mingw32.h
      host_xmake_file="${host_xmake_file} i386/x-mingw32"
      host_exeext=.exe
      out_host_hook_obj=host-mingw32.o
 -    host_lto_plugin_soname=liblto_plugin-0.dll
 +    host_lto_plugin_soname=liblto_plugin.dll
      ;;
-   i[34567]86-*-uwin*)
-     echo "*** UWIN may not be used as a host platform because"
+   i[34567]86-*-darwin* | x86_64-*-darwin*)
+     out_host_hook_obj="${out_host_hook_obj} host-i386-darwin.o"
 diff --git a/lto-plugin/Makefile.am b/lto-plugin/Makefile.am
 index a90a5da..1ebf155 100644
 --- a/lto-plugin/Makefile.am
