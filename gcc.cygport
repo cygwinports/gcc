@@ -23,7 +23,7 @@ inherit toolchain python
 
 NAME="gcc"
 VERSION=6.4.0
-RELEASE=4
+RELEASE=5
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -74,6 +74,7 @@ src_unpack_hook() {
 
 # gccgo: requires <ucontext.h>
 # libexecdir: http://cygwin.com/ml/cygwin/2013-11/msg00018.html et al
+# libssp: conflicts with builtin SSP
 CYGCONF_ARGS="
 	--libexecdir=/usr/lib
 	--enable-shared --enable-shared-libgcc --enable-static
@@ -91,7 +92,7 @@ CYGCONF_ARGS="
 	--enable-libitm
 	--enable-libquadmath
 	--enable-libquadmath-support
-	--enable-libssp
+	--disable-libssp
 	--enable-libada
 	--disable-symvers
 	--with-gnu-ld --with-gnu-as
@@ -104,6 +105,9 @@ CYGCONF_ARGS="
 
 src_compile() {
 	cd ${B}
+	# use built-in SSP with Cygwin 2.10
+	# FIXME: --disable-libssp should suffice in GCC 8
+	export gcc_cv_libc_provides_ssp=yes
 	# configure tries to test SUSv4-compliant behaviour of
 	# realpath(..., NULL) via _XOPEN_VERSION
 	export glibcxx_cv_realpath=yes
@@ -124,7 +128,6 @@ src_test() {
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libobjc/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libquadmath/.libs:"
-	gccpath+="${B}/${TOOLCHAIN_TARGET}/libssp/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libstdc++-v3/src/.libs:"
 
 	cd ${B}
@@ -199,7 +202,7 @@ _EOF
 }
 
 PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libssp0 libgfortran3 libgnat6 libobjc4 libstdc++6 libquadmath0"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libgfortran3 libgnat6 libobjc4 libstdc++6 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_OBSOLETES="${NAME}-cilkplus"
@@ -223,7 +226,6 @@ gcc_core_CONTENTS="
     usr/bin/${TOOLCHAIN_TARGET}-gcc-ranlib.exe \
     usr/lib/cpp \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/*.h \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/ssp/ \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/install-tools \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/cc1.exe \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/collect2.exe \
@@ -235,7 +237,6 @@ gcc_core_CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgomp.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libitm.* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libquadmath.* \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libssp* \
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/lto*.exe \
     usr/share/doc/${NAME}/ \
     usr/share/info/cpp.info* \
@@ -335,9 +336,6 @@ libgomp1_CONTENTS="usr/bin/cyggomp-1.dll"
 libobjc4_CATEGORY="Libs"
 libobjc4_SUMMARY="GCC Objective-C runtime library"
 libobjc4_CONTENTS="usr/bin/cygobjc-4.dll"
-libssp0_CATEGORY="Libs"
-libssp0_SUMMARY="GCC Stack-Smashing Protection runtime library"
-libssp0_CONTENTS="usr/bin/cygssp-0.dll"
 libstdc__6_CATEGORY="Libs"
 libstdc__6_SUMMARY="GCC C++ runtime library"
 libstdc__6_CONTENTS="usr/bin/cygstdc++-6.dll"
