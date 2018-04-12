@@ -22,8 +22,8 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain python
 
 NAME="gcc"
-VERSION=6.4.0
-RELEASE=5
+VERSION=7.3.0
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -38,23 +38,21 @@ esac
 SRC_DIR="gcc-${VERSION}"
 PATCH_URI="
 0001-share-mingw-fset-stack-executable-with-cygwin.patch
-0009-Cygwin-uses-sysv-ABI-on-x86_64.patch
+0007-Avoid-installing-libffi-V2.patch
+0009-Cygwin-uses-sysv-ABI-on-x86_64-V2.patch
 0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch
 0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
-0012-handle-dllimport-properly-in-medium-model.patch
+0012-handle-dllimport-properly-in-medium-model-V2.patch
 0013-skip-test-for-cygwin-mingw.patch
 0014-64bit-Cygwin-uses-SEH.patch
 0015-define-RTS_CONTROL_ENABLE-and-DTR_CONTROL_ENABLE-for.patch
 0016-fix-some-implicit-declaration-warnings.patch
 0017-__cxa-atexit-for-Cygwin.patch
 0018-prevent-modules-from-being-unloaded-before-their-dto.patch
-0019-Cygwin-doesn-t-do-text-mode-translations-for-file-ha.patch
-0020-cygwin-uses-cyg-lib-prefix.patch
+0020-cygwin-uses-cyg-lib-prefix-v3.patch
 0022-libgomp-soname-cygwin-mingw.patch
 0024-libitm-weak-symbols.patch
-0027-libtool-w32api.patch
 0028-g++-time.patch
-0029-gcc-specs.patch
 0030-newlib-ftm.patch
 0031-define_std-unix.patch
 "
@@ -202,7 +200,7 @@ _EOF
 }
 
 PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libgfortran3 libgnat6 libobjc4 libstdc++6 libquadmath0"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libgfortran4 libgnat7 libobjc4 libstdc++6 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_OBSOLETES="${NAME}-cilkplus"
@@ -324,12 +322,12 @@ libatomic1_CONTENTS="usr/bin/cygatomic-1.dll"
 libgcc1_CATEGORY="Libs"
 libgcc1_SUMMARY="GCC C runtime library"
 libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
-libgfortran3_CATEGORY="Libs"
-libgfortran3_SUMMARY="GCC Fortran runtime library"
-libgfortran3_CONTENTS="usr/bin/cyggfortran-3.dll"
-libgnat6_CATEGORY="Libs"
-libgnat6_SUMMARY="GCC Ada runtime library"
-libgnat6_CONTENTS="usr/bin/cyggnarl-6.dll usr/bin/cyggnat-6.dll"
+libgfortran4_CATEGORY="Libs"
+libgfortran4_SUMMARY="GCC Fortran runtime library"
+libgfortran4_CONTENTS="usr/bin/cyggfortran-4.dll"
+libgnat7_CATEGORY="Libs"
+libgnat7_SUMMARY="GCC Ada runtime library"
+libgnat7_CONTENTS="usr/bin/cyggnarl-7.dll usr/bin/cyggnat-7.dll"
 libgomp1_CATEGORY="Libs"
 libgomp1_SUMMARY="GCC OpenMP runtime library"
 libgomp1_CONTENTS="usr/bin/cyggomp-1.dll"

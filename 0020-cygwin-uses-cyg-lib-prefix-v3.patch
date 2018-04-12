@@ -1,17 +1,8 @@
-From 1e88360b5271f50364a481eed2b588ce8886f71f Mon Sep 17 00:00:00 2001
-From: Jonathan Yong <10walls@gmail.com>
-Date: Sat, 19 Sep 2015 14:28:13 +0800
-Subject: [PATCH] cygwin uses cyg lib prefix (v2)
-
----
- gcc/ada/gcc-interface/Makefile.in | 84 +++++++++++++++++++++------------------
- 1 file changed, 45 insertions(+), 39 deletions(-)
-
 diff --git a/gcc/ada/gcc-interface/Makefile.in b/gcc/ada/gcc-interface/Makefile.in
-index 598b262d914..a373ca0cbb0 100644
+index 7a57019..6feeaf9 100644
 --- a/gcc/ada/gcc-interface/Makefile.in
 +++ b/gcc/ada/gcc-interface/Makefile.in
-@@ -130,6 +130,7 @@ arext  = .a
+@@ -131,6 +131,7 @@ arext  = .a
  soext  = .so
  shext  =
  hyphen = -
@@ -19,7 +10,7 @@ index 598b262d914..a373ca0cbb0 100644
  
  # program_transform_name and objdir are set by configure.ac.
  program_transform_name =
-@@ -372,7 +373,7 @@ EH_MECHANISM=
+@@ -373,7 +374,7 @@ EH_MECHANISM=
  
  # Default shared object option. Note that we rely on the fact that the "soname"
  # option will always be present and last in this flag, so that we can have
@@ -28,7 +19,7 @@ index 598b262d914..a373ca0cbb0 100644
  
  SO_OPTS = -Wl,-soname,
  
-@@ -1850,6 +1851,9 @@ ifeq ($(strip $(filter-out cygwin% mingw32% pe,$(target_os))),)
+@@ -1847,6 +1848,9 @@ ifeq ($(strip $(filter-out cygwin% mingw32% pe,$(target_os))),)
    GMEM_LIB = gmemlib
    EXTRA_GNATTOOLS = ../../gnatdll$(exeext)
    EXTRA_GNATMAKE_OBJS = mdll.o mdll-utl.o mdll-fil.o
@@ -38,7 +29,7 @@ index 598b262d914..a373ca0cbb0 100644
    soext = .dll
    LIBRARY_VERSION := $(LIB_VERSION)
  endif
-@@ -2722,16 +2726,16 @@ install-gnatlib: ../stamp-gnatlib-$(RTSDIR) install-gcc-specs
+@@ -2686,16 +2690,16 @@ install-gnatlib: ../stamp-gnatlib-$(RTSDIR) install-gcc-specs
  #     Also install the .dSYM directories if they exist (these directories
  #     contain the debug information for the shared libraries on darwin)
  	for file in gnat gnarl; do \
@@ -62,7 +53,7 @@ index 598b262d914..a373ca0cbb0 100644
  	        $(DESTDIR)$(ADA_RTL_OBJ_DIR); \
  	   fi; \
  	done
-@@ -2864,25 +2868,25 @@ gnatlib-shared-default:
+@@ -2828,25 +2832,25 @@ gnatlib-shared-default:
  	     MULTISUBDIR="$(MULTISUBDIR)" \
  	     THREAD_KIND="$(THREAD_KIND)" \
               gnatlib
@@ -95,27 +86,27 @@ index 598b262d914..a373ca0cbb0 100644
 +	cd $(RTSDIR); $(LN_S) $(soprefix)gnarl$(hyphen)$(LIBRARY_VERSION)$(soext) \
 +		$(soprefix)gnarl$(soext)
  
- gnatlib-shared-dual:
- 	$(MAKE) $(FLAGS_TO_PASS) \
-@@ -2892,7 +2896,7 @@ gnatlib-shared-dual:
+ 	# Create static libgnat and libgnarl compiled with -fPIC
+ 	$(RM) $(RTSDIR)/libgnat_pic$(arext) $(RTSDIR)/libgnarl_pic$(arext)
+@@ -2866,7 +2870,7 @@ gnatlib-shared-dual:
  	     MULTISUBDIR="$(MULTISUBDIR)" \
  	     THREAD_KIND="$(THREAD_KIND)" \
               gnatlib-shared-default
 -	$(MV) $(RTSDIR)/libgna*$(soext) .
 +	$(MV) $(RTSDIR)/$(soprefix)gna*$(soext) .
+ 	$(MV) $(RTSDIR)/libgnat_pic$(arext) .
+ 	$(MV) $(RTSDIR)/libgnarl_pic$(arext) .
  	$(RM) ../stamp-gnatlib2-$(RTSDIR)
- 	$(MAKE) $(FLAGS_TO_PASS) \
-              GNATLIBFLAGS="$(GNATLIBFLAGS)" \
-@@ -2901,7 +2905,7 @@ gnatlib-shared-dual:
+@@ -2877,7 +2881,7 @@ gnatlib-shared-dual:
  	     MULTISUBDIR="$(MULTISUBDIR)" \
  	     THREAD_KIND="$(THREAD_KIND)" \
               gnatlib
 -	$(MV) libgna*$(soext) $(RTSDIR)
 +	$(MV) $(soprefix)gna*$(soext) $(RTSDIR)
+ 	$(MV) libgnat_pic$(arext) $(RTSDIR)
+ 	$(MV) libgnarl_pic$(arext) $(RTSDIR)
  
- gnatlib-shared-dual-win32:
- 	$(MAKE) $(FLAGS_TO_PASS) \
-@@ -2912,7 +2916,7 @@ gnatlib-shared-dual-win32:
+@@ -2890,7 +2894,7 @@ gnatlib-shared-dual-win32:
  	     MULTISUBDIR="$(MULTISUBDIR)" \
  	     THREAD_KIND="$(THREAD_KIND)" \
               gnatlib-shared-win32
@@ -124,7 +115,7 @@ index 598b262d914..a373ca0cbb0 100644
  	$(RM) ../stamp-gnatlib2-$(RTSDIR)
  	$(MAKE) $(FLAGS_TO_PASS) \
               GNATLIBFLAGS="$(GNATLIBFLAGS)" \
-@@ -2921,7 +2925,7 @@ gnatlib-shared-dual-win32:
+@@ -2899,7 +2903,7 @@ gnatlib-shared-dual-win32:
  	     MULTISUBDIR="$(MULTISUBDIR)" \
  	     THREAD_KIND="$(THREAD_KIND)" \
               gnatlib
@@ -133,12 +124,14 @@ index 598b262d914..a373ca0cbb0 100644
  
  # ??? we need to add the option to support auto-import of arrays/records to
  # the GNATLIBFLAGS when this will be supported by GNAT. At this point we will
-@@ -2935,20 +2939,22 @@ gnatlib-shared-win32:
+@@ -2913,22 +2917,24 @@ gnatlib-shared-win32:
  	     MULTISUBDIR="$(MULTISUBDIR)" \
  	     THREAD_KIND="$(THREAD_KIND)" \
               gnatlib
 -	$(RM) $(RTSDIR)/libgna*$(soext)
 +	$(RM) $(RTSDIR)/$(soprefix)gna*$(soext)
+ 	$(CP) $(RTSDIR)/libgnat$(arext) $(RTSDIR)/libgnat_pic$(arext)
+ 	$(CP) $(RTSDIR)/libgnarl$(arext) $(RTSDIR)/libgnarl_pic$(arext)
  	cd $(RTSDIR); `echo "$(GCC_FOR_TARGET)" \
                  | sed -e 's,\./xgcc,../../xgcc,' -e 's,-B\./,-B../../,'` -shared -shared-libgcc \
  		$(PICFLAG_FOR_TARGET) \
@@ -162,12 +155,14 @@ index 598b262d914..a373ca0cbb0 100644
  
  gnatlib-shared-darwin:
  	$(MAKE) $(FLAGS_TO_PASS) \
-@@ -2958,27 +2964,27 @@ gnatlib-shared-darwin:
+@@ -2938,29 +2944,29 @@ gnatlib-shared-darwin:
  	     MULTISUBDIR="$(MULTISUBDIR)" \
  	     THREAD_KIND="$(THREAD_KIND)" \
  	     gnatlib
 -	$(RM) $(RTSDIR)/libgnat$(soext) $(RTSDIR)/libgnarl$(soext)
 +	$(RM) $(RTSDIR)/$(soprefix)gnat$(soext) $(RTSDIR)/$(soprefix)gnarl$(soext)
+ 	$(CP) $(RTSDIR)/libgnat$(arext) $(RTSDIR)/libgnat_pic$(arext)
+ 	$(CP) $(RTSDIR)/libgnarl$(arext) $(RTSDIR)/libgnarl_pic$(arext)
  	cd $(RTSDIR); `echo "$(GCC_FOR_TARGET)" \
                  | sed -e 's,\./xgcc,../../xgcc,' -e 's,-B\./,-B../../,'` -dynamiclib $(PICFLAG_FOR_TARGET) \
 -		-o libgnat$(hyphen)$(LIBRARY_VERSION)$(soext) \
@@ -202,6 +197,3 @@ index 598b262d914..a373ca0cbb0 100644
  
  gnatlib-shared:
  	$(MAKE) $(FLAGS_TO_PASS) \
--- 
-2.13.6
-
