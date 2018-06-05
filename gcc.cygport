@@ -23,7 +23,7 @@ inherit toolchain python
 
 NAME="gcc"
 VERSION=7.3.0
-RELEASE=1
+RELEASE=2
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -99,6 +99,7 @@ CYGCONF_ARGS="
 	--with-system-zlib
 	--enable-linker-build-id
 	--with-default-libstdcxx-abi=gcc4-compatible
+	--enable-libstdcxx-filesystem-ts
 "
 
 src_compile() {
