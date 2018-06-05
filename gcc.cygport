@@ -111,6 +111,17 @@ src_compile() {
 	# realpath(..., NULL) via _XOPEN_VERSION
 	export glibcxx_cv_realpath=yes
 
+	___CFLAGS=`echo ${CFLAGS} | sed s/-Werror=format-security/-Wformat-security/g`
+	___CFLAGS=`echo ${___CFLAGS} | sed s/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g`
+	___CFLAGS=`echo ${___CFLAGS} | sed 's/[[:blank:]]\+/ /g'`
+
+	___CXXFLAGS=`echo ${CXXFLAGS} | sed s/-Werror=format-security/-Wformat-security/g`
+	___CXXFLAGS=`echo ${___CXXFLAGS} | sed s/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g`
+	___CXXFLAGS=`echo ${___CXXFLAGS} | sed 's/[[:blank:]]\+/ /g'`
+
+	export CFLAGS=${___CFLAGS}
+	export CXXFLAGS=${___CXXFLAGS}
+
 	cygconf # CYGCONF_ARGS defined above
 	cygmake BOOT_CFLAGS="${CXXFLAGS}"
 }
