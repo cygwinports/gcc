@@ -23,7 +23,7 @@ inherit toolchain python
 
 NAME="gcc"
 VERSION=7.3.0
-RELEASE=2
+RELEASE=3
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
@@ -55,6 +55,7 @@ PATCH_URI="
 0028-g++-time.patch
 0030-newlib-ftm.patch
 0031-define_std-unix.patch
+pr86138.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
