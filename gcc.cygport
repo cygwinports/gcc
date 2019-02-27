@@ -22,13 +22,13 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain python
 
 NAME="gcc"
-VERSION=7.3.0
-RELEASE=3
+VERSION=7.4.0
+RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
 DESCRIPTION="The GNU Compiler Collection includes front ends for C, C++,
-Objective-C, Fortran, and Ada, as well as libraries for these
-languages (libstdc++, libgfortran, etc)."
+Objective-C, Fortran, Ada, and Go, as well as libraries for these
+languages (libstdc++, libgcj,...)."
 HOMEPAGE="http://gcc.gnu.org/"
 case ${VERSION} in
 *.*-20[1-9][0-9][0-1][0-9][0-3][0-9])
@@ -52,10 +52,12 @@ PATCH_URI="
 0020-cygwin-uses-cyg-lib-prefix-v3.patch
 0022-libgomp-soname-cygwin-mingw.patch
 0024-libitm-weak-symbols.patch
+0025-enable-libcilkrts-V2.patch
 0028-g++-time.patch
+0029-gcc-specs.patch
 0030-newlib-ftm.patch
 0031-define_std-unix.patch
-pr86138.patch
+pr47030.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
@@ -64,7 +66,7 @@ DISTCLEANFILES="config/mt-cygwin gcc/ada/system-cygwin-x86_64.ads libgomp/config
 # These must not be set in the environment, but main cygport
 # script tries to be too helpful here and confuses auto-detection
 # process during gcc build stages.
-unset CC CXX F77 FC GOC OBJC OBJCXX
+unset CC CXX F77 FC GCJ GOC OBJC OBJCXX
 
 CYGPORT_USE_UNSTABLE_API=1
 src_unpack_hook() {
@@ -87,6 +89,7 @@ CYGCONF_ARGS="
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
+	--enable-libcilkrts
 	--enable-libgomp
 	--enable-libitm
 	--enable-libquadmath
@@ -95,6 +98,7 @@ CYGCONF_ARGS="
 	--enable-libada
 	--disable-symvers
 	--with-gnu-ld --with-gnu-as
+	--with-cloog-include=$(${TOOLCHAIN_TARGET}-gcc -print-sysroot)/usr/include/cloog-isl
 	--without-libiconv-prefix
 	--without-libintl-prefix
 	--with-system-zlib
@@ -135,6 +139,7 @@ src_test() {
 	gccpath="${B}/gcc/ada/rts:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgcc/shlib:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libatomic/.libs:"
+	gccpath+="${B}/${TOOLCHAIN_TARGET}/libcilkrts/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgfortran/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libobjc/.libs:"
@@ -212,13 +217,14 @@ _EOF
 	rm -fr ${D}/usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION}/include-fixed/
 }
 
-PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libgfortran4 libgnat7 libobjc4 libstdc++6 libquadmath0"
+KEEP_LA_FILES="none"
+
+PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-cilkplus ${NAME}-objc ${NAME}-objc++"
+PKG_NAMES+=" libatomic1 libcilkrts5 libgcc1 libgomp1 libgfortran4 libgnat7 libobjc4 libstdc++6 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
-gcc_core_OBSOLETES="${NAME}-cilkplus"
 gcc_core_REQUIRES="binutils cygwin-devel w32api-headers w32api-runtime windows-default-manifest"
-gcc_core_CONTENTS="
+gcc_core_CONTENTS="--exclude=jni*.h
     usr/bin/cc \
     usr/bin/c89 \
     usr/bin/c99 \
@@ -228,8 +234,8 @@ gcc_core_CONTENTS="
     usr/bin/gcc-nm.exe \
     usr/bin/gcc-ranlib.exe \
     usr/bin/gcov.exe \
-    usr/bin/gcov-dump.exe \
     usr/bin/gcov-tool.exe \
+    usr/bin/gcov-dump.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-${VERSION/-*/.*}.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc.exe \
     usr/bin/${TOOLCHAIN_TARGET}-gcc-ar.exe \
@@ -262,16 +268,16 @@ gcc_core_CONTENTS="
     usr/share/man/man1/cpp.1* \
     usr/share/man/man1/gcc.1* \
     usr/share/man/man1/gcov.1* \
-    usr/share/man/man1/gcov-dump.1* \
-    usr/share/man/man1/gcov-tool.1* \
+    usr/share/man/man1/gcov-dump.1.* \
+    usr/share/man/man1/gcov-tool.1.* \
     usr/share/man/man7/fsf-funding.7* \
     usr/share/man/man7/gfdl.7* \
     usr/share/man/man7/gpl.7*
 "
 gcc_g___SUMMARY="${SUMMARY} (C++)"
-gcc_g___OBSOLETES="${NAME}-java"
 gcc_g___REQUIRES="${NAME}-core"
 gcc_g___CONTENTS="
+    --exclude=gnu
     usr/bin/c++.exe \
     usr/bin/g++.exe \
     usr/bin/${TOOLCHAIN_TARGET}-c++.exe \
@@ -294,6 +300,12 @@ gcc_fortran_CONTENTS="
     usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libgfortran* \
     usr/share/info/gfortran.info* \
     usr/share/man/man1/gfortran.1* \
+"
+gcc_cilkplus_SUMMARY="${SUMMARY} (Cilk Plus)"
+gcc_cilkplus_REQUIRES="${NAME}-core"
+gcc_cilkplus_CONTENTS="
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/cilk/ \
+    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libcilkrts.* \
 "
 gcc_objc_SUMMARY="${SUMMARY} (Objective-C)"
 gcc_objc_REQUIRES="${NAME}-core"
@@ -332,6 +344,9 @@ gcc_ada_CONTENTS="
 libatomic1_CATEGORY="Libs"
 libatomic1_SUMMARY="GCC C11/C++11 locked atomics runtime library"
 libatomic1_CONTENTS="usr/bin/cygatomic-1.dll"
+libcilkrts5_CATEGORY="Libs"
+libcilkrts5_SUMMARY="GCC Cilk Plus runtime library"
+libcilkrts5_CONTENTS="usr/bin/cygcilkrts-5.dll"
 libgcc1_CATEGORY="Libs"
 libgcc1_SUMMARY="GCC C runtime library"
 libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
