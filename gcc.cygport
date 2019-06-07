@@ -22,7 +22,7 @@ TOOLCHAIN_TARGET="native"
 inherit toolchain python
 
 NAME="gcc"
-VERSION=7.4.0
+VERSION=8.3.0
 RELEASE=1
 CATEGORY="Devel"
 SUMMARY="GNU Compiler Collection"
@@ -52,12 +52,10 @@ PATCH_URI="
 0020-cygwin-uses-cyg-lib-prefix-v3.patch
 0022-libgomp-soname-cygwin-mingw.patch
 0024-libitm-weak-symbols.patch
-0025-enable-libcilkrts-V2.patch
 0028-g++-time.patch
-0029-gcc-specs.patch
 0030-newlib-ftm.patch
 0031-define_std-unix.patch
-pr47030.patch
+0032-fix-ada-malloc-error.patch
 "
 
 # new files created by patches, need to be removed if re-prep'ing
@@ -85,11 +83,11 @@ CYGCONF_ARGS="
 	--with-dwarf2
 	${ARCH_i686+--with-arch=i686} --with-tune=generic
 	${ARCH_i686+--disable-sjlj-exceptions}
-	--enable-languages=ada,c,c++,fortran,lto,objc,obj-c++
+	${ARCH_i686+--enable-languages=c,c++,fortran,lto,objc,obj-c++}
+	${ARCH_x86_64+--enable-languages=ada,c,c++,fortran,lto,objc,obj-c++}
 	--enable-graphite
 	--enable-threads=posix
 	--enable-libatomic
-	--enable-libcilkrts
 	--enable-libgomp
 	--enable-libitm
 	--enable-libquadmath
@@ -139,7 +137,6 @@ src_test() {
 	gccpath="${B}/gcc/ada/rts:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgcc/shlib:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libatomic/.libs:"
-	gccpath+="${B}/${TOOLCHAIN_TARGET}/libcilkrts/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgfortran/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libgomp/.libs:"
 	gccpath+="${B}/${TOOLCHAIN_TARGET}/libobjc/.libs:"
@@ -219,8 +216,8 @@ _EOF
 
 KEEP_LA_FILES="none"
 
-PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${NAME}-ada ${NAME}-cilkplus ${NAME}-objc ${NAME}-objc++"
-PKG_NAMES+=" libatomic1 libcilkrts5 libgcc1 libgomp1 libgfortran4 libgnat7 libobjc4 libstdc++6 libquadmath0"
+PKG_NAMES="${NAME}-core ${NAME}-g++ ${NAME}-fortran ${ARCH_x86_64+${NAME}-ada} ${NAME}-objc ${NAME}-objc++"
+PKG_NAMES+=" libatomic1 libgcc1 libgomp1 libgfortran5 ${ARCH_x86_64+libgnat8} libobjc4 libstdc++6 libquadmath0"
 gcc_REQUIRES="${NAME}-core ${NAME}-g++"
 gcc_core_SUMMARY="${SUMMARY} (C, OpenMP)"
 gcc_core_REQUIRES="binutils cygwin-devel w32api-headers w32api-runtime windows-default-manifest"
@@ -301,12 +298,6 @@ gcc_fortran_CONTENTS="
     usr/share/info/gfortran.info* \
     usr/share/man/man1/gfortran.1* \
 "
-gcc_cilkplus_SUMMARY="${SUMMARY} (Cilk Plus)"
-gcc_cilkplus_REQUIRES="${NAME}-core"
-gcc_cilkplus_CONTENTS="
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/include/cilk/ \
-    usr/lib/gcc/${TOOLCHAIN_TARGET}/${VERSION/-*/.*}/libcilkrts.* \
-"
 gcc_objc_SUMMARY="${SUMMARY} (Objective-C)"
 gcc_objc_REQUIRES="${NAME}-core"
 gcc_objc_CONTENTS="
@@ -344,18 +335,15 @@ gcc_ada_CONTENTS="
 libatomic1_CATEGORY="Libs"
 libatomic1_SUMMARY="GCC C11/C++11 locked atomics runtime library"
 libatomic1_CONTENTS="usr/bin/cygatomic-1.dll"
-libcilkrts5_CATEGORY="Libs"
-libcilkrts5_SUMMARY="GCC Cilk Plus runtime library"
-libcilkrts5_CONTENTS="usr/bin/cygcilkrts-5.dll"
 libgcc1_CATEGORY="Libs"
 libgcc1_SUMMARY="GCC C runtime library"
 libgcc1_CONTENTS="usr/bin/cyggcc_s${ARCH_x86_64+-seh}-1.dll"
-libgfortran4_CATEGORY="Libs"
-libgfortran4_SUMMARY="GCC Fortran runtime library"
-libgfortran4_CONTENTS="usr/bin/cyggfortran-4.dll"
-libgnat7_CATEGORY="Libs"
-libgnat7_SUMMARY="GCC Ada runtime library"
-libgnat7_CONTENTS="usr/bin/cyggnarl-7.dll usr/bin/cyggnat-7.dll"
+libgfortran5_CATEGORY="Libs"
+libgfortran5_SUMMARY="GCC Fortran runtime library"
+libgfortran5_CONTENTS="usr/bin/cyggfortran-5.dll"
+libgnat8_CATEGORY="Libs"
+libgnat8_SUMMARY="GCC Ada runtime library"
+libgnat8_CONTENTS="usr/bin/cyggnarl-8.dll usr/bin/cyggnat-8.dll"
 libgomp1_CATEGORY="Libs"
 libgomp1_SUMMARY="GCC OpenMP runtime library"
 libgomp1_CONTENTS="usr/bin/cyggomp-1.dll"
