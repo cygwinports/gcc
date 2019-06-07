@@ -29,9 +29,9 @@ diff --git a/gcc/config/i386/cygwin.h b/gcc/config/i386/cygwin.h
 index 2186937..803fb6c 100644
 --- a/gcc/config/i386/cygwin.h
 +++ b/gcc/config/i386/cygwin.h
-@@ -153,3 +153,7 @@ along with GCC; see the file COPYING3.  If not see
- #endif
- #define LIBGCC_SONAME "cyggcc_s" LIBGCC_EH_EXTN "-1.dll"
+@@ -156,3 +156,7 @@ along with GCC; see the file COPYING3.  If not see
+ /* We should find a way to not have to update this manually.  */
+ #define LIBGCJ_SONAME "cyggcj" /*LIBGCC_EH_EXTN*/ "-16.dll"
  
 +/* Make stack executable to avoid DEP problems with trampolines.  */
 +#define HAVE_ENABLE_EXECUTE_STACK
